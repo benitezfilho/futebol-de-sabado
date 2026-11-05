@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {validateMatch,registrationStatus,paymentDue,STATES} from "../src/logic.js";
+const m={title:"Futebol de Sábado",venue:"Farofa Society",opens_at:"2026-11-12T15:00:00Z",payment_deadline_at:"2026-11-12T23:00:00Z",queue_release_at:"2026-11-12T23:00:00Z",interest_closes_at:"2026-11-14T11:00:00Z",starts_at:"2026-11-14T12:00:00Z",capacity_outfield:22,max_goalkeepers:2,price_cents:1500,queue_payment_minutes:30};
+test("calendário e capacidade sem teto arbitrário",()=>assert.equal(validateMatch({...m,capacity_outfield:125}).capacity_outfield,125));
+test("recusa calendário inválido",()=>assert.throws(()=>validateMatch({...m,queue_release_at:"2026-11-12T14:00:00Z"})));
+test("recusa timestamp sem timezone",()=>assert.throws(()=>validateMatch({...m,opens_at:"2026-11-12T12:00"})));
+test("bloqueia inscrição antes da abertura",()=>assert.equal(registrationStatus({now:"2026-11-12T14:59:59Z",match:m,occupied:0,confirmed:0,isGoalkeeper:false}).status,"closed"));
+test("vaga de linha disponível",()=>assert.equal(registrationStatus({now:"2026-11-12T15:00:00Z",match:m,occupied:20,confirmed:19,isGoalkeeper:false}).status,STATES.PENDING));
+test("lotado com pendentes mantém fila",()=>assert.equal(registrationStatus({now:"2026-11-12T16:00:00Z",match:m,occupied:22,confirmed:20,isGoalkeeper:false}).status,STATES.WAITLIST));
+test("22 pagos gera interesse apenas histórico",()=>assert.equal(registrationStatus({now:"2026-11-12T16:00:00Z",match:m,occupied:22,confirmed:22,isGoalkeeper:false}).status,STATES.INTEREST));
+test("goleiro independente da capacidade",()=>assert.equal(registrationStatus({now:"2026-11-12T16:00:00Z",match:m,occupied:22,confirmed:22,isGoalkeeper:true}).status,STATES.GOALKEEPER));
+test("convocado recebe 30 minutos",()=>assert.equal(paymentDue("2026-11-12T23:00:00Z",30),"2026-11-12T23:30:00.000Z"));
