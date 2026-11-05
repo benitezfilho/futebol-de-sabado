@@ -8,7 +8,7 @@ export const STATES = Object.freeze({
   CANCELLED: "cancelled"
 });
 
-export const TIMESTAMP = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?(?:Z|[+-]\\d{2}:\\d{2})$/;
+export const TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 export function normalizeDate(input) {
   if (typeof input !== "string" || !TIMESTAMP.test(input)) throw new Error("Informe data com fuso horário ISO 8601 (ex.: 2026-11-12T15:00:00Z)");
