@@ -1,0 +1,39 @@
+name: Validar site público
+
+on:
+  push:
+    paths:
+      - "index.html"
+      - ".github/workflows/site-checks.yml"
+  workflow_dispatch:
+
+jobs:
+  verificacao:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar ausência de senha demonstrativa no código
+        run: |
+          if grep -qi 'demo123' index.html; then
+            echo "Senha de teste hardcoded encontrada no site público."
+            exit 1
+          fi
+      - name: Validar blocos JavaScript da página
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path("index.html").read_text(encoding="utf-8")
+          tags=re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>",html,flags=re.I|re.S)
+          assert len(tags)>=2, "Blocos de script inesperados"
+          for i,script in enumerate(tags):
+              Path(f"script{i}.mjs").write_text(script,encoding="utf-8")
+          PY
+          for file in script*.mjs; do node --check "$file"; done
+      - name: Testar botão para ver todos
+        run: |
+          grep -q "clear-admin-filter" index.html
+          grep -q "clear-home-filter" index.html
