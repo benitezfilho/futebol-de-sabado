@@ -359,6 +359,19 @@ def otp_start(payload: OtpStart, request: Request):
     if not twilio_ready():
         raise HTTPException(503, "Verificação SMS ainda não configurada.")
     phone = phone_digits(payload.phone)
+    # Limites iniciais de custo/abuso: 5 SMS por numero e 15 por IP a cada hora.
+    # Para producao, complementar com CAPTCHA, Twilio Fraud Guard e observabilidade.
+    phone_hash = hashlib.sha256(phone.encode()).hexdigest()
+    ip = request.client.host if request.client else "unknown"
+    ip_hash = hashlib.sha256(ip.encode()).hexdigest()
+    cutoff = iso(now() - timedelta(hours=1))
+    with database(write=True) as con:
+        con.execute("DELETE FROM otp_rate_events WHERE created_at < ?", (iso(now() - timedelta(days=1)),))
+        by_phone = con.execute("SELECT COUNT(*) FROM otp_rate_events WHERE phone_hash=? AND created_at>=?", (phone_hash, cutoff)).fetchone()[0]
+        by_ip = con.execute("SELECT COUNT(*) FROM otp_rate_events WHERE ip_hash=? AND created_at>=?", (ip_hash, cutoff)).fetchone()[0]
+        if by_phone >= 5 or by_ip >= 15:
+            raise HTTPException(429, "Limite de verificacoes atingido. Tente mais tarde.")
+        con.execute("INSERT INTO otp_rate_events(phone_hash,ip_hash,created_at) VALUES(?,?,?)", (phone_hash, ip_hash, iso(now())))
     url = "https://verify.twilio.com/v2/Services/" + VERIFY_SID + "/Verifications"
     try:
         response = requests.post(url, data={"To": "+55" + phone, "Channel": "sms"}, auth=(TWILIO_SID, TWILIO_TOKEN), timeout=12)
@@ -528,8 +541,9 @@ def timeline(match_id: int, request: Request):
         return {"events": [dict(x) for x in rows]}
 
 @app.get("/api/matches/{match_id}/classification")
-def classification(match_id: int):
+def classification(match_id: int, request: Request):
     with database() as con:
+        current_member(request, con)
         m = con.execute("SELECT id FROM matches WHERE id=? AND state='active'", (match_id,)).fetchone()
         if not m:
             raise HTTPException(404, "Partida não encontrada.")
