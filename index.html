@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+ <meta name="theme-color" content="#0c1512" />
+ <meta name="description" content="Organize a pelada: confirme sua vaga, acompanhe a fila de espera e pague por Pix." />
+ 
+ 
+ 
+
+ <title>Futebol de Sábado | Sua pelada organizada</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{--ink:#e8f4ea;--muted:#8c9e96;--base:#0b1310;--surface:#121e18;--surface2:#18281f;--line:#2b3d32;--lime:#b7f36c;--lime-d:#8bd846;--orange:#fbbb6b;--red:#fa7d7d;--green:#71d3a4;--blue:#8cb7f5;--font:'DM Sans',system-ui,-apple-system,sans-serif;--display:'Space Grotesk',sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:var(--base);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}a{color:inherit;text-decoration:none}a:hover{text-decoration:none}.app-shell{min-height:100vh;display:flex}.sidebar{width:250px;flex:none;background:#0e1913;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:30px 17px;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:2px 14px 52px}.brand-logo{display:grid;place-items:center;width:45px;height:45px;background:var(--lime);color:#173221;border-radius:14px;box-shadow:0 8px 22px #b7f36c20;transform:rotate(-8deg)}.ball-icon{font-size:31px;transform:rotate(8deg)}.brand strong{font-family:var(--display);font-size:25px;letter-spacing:-1.3px;line-height:1;display:block}.brand-accent,.mobile-brand span:last-child{color:var(--lime)}.brand small{display:block;letter-spacing:3.7px;font-size:9px;color:var(--muted);margin-top:6px;font-weight:800}.side-section-label{font-size:10px;color:#70897a;letter-spacing:1.7px;font-weight:800;margin:0 14px 13px}.side-nav{display:flex;flex-direction:column;gap:5px}.nav-link{display:flex;align-items:center;gap:12px;width:100%;border:1px solid transparent;border-radius:12px;padding:15px 14px;color:#a5b9ab;background:transparent;text-align:left;font-size:13px;font-weight:700}.nav-link:hover,.nav-link.active{background:#203328;color:var(--lime)}.nav-link.active{border-color:#334d35}.nav-icon{width:21px;text-align:center;font-size:18px}.side-bottom{margin-top:auto;padding:10px 7px 0}.side-info{border:1px solid #294a33;border-radius:13px;padding:15px 12px;color:var(--ink);font-size:12px;line-height:1.65;background:linear-gradient(125deg,#1e3423,#172b1b)}.side-info small{color:var(--muted)}.status-dot,.live-dot{width:7px;height:7px;display:inline-block;border-radius:50%;background:var(--lime);margin-right:7px;box-shadow:0 0 0 4px #b7f36c15}.side-foot{font-size:9px;color:#647c68;letter-spacing:1.2px;font-weight:800;padding:19px 5px 0}.side-foot span{float:right}.main{min-width:0;flex:1;display:flex;flex-direction:column}.topbar{height:77px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,4.2vw,76px)}.top-left,.top-right{font-size:10px;font-weight:800;letter-spacing:1.6px;color:#7f9887}.top-right{display:flex;align-items:center;gap:5px}.top-separator{margin:0 9px;color:#3f604a}.mobile-brand{display:none}.page-container{padding:38px clamp(24px,4.2vw,76px) 70px;width:100%;max-width:1600px;margin:0 auto}.footer{margin-top:auto;border-top:1px solid var(--line);padding:24px clamp(24px,4.2vw,76px);color:#6f8676;font-size:11px}.footer span{padding:0 7px}.initial-loading{min-height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--muted)}.spinner{width:24px;height:24px;border:2px solid var(--line);border-top-color:var(--lime);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.eyebrow{color:var(--lime);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.heading{font-family:var(--display);letter-spacing:-2px;line-height:1.13;margin:8px 0 12px;font-size:clamp(32px,4vw,54px);font-weight:700}.heading span{color:var(--lime)}.subhead{color:#9aaea0;line-height:1.75;font-size:14px;max-width:640px;margin:0}.page-head{margin-bottom:29px}.hero{background:radial-gradient(circle at 83% 0%,#2c5736 0,transparent 37%),linear-gradient(115deg,#173722,#10261b);border:1px solid #37563d;border-radius:22px;min-height:338px;padding:35px clamp(24px,4vw,58px);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;isolation:isolate}.hero:before{content:'';position:absolute;right:-120px;top:-75px;border:1px solid #96cf8b30;border-radius:50%;width:440px;height:440px;z-index:-1}.hero:after{content:'';position:absolute;right:-36px;top:27px;border:1px solid #96cf8b28;border-radius:50%;width:320px;height:320px;z-index:-1}.hero-copy{max-width:590px}.hero .eyebrow{color:#b7f36c}.hero h1{font:700 clamp(34px,4.1vw,58px)/1.08 var(--display);letter-spacing:-2.6px;max-width:590px;margin:13px 0}.hero h1 em{font-style:normal;color:var(--lime)}.hero p{color:#b0c7b4;line-height:1.7;max-width:425px;font-size:14px}.hero-graphic{height:260px;min-width:250px;position:relative;opacity:.85;display:grid;place-items:center}.field{width:182px;height:266px;border:2px solid #a0d69d55;border-radius:8px;transform:rotate(24deg);position:absolute}.field:before{content:'';position:absolute;top:50%;left:0;right:0;border-top:2px solid #a0d69d55}.field:after{content:'';position:absolute;left:25%;width:50%;height:32%;top:34%;border:2px solid #a0d69d55;border-radius:50%}.field-end{width:80px;height:35px;border:2px solid #a0d69d55;position:absolute;left:calc(50% - 40px)}.field-end.top{top:0;border-top:0}.field-end.bottom{bottom:0;border-bottom:0}.field-ball{font-size:100px;filter:drop-shadow(0 16px 20px #0004);z-index:1;transform:rotate(-14deg)}.button{border:0;border-radius:11px;background:var(--lime);color:#132318;font-size:13px;font-weight:800;padding:15px 21px;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:transform .15s,background .15s}.button:hover:not(:disabled){transform:translateY(-1px);background:#c7ff89}.button-secondary{background:#243729;color:var(--ink);border:1px solid #38533d}.button-secondary:hover:not(:disabled){background:#2a4832}.button-danger{background:#4f2727;color:#ffb1b1;border:1px solid #793b3b}.button-danger:hover:not(:disabled){background:#643232}.button-sm{padding:9px 13px;font-size:11px;border-radius:8px}.button-outline{background:transparent;border:1px solid #46664a;color:var(--lime)}.button-outline:hover{background:#1a3021}.button-block{width:100%}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.content-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:20px;margin-top:25px}.content-col{display:grid;gap:19px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:25px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:22px}.panel-title{font-family:var(--display);font-size:19px;letter-spacing:-.5px;margin:0}.panel-kicker{color:var(--muted);font-size:12px;margin-top:5px}.pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.5px;padding:8px 10px;border-radius:50px;background:#294a32;color:#b9efad;white-space:nowrap}.pill.open{background:#294a32;color:#b9efad}.pill.scheduled{background:#3c3821;color:#f3ca72}.pill.waitlist{background:#49381f;color:#f8c27a}.pill.closed,.pill.cancelled{background:#44282b;color:#ef9b9b}.pill.paid{background:#294a32;color:var(--lime)}.pill.reserved{background:#424028;color:#f5db84}.pill.expired{background:#43282c;color:#ff9e9e}.pill.neutral{background:#29362f;color:#a8bdb1}.match-top{display:flex;align-items:center;gap:17px;margin-bottom:19px}.calendar-box{background:#23352a;border:1px solid #35513b;border-radius:12px;padding:13px 12px;text-align:center;min-width:64px}.calendar-box .month{font-size:10px;color:var(--lime);font-weight:800;letter-spacing:1.7px}.calendar-box .day{font:700 30px var(--display);margin:2px 0 0}.match-name{font:700 20px var(--display);letter-spacing:-.6px}.match-meta{font-size:12px;color:var(--muted);margin-top:7px}.meta-chip{display:inline-flex;align-items:center;gap:7px;color:#afc1b4;font-size:12px}.meta-row{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:25px}.dot-sep{color:#43644b}.progress-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-bottom:10px}.progress-header span:last-child{color:var(--muted)}.progress{height:10px;border-radius:30px;background:#263a2c;overflow:hidden;position:relative}.progress > span{display:block;height:100%;background:linear-gradient(90deg,#88c950,var(--lime));border-radius:30px;transition:width .5s}.stats-mini{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin-top:22px;padding-top:19px}.stats-mini > div:not(:last-child){border-right:1px solid var(--line)}.stats-mini > div{padding:0 16px;text-align:center}.stats-mini > div:first-child{padding-left:0}.stats-mini strong{font:700 26px var(--display);display:block}.stats-mini small{display:block;font-size:10px;color:var(--muted);margin-top:3px}.match-action{margin-top:23px;width:100%}.upcoming-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.upcoming-row:first-of-type{border-top:0}.upcoming-date{font-size:12px;color:var(--ink);font-weight:800}.upcoming-place{font-size:11px;color:var(--muted);margin-top:5px}.top-guide{display:flex;gap:13px;align-items:flex-start;margin:17px 0}.guide-num{width:29px;height:29px;border:1px solid #45623e;background:#233a29;color:var(--lime);border-radius:50%;display:grid;place-items:center;flex:none;font:800 12px var(--display)}.guide-copy strong{display:block;font-size:13px}.guide-copy p{margin:4px 0 0;line-height:1.65;color:var(--muted);font-size:12px}.banner{border-radius:12px;background:#223527;border:1px solid #3c563f;padding:13px 15px;color:#bbd8bf;font-size:12px;line-height:1.6;margin-top:20px}.banner b{color:var(--lime)}.notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:15px}.empty{padding:50px 25px;text-align:center;color:var(--muted);border:1px dashed #38513c;border-radius:16px}.empty-icon{display:grid;place-items:center;width:60px;height:60px;font-size:31px;border-radius:18px;background:#27382a;margin:0 auto 16px}.empty h3{font:700 20px var(--display);color:var(--ink);margin:0 0 8px}.empty p{font-size:13px;max-width:390px;margin:0 auto 19px;line-height:1.7}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}.tab{background:#1c2b21;border:1px solid #304535;padding:10px 14px;border-radius:9px;color:#9caf9f;font-weight:800;font-size:12px}.tab.active{background:#344c37;border-color:#577f4a;color:var(--lime)}.registration-card{margin-bottom:15px}.status-text{font-size:12px;line-height:1.7;color:var(--muted)}.code-box{background:#09160e;border:1px solid #3b6041;border-radius:11px;padding:14px;word-break:break-all;color:#b9eac1;font:12px/1.8 monospace;max-height:110px;overflow:auto}.qr{max-width:220px;width:100%;background:white;padding:10px;border-radius:12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.form-group{display:flex;flex-direction:column;gap:8px;min-width:0}.form-group.full{grid-column:1/-1}.form-group label{font-size:12px;font-weight:700;color:#bfd0c1}.form-control{border:1px solid #3a5140;background:#17271c;border-radius:10px;color:var(--ink);height:46px;padding:11px 13px;width:100%;min-width:0;outline:none}.form-control:focus{border-color:#8acc72;box-shadow:0 0 0 3px #b7f36c18}.form-control::placeholder{color:#6f8575}.form-control option{color:#132218}.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.role-option{padding:15px;text-align:left;border:1px solid #3a5140;border-radius:12px;color:var(--ink);background:#17271c;transition:.15s}.role-option.active{border-color:var(--lime);background:#263f2d;box-shadow:0 0 0 1px #b7f36c33}.role-option span{font-size:22px;display:block;margin-bottom:7px}.role-option strong{font-size:13px;display:block}.role-option small{color:var(--muted);font-size:11px;display:block;margin-top:3px}.modal-overlay{position:fixed;inset:0;background:#030806d9;z-index:100;display:flex;justify-content:center;align-items:center;padding:14px;backdrop-filter:blur(5px)}.modal{background:#17261d;border:1px solid #425a47;border-radius:19px;width:min(540px,100%);max-height:min(92vh,850px);overflow:auto;padding:25px;box-shadow:0 30px 90px #0009}.modal-lg{width:min(720px,100%)}.modal-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:23px}.modal-head h2{font:700 23px var(--display);margin:0}.modal-head p{font-size:12px;color:var(--muted);margin:7px 0 0;line-height:1.5}.close-modal{height:32px;width:32px;border:1px solid var(--line);background:#253a2a;color:var(--ink);border-radius:9px;font-size:21px}.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}.error-box{border:1px solid #7c3a40;background:#40282c;color:#ffb6b6;border-radius:10px;padding:12px 14px;font-size:12px;margin-top:12px}.success-box{border:1px solid #537a4e;background:#203a26;color:#d0efc0;border-radius:10px;padding:13px 14px;font-size:12px;line-height:1.7}.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:23px}.kpi{padding:22px;border-radius:14px;border:1px solid var(--line);background:var(--surface)}.kpi small{font-size:11px;color:var(--muted);font-weight:700}.kpi strong{font:700 30px var(--display);display:block;margin-top:10px}.kpi .tiny{color:var(--lime);font-size:11px;margin-top:7px;display:block}.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}table{border-collapse:collapse;width:100%;font-size:12px}thead th{background:#1c2d21;text-align:left;color:#a6bca8;font-size:10px;letter-spacing:.6px;text-transform:uppercase;padding:14px 13px;white-space:nowrap}tbody td{padding:12px 13px;border-top:1px solid #293b2f;vertical-align:middle;color:#c9daca}tbody tr:hover{background:#1b2a20}.table-actions{display:flex;gap:6px;white-space:nowrap}.admin-tools{display:flex;align-items:center;gap:11px;flex-wrap:wrap;justify-content:space-between;margin:15px 0}.admin-tools .form-control{max-width:275px}.toast{position:fixed;bottom:30px;right:28px;z-index:200;padding:13px 17px;border-radius:11px;color:#102118;background:var(--lime);box-shadow:0 15px 50px #0007;font-size:13px;font-weight:800;max-width:350px}.toast.error{background:#ffc0c0;color:#4b161b}.queue-num{font:700 46px var(--display);color:var(--lime)}.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.team-card{border:1px solid #40563e;border-radius:13px;background:#203328;padding:16px}.team-card strong{font:700 19px var(--display);color:var(--lime)}.team-card li{margin:8px 0;color:#d1ddce;font-size:12px}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:28px 0 14px}.section-heading h2{font:700 23px var(--display);letter-spacing:-.6px;margin:0}.section-heading small{font-size:12px;color:var(--muted)}.admin-login{max-width:460px;margin:50px auto}.highlight-bar{border:1px solid #4b6941;border-radius:15px;background:#1c3222;padding:16px;margin:19px 0;font-size:12px;color:#c7e5c0}.muted{color:var(--muted)}.mono{font-family:var(--display)}.right{text-align:right}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}.mt{margin-top:17px}.mb{margin-bottom:16px}.mobile-nav{display:none}.admin-subnav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}.admin-subnav .tab{padding:11px 16px}
+@media(min-width:1500px){.page-container{padding-top:44px}.hero{min-height:365px}.content-grid{gap:24px}}
+@media(max-width:1160px){.sidebar{width:213px}.brand{padding-left:7px;padding-right:0}.brand strong{font-size:22px}.topbar{padding:0 30px}.page-container{padding:30px}.hero-graphic{min-width:185px}.hero h1{font-size:41px}.content-grid{grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr)}}
+@media(max-width:850px){.sidebar{display:none}.topbar{height:65px;padding:0 24px}.top-left{display:none}.mobile-brand{display:flex;align-items:center;gap:8px;font:700 21px var(--display)}.mini-logo{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:var(--lime);color:#133018;transform:rotate(-8deg)}.mobile-brand>span:last-child{margin-left:-8px}.page-container{padding:26px 24px 95px}.footer{display:none}.mobile-nav{display:flex;position:fixed;z-index:50;bottom:0;left:0;right:0;padding:7px 13px calc(7px + env(safe-area-inset-bottom));background:#101c14ee;border-top:1px solid #32513a;justify-content:space-around;backdrop-filter:blur(12px)}.mobile-nav-item{border:0;background:transparent;color:#8fa392;display:flex;flex-direction:column;gap:4px;align-items:center;min-width:60px;padding:7px 9px;border-radius:11px}.mobile-nav-item>span{font-size:22px}.mobile-nav-item small{font-size:10px;font-weight:700}.mobile-nav-item.active{color:var(--lime);background:#263c2b}.content-grid{grid-template-columns:1fr}.hero{min-height:295px}.hero-graphic{min-width:155px}.field{transform:rotate(24deg) scale(.75)}.field-ball{font-size:80px}}
+@media(max-width:520px){.topbar{padding:0 18px}.top-right{font-size:9px;letter-spacing:.6px}.top-separator{margin:0 2px}.page-container{padding:23px 15px 110px}.hero{border-radius:17px;padding:27px 23px;min-height:302px}.hero-copy{z-index:2}.hero h1{font-size:39px;letter-spacing:-2px;max-width:300px}.hero p{max-width:265px;font-size:12px}.hero-graphic{position:absolute;right:-68px;bottom:-24px;opacity:.17}.hero-actions{margin-top:19px}.hero-actions .button{padding:13px 16px}.panel{padding:19px;border-radius:14px}.panel-head{margin-bottom:17px}.content-grid{margin-top:16px;gap:16px}.match-top{gap:13px}.match-name{font-size:17px}.meta-row{gap:10px}.stats-mini strong{font-size:23px}.stats-mini small{font-size:9px}.stats-mini>div{padding:0 8px}.heading{font-size:38px}.kpi-grid{grid-template-columns:repeat(2,1fr);gap:9px}.kpi{padding:16px}.kpi strong{font-size:25px}.admin-tools{align-items:stretch}.admin-tools .form-control{max-width:100%;width:100%}.modal{padding:19px;border-radius:16px}.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}.form-actions{flex-direction:column-reverse}.form-actions button{width:100%}.mobile-nav{padding-left:2px;padding-right:2px}.team-grid{grid-template-columns:1fr 1fr}.queue-num{font-size:36px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;scroll-behavior:auto!important;transition:none!important}}
+
+/* Calendário de pagamento, legível em telas pequenas */
+.calendar-rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 22px}
+.calendar-rules>div{background:#1d3024;border:1px solid #37523f;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px}
+.calendar-rules span{font-size:10px;font-weight:800;letter-spacing:1px;color:#8da697}
+.calendar-rules strong{font-size:13px;line-height:1.5;color:var(--ink)}
+.admin-deadline{margin:16px 0 19px;padding:13px 15px;background:#203628;border:1px solid #416349;border-radius:12px;color:#b8d0bd;font-size:12px;line-height:1.75;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.admin-deadline strong{color:#d4f0bd}
+@media(max-width:550px){.calendar-rules{gap:8px}.calendar-rules>div{padding:11px}.calendar-rules strong{font-size:12px}}
+
+/* Identidade verificada, perfil do membro e moderação Master */
+.member-identity,.member-account-bar{display:flex;align-items:center;gap:13px;background:#203528;border:1px solid #476449;border-radius:14px;padding:15px;color:#dfefd8}
+.member-identity p,.member-account-bar small{display:block;color:#9ab3a2;font-size:11px;margin:4px 0;overflow-wrap:anywhere}
+.member-identity small{color:var(--lime);font-size:11px}
+.member-avatar{display:grid;place-items:center;flex:none;width:41px;height:41px;border-radius:13px;background:var(--lime);color:#14271a;font-weight:900;font-size:19px}
+.member-account-bar{justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.member-account-bar strong{font:700 16px var(--display)}
+.otp-input{font:800 28px var(--display);text-align:center;letter-spacing:9px;height:60px}
+@media(max-width:520px){.member-account-bar{align-items:flex-start;flex-direction:column}.member-account-bar .row{width:100%}.member-account-bar .row>button{flex:1}.otp-input{letter-spacing:6px}}
+
+/* Calendário com as três etapas e aceite opcional de WhatsApp */
+.calendar-rules{grid-template-columns:repeat(3,minmax(0,1fr))}
+.calendar-rules>div small{font-size:11px;color:#a6bca8;line-height:1.55}
+.consent-check{display:flex;gap:12px;align-items:flex-start;padding:14px 13px;border:1px solid #46684a;border-radius:11px;background:#1d3223;line-height:1.5;color:#d1e1cf;font-size:12px;margin-top:16px;cursor:pointer}
+.consent-check input{accent-color:#b7f36c;width:18px;height:18px;flex:0 0 18px}
+@media(max-width:600px){.calendar-rules{grid-template-columns:1fr}.calendar-rules>div{padding:12px 14px;gap:4px}.calendar-rules strong{font-size:14px}.calendar-rules>div small{font-size:11px}}
+
+/* V4: escalação dinâmica, classificação de pagantes e console do Master */
+.roster-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.roster-group{background:#18291f;border:1px solid #34523b;border-radius:13px;padding:13px;min-width:0}
+.roster-group h3{display:flex;justify-content:space-between;align-items:center;gap:9px;margin:0 0 11px;font:700 15px var(--display);color:#d5f1d0}
+.roster-group h3 span{font:700 12px var(--font);color:var(--lime);border-radius:15px;background:#29432c;padding:4px 8px}
+.roster-person{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #2e4534;min-width:0}
+.roster-person .pill{font-size:9px;padding:5px 7px;letter-spacing:0}
+.roster-index{width:30px;flex:none;color:var(--lime);font:700 15px var(--display)}
+.roster-name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:750;font-size:12px}
+.roster-name small{display:block;color:#9fb3a6;font-size:10px;margin-top:4px;font-weight:400;text-transform:capitalize}
+.admin-mini-heading{font:700 17px var(--display);margin:26px 0 12px}
+textarea.form-control,.broadcast-message{height:auto;min-height:110px;resize:vertical;line-height:1.6}
+.admin-subnav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px;scrollbar-width:thin}
+.admin-subnav .tab{white-space:nowrap;flex:none}
+@media(max-width:700px){.roster-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.roster-person{gap:7px}.roster-person .pill{font-size:8px;white-space:normal;text-align:center}.roster-index{width:28px}.roster-group{padding:11px}}
+
+.wa-qr{max-width:min(300px,100%);aspect-ratio:1;object-fit:contain;display:block;margin:16px auto;background:#fff;padding:12px;border-radius:12px}
+
+/* V5: seletor nativo de alto contraste, indicadores clicáveis e ações da fila */
+select.form-control{background-color:#fff!important;color:#17251b!important;color-scheme:light;border:1px solid #dce9de;cursor:pointer;font-weight:650}
+select.form-control:focus{border-color:#8fce55!important;box-shadow:0 0 0 3px rgba(183,243,108,.3)}
+select.form-control option,select.form-control optgroup{background:#fff!important;color:#111d15!important;font-weight:600}
+.kpi-link{width:100%;text-align:left;cursor:pointer;color:var(--ink);font:inherit;transition:border-color .15s,background .15s}
+.kpi-link:hover,.kpi-link:focus-visible,.kpi-active{border-color:#b7f36c;background:#1e3925;outline-offset:2px}
+.kpi-link .tiny{color:#c8f7a1}
+.stats-mini>button{border:0;background:transparent;color:inherit;text-align:center;padding:0 8px;cursor:pointer;min-width:0}
+.stats-mini>button:not(:last-child){border-right:1px solid var(--line)}
+.stats-mini>button strong{color:var(--ink)}
+.stats-mini>button:hover strong,.stats-mini>button:focus-visible strong{color:var(--lime)}
+.admin-list-filters label{font-size:12px;font-weight:750;color:#d5f1d0}
+.admin-list-filters select{max-width:255px}
+.admin-list-filters .muted{font-size:11px}
+.wa-server-panel{display:flex;flex-direction:column;gap:7px;background:#23382b;border:1px solid #4d7151;border-radius:12px;padding:14px;margin:17px 0;font-size:12px}
+.wa-server-panel strong{font-size:13px;color:#daf2da}
+.wa-server-panel small{color:#a1bfa4;line-height:1.6}
+.table-actions{flex-wrap:wrap;white-space:normal}
+@media(max-width:550px){.admin-list-filters{align-items:stretch}.admin-list-filters select{max-width:100%;width:100%}.stats-mini>button{padding:0 4px}.stats-mini small{font-size:8px}}
+
+/* Gestão da escalação legível e acionável no Android/iOS */
+.mobile-players{display:none}
+@media(max-width:680px){
+ #admin-players-list .table-wrap{display:none}
+ #admin-players-list .mobile-players{display:grid;gap:10px}
+ .mobile-player{border:1px solid #3b5b43;background:#1b2c21;padding:13px;border-radius:12px;min-width:0}
+ .mobile-player .row-between{flex-wrap:wrap;align-items:flex-start}
+ .mobile-player .row-between strong{font-size:13px;overflow-wrap:anywhere}
+ .mobile-player-detail{font-size:11px;color:#a2bea8;margin:8px 0 12px;line-height:1.5}
+ .mobile-player-actions{display:flex;flex-wrap:wrap;gap:7px}
+ .mobile-player-actions .button{font-size:11px;min-height:36px}
+}
+
+/* V7: aviso explícito de lotação com pagamento confirmado. */
+.pill.fully_paid{background:#33482a;color:#d2ff9d}.pill.interest{background:#2b3842;color:#d1e0ec}
+</style></head>
+<body><div id="demo-badge" role="status" style="position:fixed;bottom:12px;right:12px;z-index:99999;max-width:350px;background:#172c21;color:#d9f4de;border:1px solid #9eec64;border-radius:12px;padding:10px 14px;font:600 12px system-ui,sans-serif;box-shadow:0 5px 30px #0008;pointer-events:none">DEMONSTRAÇÃO V7 · Não cadastre dados reais. Pix, SMS e WhatsApp são simulados.</div>
+ <div class="app-shell">
+   <aside class="sidebar">
+     <a class="brand" href="/" data-nav="home" aria-label="Início Futebol de Sábado">
+       <span class="brand-logo"><span class="ball-icon">✦</span></span>
+       <span><strong>FUTEBOL<span class="brand-accent">.</span></strong><small>DE SÁBADO</small></span>
+     </a>
+     <div class="side-section-label">MENU PRINCIPAL</div>
+     <nav class="side-nav" aria-label="Navegação principal">
+       <button class="nav-link active" data-nav="home"><span class="nav-icon">◈</span> Início</button>
+       <button class="nav-link" data-nav="my"><span class="nav-icon">▣</span> Área do membro</button>
+       <button class="nav-link" data-nav="ranking"><span class="nav-icon">♜</span> Ranking</button>
+       <button class="nav-link" data-nav="admin"><span class="nav-icon">⚙</span> Admin Master</button>
+     </nav>
+     <div class="side-bottom">
+       <div class="side-info"><span class="status-dot"></span> A bola não pode parar.<br><small>Organização sem confusão.</small></div>
+       <div class="side-foot">FEITO PARA QUEM JOGA. <span>⚽</span></div>
+     </div>
+   </aside>
+   <main class="main">
+     <div class="topbar">
+       <a class="mobile-brand" href="/" data-nav="home"><span class="mini-logo">✦</span> FUTEBOL<span>.</span></a>
+       <div class="top-left"><span class="crumb">PELA RESENHA, PELO FUTEBOL</span></div>
+       <div class="top-right"><span class="live-dot"></span> FUTEBOL SOCIETY <span class="top-separator">/</span> GOIÂNIA</div>
+     </div>
+     <div id="screen" class="page-container"><div class="initial-loading"><div class="spinner"></div><p>Preparando o campo...</p></div></div>
+     <footer class="footer">© 2026 Futebol de Sábado <span>•</span> Jogo organizado, resenha garantida.</footer>
+   </main>
+ </div>
+ <nav class="mobile-nav" aria-label="Atalhos">
+   <button class="mobile-nav-item active" data-nav="home"><span>⌂</span><small>Início</small></button>
+   <button class="mobile-nav-item" data-nav="my"><span>▣</span><small>Membros</small></button>
+   <button class="mobile-nav-item" data-nav="ranking"><span>♜</span><small>Ranking</small></button>
+   <button class="mobile-nav-item" data-nav="admin"><span>⚙</span><small>Admin</small></button>
+ </nav>
+ <div id="modal-root"></div><div id="toast-root" aria-live="polite"></div>
+ <script>/* Demonstração offline, dados ficam somente neste navegador. Não use para pagamentos reais. */
+window.history.replaceState=()=>{};
+try { localStorage.getItem('__test__'); } catch {
+ const mem = new Map();Object.defineProperty(window, 'localStorage', {configurable:true,value:{getItem:k=>mem.has(k)?mem.get(k):null,setItem:(k,v)=>mem.set(k,String(v)),removeItem:k=>mem.delete(k)}});
+}
+const DBKEY='futebol_demo_membros_v7';
+const DEMO=(function(){
+ const old=(()=>{try{return JSON.parse(localStorage.getItem(DBKEY))}catch{return null}})();
+ if(old){
+  for(const m of (old.matches||[])){
+   const oldTime=new Date(m.payment_deadline);
+   if(oldTime.getUTCDay()===4 && oldTime.getUTCHours()===21 && oldTime.getUTCMinutes()===0){
+     const original=m.payment_deadline;
+     m.payment_deadline=new Date(oldTime.getTime()+2*3600000).toISOString();
+     for(const r of old.regs||[]){
+       if(r.match_id===m.id && r.status==='reserved' && (r.reserved_until===original || new Date(r.created_at)<oldTime))
+         r.reserved_until=m.payment_deadline;
+     }
+   }
+  }
+  for(const m of (old.matches||[])){
+   m.waitlist_releases_at ||= m.payment_deadline;
+   m.waitlist_note ||= '';
+  }
+  for(const member of (old.members||[])) member.whatsapp_opt_in ||= false;
+  return old;
+ }
+ const now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'})), day=now.getDay(), next=(6-day+7)%7;
+ const saturday=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()+next+(next===0&&now.getHours()>=9?7:0),12,0));
+ const matches=[];
+ for(let i=0;i<7;i++){
+  const start=new Date(saturday.getTime()+i*7*86400000),th=new Date(start.getTime()-2*86400000);
+  const open=new Date(th);open.setUTCHours(15,0);const pay=new Date(th);pay.setUTCHours(23,0);
+  const close=new Date(start);close.setUTCHours(11,0);
+  matches.push({id:i+1,title:'Futebol de Sábado',venue:'Farofa Society',starts_at:start.toISOString(),opens_at:open.toISOString(),payment_deadline:pay.toISOString(),waitlist_releases_at:pay.toISOString(),waitlist_note:'Quem não confirmar o Pix perde a reserva. Convocaremos o próximo da fila.',signup_closes_at:close.toISOString(),capacity:20,price_cents:1500,goalie_limit:2,status:'active'});
+ }
+ return {matches,regs:[],interests:[],teams:[],notices:[],members:[],stats:[],votes:[],memberLogged:null,adminLogged:false};
+})();
+DEMO.interests ||= [];DEMO.members ||= [];DEMO.memberLogged ||= null;DEMO.stats ||= [];DEMO.votes ||= [];
+if(!DEMO.regs.length){
+ const names=['João Pedro','Eduardo Costa','Heitor Silva','Caio Oliveira','Hadrian Souza','Rodrigo Alves','Lucas Ribeiro','Alexandre Lima','Gustavo Santos','Ferreira Lopes','Yan Pereira','Paulo Gomes','Darwin Silva','Gabriel Moura','Matheus Carvalho','Bruno Freitas','André Nunes','Pedro Henrique','Marcos Vinicius','Rafael Dias','Thiago Almeida','Felipe Campos','Kayo Matos','Renan Rocha','Igor Martins'];
+ const m=DEMO.matches[0];m.capacity=22;m.voting_enabled=true;
+ names.forEach((name,i)=>{
+    const mid=i+1,phone=`6299${String(2000000+i).padStart(7,'0')}`,role=i>=18&&i<20?'goleiro':'linha';
+    const member={id:mid,name,phone,email:`exemplo${i+1}@example.com`,verified_at:m.opens_at,active:true,whatsapp_opt_in:i%4!==0};
+    DEMO.members.push(member);
+    const status=i<20?'paid':i<22?'reserved':'waitlist';
+    const paid_at=status==='paid'?new Date(Date.now()-86400000+(i*60000)).toISOString():null;
+    DEMO.regs.push({id:mid,token:'exemplo-'+mid,match_id:m.id,member_id:mid,name,phone,email:member.email,role,
+      position:role==='goleiro'?'goleiro':i%2?'atacante':'zagueiro',status,paid_at,
+      reserved_until:status==='reserved'?m.payment_deadline:null,created_at:new Date(Date.now()-3600000+(i*1000)).toISOString(),attended:status==='paid'?1:0,
+      pix_code:null,pix_qr_image:null,review_reason:''});
+    if(status==='paid')DEMO.stats.push({registration_id:mid,goals: i%4===0?2:i%5===0?1:0,assists:i%3===0?1:0});
+ });
+ saveDemo();
+}
+
+function currentMember(){return DEMO.members.find(x=>x.id===DEMO.memberLogged&&x.active)!==undefined?DEMO.members.find(x=>x.id===DEMO.memberLogged):null}
+let lastOTP=null;
+function saveDemo(){try{localStorage.setItem(DBKEY,JSON.stringify(DEMO))}catch{}}
+function processDemo(){
+ let changed=false;
+ const now=Date.now();
+ for(const m of DEMO.matches){
+  if(m.status!=='active'||m.deleted_at||Date.now()<new Date(m.opens_at).getTime())continue;
+  let expired=false;
+  for(const r of DEMO.regs.filter(r=>r.match_id===m.id && r.status==='reserved' && r.role!=='goleiro')){
+   if(r.reserved_until && new Date(r.reserved_until).getTime()<=now){r.status='expired';r.reserved_until=null;expired=true;changed=true;}
+  }
+  if(expired||new Date(m.waitlist_releases_at||m.payment_deadline).getTime()<=now){promote(m.id);changed=true;}
+ }
+ if(changed)saveDemo();
+}
+function statuses(match){const regs=DEMO.regs.filter(r=>r.match_id===match.id);const paid=regs.filter(r=>r.status==='paid'&&r.role==='linha').length;const reserved=regs.filter(r=>r.status==='reserved'&&r.role==='linha').length;const waiting=regs.filter(r=>r.status==='waitlist'&&r.role==='linha').length;
+return {...match,paid,reserved,waiting,goalie_paid:regs.filter(r=>r.status==='paid'&&r.role==='goleiro').length,goalie_pending:regs.filter(r=>r.status==='reserved'&&r.role==='goleiro').length,interest_count:DEMO.interests.filter(i=>i.match_id===match.id).length,spots_left:Math.max(0,match.capacity-paid-reserved),state:match.status!=='active'||match.deleted_at?'cancelled':Date.now()>=new Date(match.signup_closes_at).getTime()?'closed':Date.now()<new Date(match.opens_at).getTime()?'scheduled':paid>=match.capacity?'fully_paid':paid+reserved>=match.capacity||waiting>0?'waitlist':'open'};}
+
+
+function demoRoster(matchId){
+ const regs=DEMO.regs.filter(r=>r.match_id===matchId).map(r=>({...r,
+   goals:DEMO.stats.find(s=>s.registration_id===r.id)?.goals||0,
+   assists:DEMO.stats.find(s=>s.registration_id===r.id)?.assists||0,
+   votes:DEMO.votes.filter(v=>v.voted_registration_id===r.id).length}));
+ const order={paid:0,reserved:1,waitlist:2,expired:3,cancelled:4};
+ regs.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9) ||
+    ((a.status==='paid'?a.paid_at:a.status==='waitlist'?(a.queue_entered_at||a.created_at):a.created_at)||'').localeCompare((b.status==='paid'?b.paid_at:b.status==='waitlist'?(b.queue_entered_at||b.created_at):b.created_at)||'') ||a.id-b.id);
+ let paid=0,waiting=0;
+ return regs.map(r=>{if(r.status==='paid'){
+   if(r.role==='goleiro')return {...r,group:'goleiros',rank:null};
+   paid++;return {...r,group:paid<=10?'titulares':'rodizio',rank:paid};
+  }if(r.status==='waitlist')return {...r,group:'fila',rank:++waiting};
+  return {...r,group:r.status==='reserved'?'pendentes':'inativos',rank:null};
+ }).map(({phone,email,...publicRow})=>publicRow);
+}
+function promote(match_id,force=false){const m=DEMO.matches.find(x=>x.id===match_id);if(!force&&Date.now()<new Date(m.opens_at).getTime())return;if(Date.now()>=new Date(m.signup_closes_at).getTime())return;if(!force && Date.now()>=new Date(m.payment_deadline).getTime() && Date.now()<new Date(m.waitlist_releases_at||m.payment_deadline).getTime())return;
+ let free=m.capacity-DEMO.regs.filter(x=>x.match_id===match_id&&x.role==='linha'&&['paid','reserved'].includes(x.status)).length;
+ let goalies=DEMO.regs.filter(x=>x.match_id===match_id&&x.role==='goleiro'&&['paid','reserved'].includes(x.status)).length;
+ for(const r of DEMO.regs.filter(x=>x.match_id===match_id&&x.status==='waitlist'&&!x.queue_hold).sort((a,b)=>String(a.queue_entered_at||a.created_at).localeCompare(String(b.queue_entered_at||b.created_at))||a.id-b.id)){
+   if(r.role==='linha'&&free<=0)continue;if(r.role==='goleiro'&&goalies>=m.goalie_limit)continue;
+   r.status='reserved';r.reserved_until=r.role==='linha'?new Date(Date.now()+30*60000).toISOString():null;
+   if(r.role==='goleiro')goalies++;else free--;
+   DEMO.notices.push({id:Math.random(),match_id,name:r.name,phone:r.phone,token:r.token,message:r.role==='goleiro'?'Vaga de goleiro aguardando aprovação do Master.':'Sua vaga foi liberada no Futebol de Sábado! Confirme seu Pix.'});
+ }
+}
+function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}})}
+function fault(text,status=400){return json({detail:text},status)}
+window.fetch=async function mockedFetch(input, options={}){
+ let url=String(input);let path=url.split('?')[0];const method=options.method||'GET',body=options.body?JSON.parse(options.body):{};
+ processDemo();
+ if(path==='/api/config')return json({demo:true,pix_mode:'manual',pix_available:true});
+ if(path==='/api/matches')return json({matches:DEMO.matches.filter(m=>!m.deleted_at).map(statuses)});
+ if(path==='/api/ranking'){
+  const people={};DEMO.regs.filter(x=>x.status==='paid').forEach(r=>{
+    const p=people[r.member_id] ||= {name:r.name,presencas:0,gols:0,assistencias:0,mvps:0};
+    p.presencas+=r.attended?1:0;
+    p.gols+=DEMO.stats.find(s=>s.registration_id===r.id)?.goals||0;
+    p.assistencias+=DEMO.stats.find(s=>s.registration_id===r.id)?.assists||0;
+  });
+  const ranking=Object.values(people).map(r=>({...r,pontos:r.gols*3+r.assistencias*2+r.mvps*5+r.presencas}));
+  return json({ranking:ranking.sort((a,b)=>b.pontos-a.pontos||b.gols-a.gols||b.assistencias-a.assistencias)});
+ }
+ const rosterPath=path.match(/^\/api\/matches\/(\d+)\/roster$/);
+ if(rosterPath){if(!currentMember()&&!DEMO.adminLogged)return fault('Acesse como membro para consultar os nomes.',401);
+  return json({match_id:Number(rosterPath[1]),roster:demoRoster(Number(rosterPath[1]))})}
+ const communityPath=path.match(/^\/api\/matches\/(\d+)\/(community|vote)$/);
+ if(communityPath){const member=currentMember();if(!member)return fault('Entre como membro.',401);
+  const mid=Number(communityPath[1]);const match=DEMO.matches.find(m=>m.id===mid);if(!match)return fault('Partida não encontrada.',404);
+  const mine=DEMO.regs.find(r=>r.match_id===mid&&r.member_id===member.id&&r.status==='paid');
+  if(communityPath[2]==='community')return json({match_id:mid,players:demoRoster(mid).filter(r=>r.status==='paid'),voting_enabled:!!match.voting_enabled,
+    can_vote:!!mine&&!!match.voting_enabled,my_registration_id:mine?.id||null,my_vote:DEMO.votes.find(v=>v.match_id===mid&&v.voter_member_id===member.id)?.voted_registration_id||null});
+  if(!match.voting_enabled||!mine)return fault('Votação não está aberta para sua conta.',409);
+  const candidate=DEMO.regs.find(r=>r.id===body.registration_id&&r.match_id===mid&&r.status==='paid');
+  if(!candidate||candidate.member_id===member.id)return fault('Não é permitido votar em si mesmo ou em jogadores não confirmados.',422);
+  DEMO.votes=DEMO.votes.filter(v=>!(v.match_id===mid&&v.voter_member_id===member.id));
+  DEMO.votes.push({match_id:mid,voter_member_id:member.id,voted_registration_id:candidate.id});saveDemo();return json({ok:true});
+ }
+ if(path==='/api/member/otp/start'&&method==='POST'){
+    const phone=String(body.phone||'').replace(/\D/g,'').replace(/^55(?=\d{11}$)/,'');
+    if(!/^\d{11}$/.test(phone))return fault('Informe celular com DDD.',422);
+    const code=String(Math.floor(100000+Math.random()*900000));lastOTP={phone,code};
+    return json({ok:true,delivery:'simulado',demo_code:code});
+ }
+ if(path==='/api/member/otp/verify'&&method==='POST'){
+    const phone=String(body.phone||'').replace(/\D/g,'').replace(/^55(?=\d{11}$)/,'');
+    if(!lastOTP||phone!==lastOTP.phone||body.code!==lastOTP.code)return fault('Código incorreto (demonstração local).',401);
+    let member=DEMO.members.find(x=>x.phone===phone);
+    if(member&&!member.active)return fault('Membro bloqueado pelo Master.',403);
+    if(!member){member={id:DEMO.members.length+1,name:'',phone,email:'',verified_at:new Date().toISOString(),active:true,whatsapp_opt_in:false};DEMO.members.push(member)}
+    DEMO.memberLogged=member.id;lastOTP=null;saveDemo();return json({ok:true,member,needs_profile:!member.name||!member.email});
+ }
+ if(path==='/api/member/me'){
+    const member=currentMember();return member?json({member,needs_profile:!member.name||!member.email}):fault('Entre com código de SMS.',401);
+ }
+ if(path==='/api/member/profile'&&method==='PUT'){
+    const member=currentMember();if(!member)return fault('Entre com o seu código.',401);
+    const name=String(body.name||'').trim().replace(/\s+/g,' '),email=String(body.email||'').trim().toLowerCase();
+    if(name.split(' ').length<2||!email.includes('@'))return fault('Informe nome completo e e-mail.',422);
+    if(DEMO.members.some(x=>x.id!==member.id&&x.email===email))return fault('Este e-mail já pertence a outro membro.',409);
+    member.name=name;member.email=email;member.whatsapp_opt_in=!!body.whatsapp_opt_in;DEMO.regs.filter(r=>r.member_id===member.id).forEach(r=>{r.name=name;r.email=email});saveDemo();return json({ok:true,member});
+ }
+ if(path==='/api/member/logout'&&method==='POST'){DEMO.memberLogged=null;saveDemo();return json({ok:true})}
+ if(path==='/api/member/registrations'){
+    const member=currentMember();if(!member)return fault('Entre com código de SMS.',401);
+    const registrations=DEMO.regs.filter(r=>r.member_id===member.id).map(r=>{
+      const m=DEMO.matches.find(x=>x.id===r.match_id);
+      const ahead=DEMO.regs.filter(x=>x.match_id===m.id&&x.status==='waitlist');
+      return {token:r.token,registration:r,match:statuses(m),queue_position:r.status==='waitlist'?ahead.findIndex(x=>x.id===r.id)+1:null};
+    });return json({registrations,interests:DEMO.interests.filter(i=>i.member_id===member.id).map(i=>({...i,...((m)=>({title:m.title,venue:m.venue,starts_at:m.starts_at,signup_closes_at:m.signup_closes_at}))(DEMO.matches.find(m=>m.id===i.match_id))}))});
+ }
+ if(path==='/api/register'&&method==='POST'){
+   const member=currentMember();if(!member)return fault('Faça acesso com o código do celular.',401);
+   if(!member.name||!member.email)return fault('Complete seu cadastro.',403);
+   const m=DEMO.matches.find(x=>x.id===body.match_id);if(!m)return fault('Partida não encontrada',404);
+   if(m.status!=='active'||m.deleted_at||Date.now()>=new Date(m.signup_closes_at).getTime())return fault('Inscrições encerradas para esta partida.',400);
+   if(Date.now()<new Date(m.opens_at).getTime())return fault('Inscrições ainda não abertas. A lista será liberada em '+new Date(m.opens_at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})+' (horário de Brasília).',409);
+   if(DEMO.regs.some(r=>r.match_id===m.id&&r.member_id===member.id&&!['cancelled','expired'].includes(r.status)))return fault('Você já está inscrito nesta partida.',409);
+   if(DEMO.interests.some(i=>i.match_id===m.id&&i.member_id===member.id))return fault('Seu interesse já foi registrado nesta partida.',409);
+   const role=body.position==='goleiro'?'goleiro':'linha';
+   const paidLine=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha'&&r.status==='paid').length;
+   if(role==='linha'&&paidLine>=m.capacity){const id=DEMO.interests.length+1;DEMO.interests.push({id,match_id:m.id,member_id:member.id,position:body.position||'indefinido',created_at:new Date().toISOString()});saveDemo();return json({status:'interest',interest_id:id,match_id:m.id,historical_only:true},201);}
+   const count=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha'&&['paid','reserved'].includes(r.status)).length;
+   const goalies=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='goleiro'&&['paid','reserved'].includes(r.status)).length;
+   const queued=DEMO.regs.some(r=>r.match_id===m.id&&r.status==='waitlist'&&r.role===role);const hold=Date.now()>=new Date(m.payment_deadline).getTime()&&Date.now()<new Date(m.waitlist_releases_at||m.payment_deadline).getTime();const fits=!queued&&!hold&&((role==='linha'&&count<m.capacity)||(role==='goleiro'&&goalies<m.goalie_limit));
+   const status=fits?'reserved':'waitlist',id=DEMO.regs.length+1;
+   const token='demo'+id+'-'+Math.random().toString(36).slice(2,18);
+   const expiry=role==='goleiro'?null:new Date(Math.min(Date.now()<new Date(m.payment_deadline)?new Date(m.payment_deadline).getTime():Date.now()+30*60000,new Date(m.starts_at).getTime())).toISOString();
+   DEMO.regs.push({id,token,match_id:m.id,member_id:member.id,name:member.name,phone:member.phone,email:member.email,role,position:body.position||'indefinido',status,reserved_until:status==='reserved'?expiry:null,paid_at:null,created_at:new Date().toISOString(),attended:0,pix_code:null,pix_qr_image:null,review_reason:''});
+   if(role==='goleiro'&&fits)DEMO.notices.push({id:Math.random(),match_id:m.id,name:member.name,phone:member.phone,token,message:'Goleiro aguardando aprovação do Master.'});
+   saveDemo();return json({token,status,match_id:m.id,reserved_until:expiry},201);
+ }
+ const regPath=path.match(/^\/api\/registration\/([^/]+)(?:\/(cancel|pix))?$/);
+ if(regPath){const token=decodeURIComponent(regPath[1]);const r=DEMO.regs.find(x=>x.token===token);if(!r)return fault('Inscrição não encontrada',404);if(!currentMember())return fault('Entre como membro.',401);if(r.member_id!==currentMember().id)return fault('Esta vaga pertence a outro membro.',403);const m=DEMO.matches.find(x=>x.id===r.match_id);
+  if(regPath[2]==='pix')return (r.status==='reserved'&&r.role!=='goleiro')?json({mode:'manual',key:'CHAVE PIX FICTÍCIA - NÃO PAGAR',amount:m.price_cents/100}):fault('Sem pagamento pendente',409);
+  if(regPath[2]==='cancel'){if(r.status==='paid')return fault('Confirme com o organizador',409);r.status='cancelled';promote(m.id);saveDemo();return json({ok:true})}
+  const ahead=DEMO.regs.filter(x=>x.match_id===m.id&&x.status==='waitlist');
+  return json({registration:r,match:statuses(m),queue_position:ahead.findIndex(x=>x.id===r.id)+1});
+ }
+ if(path==='/api/admin/login'){if(body.password==='demo123'){DEMO.adminLogged=true;saveDemo();return json({ok:true})}return fault('Senha da demonstração: demo123',401)}
+ if(path==='/api/admin/logout'){DEMO.adminLogged=false;saveDemo();return json({ok:true})}
+ if(path==='/api/admin/demo/full-paid'&&method==='POST'){
+   if(!DEMO.adminLogged)return fault('Somente Master.',401);
+   const m=DEMO.matches.find(x=>x.id===body.match_id);if(!m)return fault('Partida não encontrada.',404);
+   m.capacity=22;
+   m.opens_at=new Date(Date.now()-3600000).toISOString();
+   m.signup_closes_at=new Date(Date.now()+86400000).toISOString();
+   m.starts_at=new Date(Date.now()+2*86400000).toISOString();
+   let list=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha');
+   const now=new Date().toISOString();
+   for(const r of list){if(r.status==='waitlist'||r.status==='reserved'){r.status='paid';r.paid_at=now;r.reserved_until=null;}}
+   list=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha'&&r.status==='paid');
+   for(let i=list.length;i<m.capacity;i++){
+      const id=Math.max(0,...DEMO.regs.map(x=>x.id))+1;
+      const name='Jogador de demonstração '+(i+1);
+      const member={id:Math.max(0,...DEMO.members.map(x=>x.id))+1,name,phone:'629'+String(90000000+i).padStart(8,'0'),email:`lotacao${i}@example.com`,verified_at:now,active:true,whatsapp_opt_in:false};
+      DEMO.members.push(member);
+      DEMO.regs.push({id,token:'demopago'+id,match_id:m.id,member_id:member.id,name,phone:member.phone,email:member.email,role:'linha',position:'indefinido',status:'paid',paid_at:now,reserved_until:null,created_at:now,attended:0});
+   }
+   saveDemo();return json({ok:true});
+ }
+ if(path==='/api/admin/demo/expire'&&method==='POST'){
+  if(!DEMO.adminLogged)return fault('Sem permissão.',401);
+  const m=DEMO.matches.find(m=>m.id===body.match_id);if(!m)return fault('Partida não encontrada.',404);
+  for(const r of DEMO.regs.filter(r=>r.match_id===m.id && r.status==='reserved' && r.role!=='goleiro')){r.status='expired';r.reserved_until=null;}
+  promote(m.id,true);saveDemo();return json({ok:true});
+ }
+ if(path==='/api/admin/overview'){
+  if(!DEMO.adminLogged)return fault('Entre com a senha demo123',401);
+  const teams=DEMO.teams.flatMap(t=>t.players.map(id=>({...t,name:DEMO.regs.find(r=>r.id===id)?.name||'Jogador',role:DEMO.regs.find(r=>r.id===id)?.role||'linha'})));
+  return json({matches:DEMO.matches.filter(m=>!m.deleted_at).map(statuses),archived_matches:DEMO.matches.filter(m=>m.deleted_at).map(statuses),registrations:DEMO.regs,historical_interests:DEMO.interests.map(i=>({...i,...((member)=>({name:member.name,phone:member.phone,email:member.email}))(DEMO.members.find(m=>m.id===i.member_id))})),teams,notifications:DEMO.notices,broadcast_history:[],members:DEMO.members,stats:DEMO.stats,role:'master',whatsapp_provider:'manual',whatsapp_ready:false,whatsapp_server:null,whatsapp_instance:null});
+ }
+ const paymentPath=path.match(/^\/api\/admin\/registrations\/(\d+)\/payment-time$/);
+ if(paymentPath&&method==='PUT'){
+    if(!DEMO.adminLogged)return fault('Somente Master.',401);
+    const r=DEMO.regs.find(x=>x.id===Number(paymentPath[1]));if(!r||r.status!=='paid'||r.role==='goleiro')return fault('Não é possível alterar.',409);
+    r.paid_at=new Date(body.paid_at).toISOString();saveDemo();return json({ok:true});
+ }
+ const statsPath=path.match(/^\/api\/admin\/registrations\/(\d+)\/stats$/);
+ if(statsPath&&method==='PUT'){
+    if(!DEMO.adminLogged)return fault('Somente Admin Master.',401);
+    const id=Number(statsPath[1]),r=DEMO.regs.find(r=>r.id===id);
+    if(!r||r.status!=='paid')return fault('Jogador não confirmado.',409);
+    DEMO.stats=DEMO.stats.filter(s=>s.registration_id!==id);
+    DEMO.stats.push({registration_id:id,goals:Number(body.goals),assists:Number(body.assists)});
+    saveDemo();return json({ok:true});
+ }
+ const voteAdmin=path.match(/^\/api\/admin\/matches\/(\d+)\/voting$/);
+ if(voteAdmin&&method==='POST'){
+    if(!DEMO.adminLogged)return fault('Somente Admin Master.',401);
+    const m=DEMO.matches.find(m=>m.id===Number(voteAdmin[1]));if(!m)return fault('Não encontrado.',404);
+    m.voting_enabled=!!body.enabled;saveDemo();return json({ok:true});
+ }
+ if(path==='/api/admin/whatsapp/broadcast')return fault('Envio automático não está conectado na demonstração. Utilize os links individuais.',409);
+ const memberAccess=path.match(/^\/api\/admin\/members\/(\d+)\/access$/);
+ if(memberAccess&&method==='POST'){
+   if(!DEMO.adminLogged)return fault('Entre no painel do Master.',401);
+   const m=DEMO.members.find(x=>x.id===Number(memberAccess[1]));if(!m)return fault('Não encontrado.',404);
+   m.active=!!body.active;if(!m.active&&DEMO.memberLogged===m.id)DEMO.memberLogged=null;saveDemo();return json({ok:true});
+ }
+ const queueAction=path.match(/^\/api\/admin\/registrations\/(\d+)\/queue$/);
+ if(queueAction&&method==='POST'){
+   if(!DEMO.adminLogged)return fault('Entre como Admin Master.',401);
+   const r=DEMO.regs.find(x=>x.id===Number(queueAction[1]));if(!r)return fault('Jogador não encontrado.',404);
+   const m=DEMO.matches.find(x=>x.id===r.match_id);if(!m||m.deleted_at)return fault('Partida inativa.',409);
+   if(body.action==='waitlist'){
+      if(r.status!=='reserved')return fault('Apenas reservas pendentes podem ir para a fila.',409);
+      r.status='waitlist';r.reserved_until=null;r.queue_entered_at=new Date().toISOString();r.queue_hold=1;promote(m.id);
+   }else if(body.action==='release'){
+      if(r.status!=='waitlist'||!r.queue_hold)return fault('Jogador não está em espera manual.',409);
+      r.queue_hold=0;promote(m.id,true);
+   }else if(body.action==='remove'){
+      if(r.status!=='waitlist')return fault('Jogador não está na fila de espera.',409);
+      r.status='cancelled';r.queue_hold=0;promote(m.id);
+   }else if(body.action==='promote'){
+      if(r.status!=='waitlist')return fault('Jogador não está na fila.',409);
+      let occupied=DEMO.regs.filter(x=>x.match_id===m.id&&['paid','reserved'].includes(x.status)).length;
+      if(body.replace_registration_id){const swap=DEMO.regs.find(x=>x.id===body.replace_registration_id&&x.match_id===m.id);
+        if(!swap||swap.status!=='reserved')return fault('Substituição permitida somente com reserva pendente.',409);
+        swap.status='waitlist';swap.queue_hold=1;swap.reserved_until=null;swap.queue_entered_at=new Date().toISOString();occupied--;
+      }
+      if(occupied>=m.capacity)return fault('Partida lotada. Selecione uma reserva pendente para substituir.',409);
+      const goalies=DEMO.regs.filter(x=>x.match_id===m.id&&x.role==='goleiro'&&['paid','reserved'].includes(x.status)).length;
+      if(r.role==='goleiro'&&goalies>=m.goalie_limit)return fault('Limite de goleiros atingido.',409);
+      r.status='reserved';r.queue_hold=0;r.reserved_until=r.role==='goleiro'?null:new Date(Date.now()+30*60000).toISOString();
+      DEMO.notices.push({id:Math.random(),match_id:m.id,name:r.name,phone:r.phone,token:r.token,message:'Vaga liberada manualmente. Confira seu prazo para confirmar a vaga.'});
+   }else return fault('Ação inválida.',422);
+   saveDemo();return json({ok:true,action:body.action,match_id:m.id});
+ }
+ const queueRun=path.match(/^\/api\/admin\/matches\/(\d+)\/queue\/run$/);
+ if(queueRun&&method==='POST'){
+    if(!DEMO.adminLogged)return fault('Entre como Admin Master.',401);
+    const matchId=Number(queueRun[1]);const m=DEMO.matches.find(x=>x.id===matchId);
+    if(!m||m.deleted_at)return fault('Partida não encontrada.',404);
+    const now=Date.now();
+    for(const r of DEMO.regs.filter(x=>x.match_id===matchId&&x.status==='reserved'&&x.reserved_until&&new Date(x.reserved_until).getTime()<=now)){
+      r.status='expired';r.reserved_until=null;
+    }
+    promote(matchId,true);saveDemo();return json({ok:true,notice:'Fila processada manualmente. Esperas manuais permanecem até liberação pelo Master.'});
+ }
+ const adminReg=path.match(/^\/api\/admin\/registrations\/(\d+)\/(confirm|cancel|attendance)$/);
+ if(adminReg){const r=DEMO.regs.find(x=>x.id===Number(adminReg[1]));if(!r)return fault('Não encontrado',404);
+  if(adminReg[2]==='confirm'){if(r.status!=='reserved')return fault('Somente reserva válida pode ser confirmada.',409);r.status='paid';r.reserved_until=null;r.paid_at=new Date().toISOString();}else if(adminReg[2]==='attendance')r.attended=body.attended?1:0;else{r.status='cancelled';promote(r.match_id)}
+  saveDemo();return json({ok:true});
+ }
+ const archivedMatch=path.match(/^\/api\/admin\/matches\/(\d+)\/restore$/);
+ if(archivedMatch&&method==='POST'){
+    if(!DEMO.adminLogged)return fault('Somente Admin Master.',401);
+    const m=DEMO.matches.find(x=>x.id===Number(archivedMatch[1]));if(!m)return fault('Não encontrado.',404);
+    m.deleted_at=null;m.status='active';saveDemo();return json({ok:true});
+ }
+ const adminMatch=path.match(/^\/api\/admin\/matches\/(\d+)(?:\/(draw|export))?$/);
+ if(path==='/api/admin/matches'&&method==='POST'){
+  if(!Number.isSafeInteger(body.capacity)||body.capacity<2||body.goalie_limit<0)return fault('Quantidade de jogadores inválida.',422);if(!(new Date(body.opens_at)<new Date(body.payment_deadline) && new Date(body.payment_deadline)<=new Date(body.waitlist_releases_at) && new Date(body.waitlist_releases_at)<new Date(body.signup_closes_at) && new Date(body.signup_closes_at)<new Date(body.starts_at)))return fault('Confira a ordem das datas do calendário.',422);
+  const id=Math.max(0,...DEMO.matches.map(x=>x.id))+1;DEMO.matches.push({...body,waitlist_releases_at:body.waitlist_releases_at||body.payment_deadline,id,status:'active',voting_enabled:false});saveDemo();return json({id},201);
+ }
+ if(adminMatch){const id=Number(adminMatch[1]);if(method==='DELETE'){const m=DEMO.matches.find(x=>x.id===id);if(!m)return fault('Não encontrado.',404);m.deleted_at=new Date().toISOString();m.status='cancelled';const paid_registrations=DEMO.regs.filter(r=>r.match_id===id&&r.status==='paid').length;saveDemo();return json({ok:true,paid_registrations,notice:'Partida arquivada. Avalie reembolsos manualmente.'});}if(method==='PATCH'){const i=DEMO.matches.findIndex(m=>m.id===id);if(i<0)return fault('Não encontrado',404);
+   const occupied=DEMO.regs.filter(r=>r.match_id===id&&r.role==='linha'&&['reserved','paid'].includes(r.status)).length;
+   if(!Number.isSafeInteger(body.capacity)||body.capacity<2||body.capacity<occupied||body.goalie_limit<0)return fault('Limite de vagas inválido ou inferior às reservas existentes.',422);
+   DEMO.matches[i]={...DEMO.matches[i],...body};promote(id);saveDemo();return json({ok:true})}
+  if(adminMatch[2]==='draw'){
+   const regs=DEMO.regs.filter(r=>r.match_id===id&&r.status==='paid');const count=Number(body.team_count);
+   if(regs.length<count)return fault('Jogadores insuficientes para o sorteio',422);
+   DEMO.teams=DEMO.teams.filter(t=>t.match_id!==id);
+   regs.forEach((r,i)=>{const label='Time '+String.fromCharCode(65+i%count);let t=DEMO.teams.find(x=>x.match_id===id&&x.label===label);if(!t){t={match_id:id,label,players:[]};DEMO.teams.push(t)}t.players.push(r.id)});
+   saveDemo();return json({ok:true});
+  }
+ }
+ const note=path.match(/^\/api\/admin\/notifications\/(\d+)\/dismiss$/);
+ if(note){DEMO.notices=DEMO.notices.filter(x=>Number(x.id)!==Number(note[1]));saveDemo();return json({ok:true})}
+ return fault('Recurso não disponível na demonstração local.',404);
+};
+
+</script></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
+'use strict';
+const $ = (s, root = document) => root.querySelector(s);
+const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+const BR_TZ = 'America/Sao_Paulo';
+const siteLink = location.origin && location.origin!=='null' ? location.origin : '[link público após publicação]';
+const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'jogadores', adminFilter: 'all', homeFilter: 'all', activeMatch: null,
+  my: [], interests: [], member: null, pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
+const storeKey = 'racha_minhas_inscricoes_v1';
+const savedTokens = () => { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch { return []; } };
+const saveToken = token => { const all = [...new Set([token, ...savedTokens()])].slice(0, 80); localStorage.setItem(storeKey, JSON.stringify(all)); };
+const escapeHTML = s => String(s ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+const asDate = s => s ? new Date(s) : null;
+const number = n => Number(n || 0).toLocaleString('pt-BR');
+const money = cents => (Number(cents || 0) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const dateBR = (s, opt = {}) => asDate(s)?.toLocaleString('pt-BR', { timeZone: BR_TZ, ...opt }) || '—';
+const dayNo = s => dateBR(s, { day: '2-digit' });
+const month = s => dateBR(s, { month: 'short' }).replace('.', '').toUpperCase();
+const week = s => dateBR(s, { weekday: 'long' });
+const shortDate = s => dateBR(s, { weekday: 'short', day: '2-digit', month: 'short' });
+const clock = s => dateBR(s, { hour: '2-digit', minute: '2-digit' });
+const fullDate = s => dateBR(s, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+const inputDate = s => {
+  if (!s) return '';
+  const format = new Intl.DateTimeFormat('sv-SE', { timeZone:BR_TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+  return format.format(asDate(s)).replace(' ', 'T');
+};
+const offsetDate = s => s ? s + ':00-03:00' : '';
+const phoneDigits = v => {
+  let digits=String(v||'').replace(/\D/g,'');
+  if(digits.startsWith('55') && digits.length>=13) digits=digits.slice(2);
+  return digits.slice(0,11);
+};
+const phoneMask = v => {
+  const d=phoneDigits(v);
+  if(d.length<=2) return d.length?'('+d:'';
+  if(d.length<=7) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+};
+const labels = { fully_paid: 'VAGAS PREENCHIDAS', interest: 'INTERESSE REGISTRADO', open: 'INSCRIÇÕES ABERTAS', scheduled: 'ABRE EM BREVE', waitlist: 'LISTA DE ESPERA', closed: 'ENCERRADO', cancelled: 'CANCELADO',
+  paid: 'VAGA CONFIRMADA', reserved: 'AGUARDANDO PIX', expired: 'PRAZO EXPIRADO' };
+const statusText = s => labels[s] || s;
+const statusPill = s => `<span class="pill ${escapeHTML(s)}">${escapeHTML(statusText(s))}</span>`;
+const headline = (kicker, title, subtitle) => `<header class="page-head"><div class="eyebrow">${kicker}</div><h1 class="heading">${title}</h1><p class="subhead">${subtitle}</p></header>`;
+const empty = (icon, title, copy, action = '') => `<div class="empty"><div class="empty-icon">${icon}</div><h3>${title}</h3><p>${copy}</p>${action}</div>`;
+const panelTitle = (title, sub = '', right = '') => `<div class="panel-head"><div><h2 class="panel-title">${title}</h2>${sub ? `<div class="panel-kicker">${sub}</div>` : ''}</div>${right}</div>`;
+
+async function api(path, opts={}) {
+  const headers = { ...opts.headers };
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  let response;
+  try { response = await fetch(path, { credentials:'same-origin', ...opts, headers }); }
+  catch { throw new Error('Sem conexão com o servidor. Confira sua internet.'); }
+  let payload = {};
+  try { payload = await response.json(); } catch { /* e.g. 502 */ }
+  if (!response.ok) throw new Error(typeof payload.detail === 'string' ? payload.detail : 'Não foi possível completar a operação.');
+  return payload;
+}
+function toast(message, isError=false) {
+  $('#toast-root').innerHTML = `<div class="toast ${isError?'error':''}" role="status">${escapeHTML(message)}</div>`;
+  clearTimeout(toast.timer);toast.timer=setTimeout(()=>{$('#toast-root').innerHTML=''},4600);
+}
+function modal(title, subtitle, body, large=false) {
+  $('#modal-root').innerHTML = `<div class="modal-overlay" role="presentation"><section class="modal ${large?'modal-lg':''}" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="modal-head"><div><h2>${title}</h2><p>${subtitle}</p></div><button class="close-modal" data-action="close" aria-label="Fechar janela">×</button></div>${body}</section></div>`;
+}
+function closeModal() { $('#modal-root').innerHTML=''; }
+function setLoading(button, status=true) { if (button) { button.disabled=status; button.dataset.original ||= button.textContent;button.textContent = status?'Processando...':button.dataset.original; } }
+function content(html) { $('#screen').innerHTML=html; }
+async function reloadMatches() { const data=await api('/api/matches'); state.matches=data.matches; state.activeMatch=state.activeMatch && state.matches.find(x=>x.id===state.activeMatch.id) || state.matches[0] || null; }
+async function refresh() { try {await reloadMatches();if(state.view==='home')renderHome();else if(state.view==='my')await renderMy();} catch(e){console.error(e)} }
+function nav(view) {
+  state.view=view;
+  history.replaceState(null,'',view==='home'?'/':`/${view==='my'?'?pagina=minhas-inscricoes':view==='admin'?'admin':'ranking'}`);
+  $$('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===view));
+  if (view==='home') renderHome(); if (view==='my')renderMy(); if(view==='ranking')renderRanking();if(view==='admin')renderAdmin();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function matchCard(m, main=false) {
+  const available = Math.max(0,m.capacity-m.paid-m.reserved);
+  const occupied = m.paid+m.reserved;
+  const actionLabel=m.state==='scheduled'?'Inscrições ainda não abertas':m.state==='waitlist'?'Entrar na fila de espera':m.state==='fully_paid'?'Registrar interesse':m.state==='open'?'Garantir minha vaga':'Ver detalhes';
+  return `<article class="panel ${main?'match-primary':''}">${panelTitle(main?'Próxima partida':escapeHTML(m.title),main?'A próxima resenha já tem data.':escapeHTML(m.venue),statusPill(m.state))}
+    <div class="match-top"><div class="calendar-box"><div class="month">${month(m.starts_at)}</div><div class="day">${dayNo(m.starts_at)}</div></div>
+      <div><div class="match-name">${escapeHTML(m.title)}</div><div class="match-meta">${escapeHTML(week(m.starts_at))} • ${clock(m.starts_at)} • ${escapeHTML(m.venue)}</div></div></div>
+    <div class="meta-row"><span class="meta-chip">◷ ${clock(m.starts_at)} h</span><span class="meta-chip">⚑ ${escapeHTML(m.venue)}</span><span class="meta-chip">◎ ${money(m.price_cents)} / jogador</span></div>
+    <div class="calendar-rules"><div><span>01 · ABERTURA DA LISTA</span><strong>${shortDate(m.opens_at)} • ${clock(m.opens_at)}</strong><small>Inscrições liberadas</small></div><div><span>02 · PAGAMENTO ATÉ</span><strong>${shortDate(m.payment_deadline)} • ${clock(m.payment_deadline)}</strong><small>Vaga não paga expira</small></div><div><span>03 · CONVOCAÇÃO DA FILA</span><strong>${shortDate(m.waitlist_releases_at||m.payment_deadline)} • ${clock(m.waitlist_releases_at||m.payment_deadline)}</strong><small>${escapeHTML(m.waitlist_note||'Vagas pendentes serão liberadas automaticamente para a fila de espera.')}</small></div></div>
+    <div class="progress-header"><b>Ocupação das vagas</b><span>${occupied} de ${m.capacity} vagas</span></div>
+    <div class="progress" role="progressbar" aria-valuenow="${occupied}" aria-valuemin="0" aria-valuemax="${m.capacity}"><span style="width:${100*occupied/Math.max(1,m.capacity)}%"></span></div>
+    <div class="stats-mini"><button type="button" data-action="home-filter" data-filter="paid" data-id="${m.id}" aria-label="Ver confirmados"><strong>${m.paid}</strong><small>CONFIRMADOS</small></button><button type="button" data-action="home-filter" data-filter="reserved" data-id="${m.id}" aria-label="Ver pendentes de Pix"><strong>${m.reserved}</strong><small>PENDENTES</small></button><button type="button" data-action="home-filter" data-filter="waitlist" data-id="${m.id}" aria-label="Ver lista de espera"><strong>${m.waiting}</strong><small>NA FILA DE ESPERA</small></button></div>
+    <button class="button match-action ${m.state==='scheduled'?'button-outline':''}" data-action="open-register" data-id="${m.id}" ${['closed','cancelled'].includes(m.state)?'disabled':''}>${actionLabel} <span>↗</span></button>
+    ${m.state==='scheduled'?`<p class="notice">Inscrições ainda não abertas. A lista será liberada em <b>${fullDate(m.opens_at)}</b>.</p>`:''}
+    ${m.state==='waitlist'?`<p class="notice">As ${m.capacity} vagas estão ocupadas. Entre na fila para ser convocado se alguém não pagar ou cancelar.</p>`:''}
+    ${m.state==='fully_paid'?`<div class="highlight-bar"><b>${m.capacity} de ${m.capacity} jogadores de linha já pagaram.</b> A lista está completa. Você pode registrar seu interesse para histórico até ${fullDate(m.signup_closes_at)}, sem vaga, Pix ou convocação automática.</div>`:''}
+    </article>`;
+}
+function renderHome() {
+  const main=state.matches[0];
+  const next=state.matches.slice(1,4);
+  content(`<section class="hero"><div class="hero-copy"><div class="eyebrow">⚡ TODA SEMANA TEM JOGO</div><h1>A resenha começa <em>antes do apito.</em></h1><p>Inscreva-se, confirme sua vaga e acompanhe a lista de espera. Cada jogador com sua própria conta, sem nomes colocados por terceiros.</p>
+      <div class="hero-actions"><button class="button" data-action="open-register" data-id="${main?.id||0}">Quero jogar <span>↗</span></button><button class="button button-secondary" data-nav="my">Minhas inscrições</button></div></div>
+      <div class="hero-graphic" aria-hidden="true"><div class="field"><span class="field-end top"></span><span class="field-end bottom"></span></div><span class="field-ball">⚽</span></div></section>
+      ${state.config.demo?'<div class="highlight-bar">MODO DEMONSTRAÇÃO: respeite o calendário de abertura configurado para cada partida. Pagamentos reais não estão ativos.</div>':''}
+      <div class="content-grid"><div class="content-col">${main?matchCard(main,true):empty('⚽','Sem partidas','Uma nova partida aparecerá aqui em breve.')}
+       ${main?`<section class="panel" id="public-roster">${panelTitle('Escalação e lista','Pagos, pendentes e fila de espera em um só lugar.')}${state.member?'<p class="muted">Carregando os jogadores...</p>':`<p class="notice">Para proteger os dados dos jogadores, entre como membro para consultar os nomes completos e os status.</p><button class="button button-sm" data-action="member-login">Entrar e ver a lista</button>`}</section>`:''}
+       <section class="panel">${panelTitle('Como funciona','Três passos para entrar em campo.')}
+        <div class="top-guide"><span class="guide-num">01</span><div class="guide-copy"><strong>Valide seu celular e entre na lista</strong><p>Uma conta por número verificado. As inscrições abrem na quinta às 12h. Cada partida mostra sua data e horário de abertura.</p></div></div>
+        <div class="top-guide"><span class="guide-num">02</span><div class="guide-copy"><strong>Confirme o Pix</strong><p>O prazo do Pix e a liberação da fila constam no calendário de cada partida.</p></div></div>
+        <div class="top-guide"><span class="guide-num">03</span><div class="guide-copy"><strong>Partiu futebol</strong><p>${main?`${shortDate(main.starts_at)}, às ${clock(main.starts_at)}, em ${escapeHTML(main.venue)}`:'Data e local informados na partida'}. Goleiros são isentos após aprovação.</p></div></div>
+        <div class="banner">✓ <b>Regra de ouro:</b> somente o pagamento confirmado garante a vaga. O limite de jogadores é definido pelo organizador em cada partida. Quando lotar, começa a lista de espera.</div></section>
+      </div><div class="content-col"><section class="panel">${panelTitle('Próximos jogos','Prepare a chuteira.')} ${next.length?next.map(m=>`<div class="upcoming-row"><div><div class="upcoming-date">${shortDate(m.starts_at)} • ${clock(m.starts_at)}</div><div class="upcoming-place">${escapeHTML(m.venue)}</div></div><button class="button button-sm button-secondary" data-action="open-register" data-id="${m.id}">Ver ↗</button></div>`).join(''):'<p class="muted">Em breve.</p>'}</section>
+       <section class="panel">${panelTitle('Informações do futebol','Tudo num só lugar.')}<div class="top-guide"><span class="guide-num">⚑</span><div class="guide-copy"><strong>${escapeHTML(main?.venue||'Local a definir')}</strong><p>Local da próxima partida. Editável pelo Master.</p></div></div><div class="top-guide"><span class="guide-num">#</span><div class="guide-copy"><strong>${main ? `${main.capacity} vagas nesta partida` : 'Vagas configuráveis'}</strong><p>O administrador define quantos jogadores participam. Lista de espera após lotar.</p></div></div><div class="top-guide"><span class="guide-num">R$</span><div class="guide-copy"><strong>${main?money(main.price_cents):'R$ 15,00'} por jogador</strong><p>Goleiros não pagam após aprovação do Admin Master. O painel controla as confirmações.</p></div></div></section>
+       </div></div>`);
+  if(main && state.member)loadHomeRoster(main.id);
+}
+function rosterRows(rows,emptyCopy='Nenhum jogador neste grupo.'){
+  return rows.length?rows.map(x=>`<div class="roster-person"><span class="roster-index">${x.rank?`${x.rank}º`:x.role==='goleiro'?'🧤':'•'}</span><span class="roster-name">${escapeHTML(x.name)}<small>${escapeHTML(x.position==='indefinido'?'Sem preferência':x.position)}</small></span><span>${statusPill(x.status)}</span></div>`).join(''):`<p class="muted">${emptyCopy}</p>`;
+}
+function renderRosterSections(roster,filter='all'){
+  const part=group=>roster.filter(x=>x.group===group);
+  const active = filter==='paid'?['titulares','rodizio','goleiros']:filter==='reserved'?['pendentes']:filter==='waitlist'?['fila']:['titulares','rodizio','goleiros','pendentes','fila'];
+  const two=(title,items)=>`<div class="roster-group"><h3>${title} <span>${items.length}</span></h3>${rosterRows(items)}</div>`;
+  return `<div class="roster-grid">${[...([['titulares','Primeiros 10 pagantes'],['rodizio','Rodízio de jogadores'],['goleiros','Goleiros confirmados'],['pendentes','Aguardando pagamento'],['fila','Lista de espera']])].filter(([group])=>active.includes(group)).map(([group,title])=>two(title,part(group))).join('')}</div><p class="notice">A classificação dos jogadores de linha considera a hora da confirmação do Pix. Goleiros são isentos e aparecem separados.</p>`;
+}
+async function loadHomeRoster(matchId){
+  try{const result=await api(`/api/matches/${matchId}/roster`);if(state.view==='home'&&$('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação da próxima partida','Lista atualizada por status e ordem de confirmação.')+renderRosterSections(result.roster,state.homeFilter);}
+  catch(e){if($('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação','Entre novamente para consultar.')+`<button class="button button-sm" data-action="member-login">Entrar</button>`}
+}
+function registerModal(matchID) {
+  const m=state.matches.find(x=>x.id===Number(matchID));
+  if (!m) return toast('Partida não encontrada.',true);
+  if (m.state==='closed'||m.state==='cancelled')return toast('As inscrições desta partida estão encerradas.',true);
+  if(m.state==='scheduled'||Date.now()<new Date(m.opens_at).getTime())return modal('Abertura programada',`Inscrições ainda não abertas`,
+      `<div class="highlight-bar">A lista para <b>${escapeHTML(m.title)}</b> será aberta em <b>${fullDate(m.opens_at)}</b>. Você poderá garantir a vaga a partir desse horário. Antes disso, nenhuma inscrição é aceita.</div><button class="button button-secondary button-block" data-action="close">Entendi</button>`);
+  if(!state.member){state.pendingMatchID=m.id;return openMemberLogin()}
+  if(!state.member.name || !state.member.email){state.pendingMatchID=m.id;return openProfile()}
+  state.selectedRole='indefinido';
+  modal(m.state==='fully_paid'?'Todas as vagas de linha foram preenchidas':m.state==='waitlist'?'Entrar na lista de espera':'Garantir minha vaga',`${shortDate(m.starts_at)} • ${clock(m.starts_at)}`,
+    `<form id="registration-form"><input name="match_id" type="hidden" value="${m.id}"/>
+    <div class="member-identity"><span class="member-avatar">✓</span><div><strong>${escapeHTML(state.member.name)}</strong><p>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</p><small>Inscrição individual autenticada por SMS</small></div></div>
+    ${m.state==='fully_paid'?`<div class="highlight-bar" role="alert"><strong>${m.capacity} jogadores de linha confirmaram o pagamento!</strong> Você pode registrar seu interesse até ${fullDate(m.signup_closes_at)}. Seu registro será apenas histórico, sem lista de espera, sem Pix, sem garantia de vaga e sem convocação automática. Goleiros possuem controle próprio e precisam de aprovação do Master.</div>`:''}
+    <div class="form-group mt"><label for="player-position">Sua posição (opcional)</label><select class="form-control" id="player-position" name="position"><option value="indefinido">Não informar / sem preferência</option><option value="atacante">Atacante</option><option value="zagueiro">Zagueiro</option><option value="goleiro">Goleiro (isento, sujeito à aprovação)</option></select></div>
+    <div class="banner">Linha: <b>${money(m.price_cents)}</b>. Goleiro: <b>gratuito após aprovação do Master</b>. Prazo inicial: <b>${fullDate(m.payment_deadline)}</b>. Convocados depois têm 30 minutos.</div>
+    <p class="notice">Uma inscrição por membro verificado em cada partida. Não é permitido reservar vaga para outro jogador.</p><div id="form-error"></div>
+    <div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Cancelar</button><button type="submit" class="button">${m.state==='fully_paid'?'Registrar interesse (histórico)':m.state==='waitlist'?'Entrar na fila':'Solicitar minha vaga'} ↗</button></div></form>`);
+  if(m.state==='fully_paid'){const position=$('#player-position');position?.addEventListener('change',()=>{$('#registration-form [type=submit]').textContent=position.value==='goleiro'?'Solicitar vaga de goleiro ↗':'Registrar interesse (histórico) ↗';});}
+}
+async function sendRegistration(form) {
+  const button=form.querySelector('[type=submit]');setLoading(button,true);
+  $('#form-error').innerHTML='';
+  const f=new FormData(form);
+  try {
+    const result=await api('/api/register',{method:'POST',body:JSON.stringify({match_id:Number(f.get('match_id')),position:f.get('position')||'indefinido'})});
+    if(result.status==='interest'){
+      closeModal();await reloadMatches();await loadMy();nav('my');
+      toast('Interesse registrado apenas para histórico. Nenhuma vaga foi reservada.');
+      return;
+    }
+    saveToken(result.token);state.registrationToken=result.token;
+    closeModal();await reloadMatches();await loadMy();
+    toast('Inscrição realizada! Acompanhe o status da sua vaga.');nav('my');
+    showMyDetails(result.token);
+  } catch(e) { $('#form-error').innerHTML=`<div class="error-box">${escapeHTML(e.message)}</div>`; }
+  finally {setLoading(button,false);}
+}
+async function loadMy() {
+  if(!state.member){state.my=[];return}
+  const data=await api('/api/member/registrations');
+  state.my=data.registrations;state.interests=data.interests||[];
+}
+async function renderMy() {
+  if(!state.member){content(`${headline('ÁREA DO MEMBRO','Seu <span>futebol.</span>','Entre com seu próprio celular para acessar suas inscrições.')}
+    <section class="panel admin-login">${panelTitle('Acesso individual','Código de verificação por SMS, sem senha.')}<button class="button button-block" data-action="member-login">Entrar ou criar minha conta ↗</button></section>`);return}
+  if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Seu celular já foi validado. Falta só nome completo e e-mail.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
+  content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Suas inscrições acompanham sua conta, em qualquer celular onde você entrar.')}
+    <div class="member-account-bar"><div><strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div><div id="my-container">${empty('◷','Carregando inscrições...','Buscando suas vagas.')}</div>`);
+  await loadMy();if(state.view!=='my')return;
+  $('#my-container').innerHTML=(state.my.length?state.my.map(x=>{
+    const r=x.registration,m=x.match;
+    const waiting=r.status==='waitlist'?`<div class="row mt"><strong>Posição na fila:</strong><strong class="queue-num">#${x.queue_position}</strong></div>`:'';
+    const expiry=r.status==='reserved'&&r.role!=='goleiro'?`<div class="highlight-bar">Você tem até <b>${fullDate(r.reserved_until)}</b> para confirmar o pagamento.</div>`:'';
+    return `<section class="panel registration-card">${panelTitle(escapeHTML(m.title),`${shortDate(m.starts_at)} • ${clock(m.starts_at)} • ${escapeHTML(m.venue)}`,r.status==='reserved'&&r.role==='goleiro'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status))}
+      <div class="meta-row"><span class="meta-chip">◉ ${escapeHTML(r.name)}</span><span class="meta-chip">${r.position==='goleiro'?'🧤 Goleiro':r.position==='atacante'?'⚽ Atacante':r.position==='zagueiro'?'🛡 Zagueiro':'⚽ Sem preferência'}</span><span class="meta-chip">${money(r.role==='goleiro'?0:m.price_cents)}</span></div>
+      ${waiting}${expiry}${r.status==='reserved'&&r.role==='goleiro'?'<div class="highlight-bar">🧤 Goleiro isento. Aguardando aprovação do Admin Master.</div>':''}${r.status==='paid'?'<div class="success-box">✓ Sua vaga está confirmada. Boa partida!</div>':''}
+      ${r.status==='waitlist'?'<p class="status-text">Quando uma vaga abrir, você entra na próxima convocação. Volte a esta página para consultar o status.</p>':''}
+      ${r.status==='expired'?'<div class="error-box">O prazo terminou antes da confirmação. Se houve pagamento, procure o organizador.</div>':''}
+      <div class="row mt"><button class="button button-sm" data-action="my-detail" data-token="${x.token}">Ver inscrição ↗</button>
+        ${r.status==='reserved'&&r.role!=='goleiro'?`<button class="button button-sm button-secondary" data-action="get-pix" data-token="${x.token}">Gerar Pix</button>`:''}
+        ${['reserved','waitlist'].includes(r.status)?`<button class="button button-sm button-outline" data-action="self-cancel" data-token="${x.token}">Cancelar inscrição</button>`:''}</div></section>`;
+  }).join(''):empty('▣','Nenhuma inscrição ainda','Quando você se inscrever em um jogo, ele aparecerá aqui.',
+    `<button class="button" data-nav="home">Ver próximos jogos ↗</button>`)) + (state.interests.length?`<section class="panel mt">${panelTitle('Histórico de interesses', 'Registros que não ocupam vagas e não participam da fila automática.')}${state.interests.map(i=>`<div class="upcoming-row"><div><strong>${escapeHTML(i.title)}</strong><p class="status-text">${shortDate(i.starts_at)} · ${escapeHTML(i.venue)} · Registrado em ${fullDate(i.created_at)}</p></div><span class="pill">SOMENTE HISTÓRICO</span></div>`).join('')}</section>`:'');
+}
+async function showMyDetails(token) {
+  let x=state.my.find(t=>t.token===token);
+  if(!x){try{x={...await api('/api/registration/'+token),token};}catch(e){return toast(e.message,true)}}
+  const {registration:r,match:m}=x;
+  const link=`${location.origin}/?inscricao=${encodeURIComponent(token)}`;
+  modal('Sua inscrição',`${shortDate(m.starts_at)} • ${escapeHTML(m.venue)}`,
+    `<div class="row-between mb"><strong>${escapeHTML(r.name)}</strong>${r.status==='reserved'&&r.role==='goleiro'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}</div>
+      <div class="banner">${r.status==='paid'?'Tudo certo. Sua vaga está garantida!':r.status==='reserved'?r.role==='goleiro'?'Sua solicitação de goleiro gratuito aguarda aprovação do Master.':'Vaga reservada temporariamente. Confirme o Pix dentro do prazo.':r.status==='waitlist'?'Você está na lista de espera e poderá ser convocado.':'Consulte o organizador caso precise de ajuda.'}</div>
+      ${r.status==='reserved'&&r.role!=='goleiro'?`<p class="notice">Prazo: ${fullDate(r.reserved_until)}</p><button class="button button-block mt" data-action="get-pix" data-token="${token}">Gerar pagamento Pix ↗</button>`:''}
+      ${r.status==='waitlist'?`<p class="status-text">Posição na fila: <strong>#${x.queue_position}</strong></p>`:''}
+      <div class="form-actions"><button class="button" data-action="close">Concluir</button></div>`);
+}
+async function getPix(token) {
+  const reg=state.my.find(x=>x.token===token);
+  if(!reg)return toast('Inscrição não encontrada.',true);
+  if(state.config.pix_mode==='mercadopago') {
+    modal('Gerar Pix automático','O CPF é usado exclusivamente na requisição à operadora e não é salvo no sistema.',
+      `<form id="pix-form"><input type="hidden" name="token" value="${token}"/><div class="form-group"><label>CPF do pagador</label><input name="cpf" class="form-control" required inputmode="numeric" autocomplete="off" placeholder="000.000.000-00"/></div><div id="form-error"></div><div class="form-actions"><button class="button button-secondary" type="button" data-action="close">Cancelar</button><button class="button" type="submit">Gerar Pix</button></div></form>`);
+  } else await showPix(token,'');
+}
+async function showPix(token,cpf) {
+  try {
+    const data=await api(`/api/registration/${encodeURIComponent(token)}/pix`,{method:'POST',body:JSON.stringify({cpf})});
+    if(data.mode==='manual'){
+      modal('Pagamento por Pix',`Valor: ${money(data.amount*100)} • Confirmação manual`,
+        `<div class="banner"><b>Importante:</b> copiar o Pix não garante a vaga. Após pagar, envie o comprovante ao organizador para confirmação.</div><p class="notice">Chave Pix do organizador:</p><div class="code-box">${escapeHTML(data.key)}</div><div class="form-actions"><button class="button button-secondary" data-action="copy" data-text="${escapeHTML(data.key)}">Copiar chave Pix</button><button class="button" data-action="close">Entendi</button></div>`);
+    } else {
+      modal('Seu Pix está pronto',`Valor: ${money(data.amount*100)} • A confirmação vem pela operadora`,
+        `<div class="row" style="justify-content:center">${data.qr?`<img class="qr" alt="QR Code Pix" src="data:image/png;base64,${escapeHTML(data.qr)}" />`:''}</div>
+         <p class="notice">Pix copia e cola:</p><div class="code-box">${escapeHTML(data.code)}</div><p class="notice">A atualização pode levar alguns instantes após o pagamento.</p>
+         <div class="form-actions"><button class="button button-secondary" data-action="copy" data-text="${escapeHTML(data.code)}">Copiar Pix</button><button class="button" data-action="close">Concluir</button></div>`);
+    }
+  } catch(e){toast(e.message,true); const fe=$('#form-error');if(fe)fe.innerHTML=`<div class="error-box">${escapeHTML(e.message)}</div>`;}
+}
+async function renderRanking(){
+  content(`${headline('COMUNIDADE DO FUTEBOL','Ranking e <span>MVP.</span>','Gols, assistências, presença e votação. A resenha também tem números.')}
+     <section class="panel">${panelTitle('Melhores jogadores','3 pontos por gol, 2 por assistência, 5 por MVP e 1 por presença.')}
+     <div id="ranking-list"><p class="muted">Carregando classificação...</p></div></section>
+     <section class="panel mt" id="community-panel">${panelTitle('Votação para MVP do dia','Cada membro confirmado pode votar em outro jogador quando o Master liberar.')}
+      ${state.member?'<p class="muted">Carregando partidas...</p>':'<p class="notice">Entre na sua conta de membro para votar e consultar os resultados.</p><button class="button button-sm" data-action="member-login">Entrar como membro</button>'}</section>`);
+  try{
+    const d=await api('/api/ranking');if(state.view!=='ranking')return;
+    $('#ranking-list').innerHTML=d.ranking.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th>Membro</th><th>Pontos</th><th>Gols</th><th>Assist.</th><th>MVP</th><th>Jogos</th></tr></thead><tbody>
+      ${d.ranking.map((r,i)=>`<tr><td><strong style="color:var(--lime)">${i+1}º</strong></td><td>${escapeHTML(r.name)}</td><td><strong>${r.pontos}</strong></td><td>${r.gols}</td><td>${r.assistencias}</td><td>${r.mvps}</td><td>${r.presencas}</td></tr>`).join('')}</tbody></table></div>`:
+      empty('⚽','O ranking vai começar','Gols, assistências e presenças serão contabilizados após as partidas.');
+    if(state.member){const match=state.matches.find(x=>x.voting_enabled)||state.matches[0];if(match)await loadCommunity(match.id)}
+  }catch(e){toast(e.message,true)}
+}
+async function loadCommunity(matchId){
+  const place=$('#community-panel');if(!place)return;
+  try{
+    const d=await api(`/api/matches/${matchId}/community`);
+    if(state.view!=='ranking'||!$('#community-panel'))return;
+    const options=state.matches.map(m=>`<option value="${m.id}" ${m.id===matchId?'selected':''}>${shortDate(m.starts_at)} • ${escapeHTML(m.title)}</option>`).join('');
+    const nominees=d.players.map(r=>`<div class="roster-person"><span class="roster-index">${r.votes} ★</span><span class="roster-name">${escapeHTML(r.name)}<small>${r.goals} gols • ${r.assists} assistências</small></span>
+      <button class="button button-sm ${d.my_vote===r.id?'button-secondary':''}" data-action="vote-mvp" data-id="${r.id}" data-match="${matchId}" ${!d.can_vote||d.my_registration_id===r.id?'disabled':''}>${d.my_vote===r.id?'Meu voto ✓':'Votar'}</button></div>`).join('');
+    const maxVotes=Math.max(0,...d.players.map(x=>x.votes));
+    const winners=d.players.filter(x=>maxVotes>0&&x.votes===maxVotes).map(x=>x.name).join(', ');
+    place.innerHTML=panelTitle('MVP da partida','Vote uma vez por partida. Pode alterar o voto enquanto estiver aberta.')+
+      `${maxVotes?`<div class="highlight-bar">🏆 <b>MVP parcial:</b> ${escapeHTML(winners)} com ${maxVotes} voto(s). ${d.voting_enabled?'Resultado ainda pode mudar.':'Votação encerrada.'}</div>`:''}<div class="form-group mb"><label>Escolha a partida</label><select class="form-control" id="community-match">${options}</select></div>
+      <p class="notice">${d.voting_enabled?'Votação liberada pelo Master.':'Votação ainda não liberada pelo Master.'} Somente participantes confirmados votam; ninguém vota em si mesmo.</p>
+      ${nominees||'<p class="muted">Nenhum participante confirmado nesta partida.</p>'}`;
+  }catch(e){place.innerHTML=panelTitle('MVP da partida')+`<p class="muted">${escapeHTML(e.message)}</p>`}
+}
+
+async function renderAdmin(){
+  if(!state.admin){
+    content(`${headline('ÁREA RESTRITA','Painel do <span>Admin Master.</span>','Controle de jogadores, vagas, pagamentos, sorteio e histórico.')}
+      <section class="panel admin-login">${panelTitle('Entrar na administração','Acesso exclusivo do Admin Master.')}
+        <form id="admin-login-form"><div class="form-group"><label>E-mail do Admin Master</label><input type="email" name="email" class="form-control" autocomplete="username" ${state.config.demo?'':'required'} placeholder="seu@email.com"/></div><div class="form-group mt"><label>Senha de acesso</label><input type="password" name="password" class="form-control" autocomplete="current-password" required placeholder="Digite a senha do organizador"/></div>
+        <div id="admin-error"></div><button type="submit" class="button button-block mt">Entrar no painel ↗</button></form></section>`);
+    try{state.admin=await api('/api/admin/overview');drawAdmin();}catch{ /* login form remains */ }
+  }else drawAdmin();
+}
+async function reloadAdmin(){state.admin=await api('/api/admin/overview');await reloadMatches();drawAdmin()}
+function drawAdmin(){
+  const data=state.admin; if(state.view!=='admin'||!data)return;
+  const upcoming=data.matches.filter(m=>new Date(m.starts_at)>new Date() && m.status==='active');
+  if(!upcoming.length && data.matches.length)upcoming.push(data.matches[0]);
+  if(!state.activeMatch || !data.matches.find(m=>m.id===state.activeMatch.id))state.activeMatch=upcoming[0]||data.matches[0];
+  const selected=data.matches.find(m=>m.id===state.activeMatch?.id)||upcoming[0]||data.matches[0];
+  if(selected)state.activeMatch=selected;
+  const reg=data.registrations.filter(r=>r.match_id===selected?.id);
+  const paid=reg.filter(x=>x.status==='paid'&&x.role==='linha');
+  const waiting=reg.filter(x=>x.status==='waitlist');
+  const pending=reg.filter(x=>x.status==='reserved'&&x.role!=='goleiro');
+  const goalkeepers=reg.filter(x=>x.status==='reserved'&&x.role==='goleiro');
+  const revenue=paid.filter(x=>x.role==='linha').length*(selected?.price_cents||0);
+  const interestCount=(data.historical_interests||[]).filter(x=>x.match_id===selected?.id).length;
+  const matchesOptions=data.matches.map(m=>`<option ${m.id===selected?.id?'selected':''} value="${m.id}">${shortDate(m.starts_at)} • ${escapeHTML(m.title)}</option>`).join('');
+  const orderedPaid=paid.filter(x=>x.role==='linha').sort((a,b)=>(a.paid_at||'').localeCompare(b.paid_at||'')||a.id-b.id);
+  content(`${headline('CENTRAL DE CONTROLE','Painel <span>administrativo.</span>','Você comanda a partida. O sistema cuida da lista, da fila e das confirmações.')}
+    <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button>
+    <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
+    <div class="kpi-grid"><button type="button" class="kpi kpi-link ${state.adminFilter==='paid'?'kpi-active':''}" data-action="admin-filter" data-filter="paid" aria-label="Abrir lista de confirmados"><small>VAGAS CONFIRMADAS</small><strong>${paid.length}<span class="muted">/${selected?.capacity??'—'}</span></strong><span class="tiny">Ver confirmados →</span></button>
+    <button type="button" class="kpi kpi-link ${state.adminFilter==='reserved'?'kpi-active':''}" data-action="admin-filter" data-filter="reserved" aria-label="Abrir lista de pendentes"><small>AGUARDANDO PIX</small><strong>${pending.length}</strong><span class="tiny">Ver pendentes →</span></button>
+    <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
+    <button type="button" class="kpi kpi-link ${state.adminFilter==='goleiro'?'kpi-active':''}" data-action="admin-filter" data-filter="goleiro" aria-label="Abrir lista de goleiros pendentes"><small>GOLEIROS PENDENTES</small><strong>${goalkeepers.length}</strong><span class="tiny">Ver goleiros →</span></button><div class="kpi"><small>ARRECADAÇÃO</small><strong>${money(revenue)}</strong><span class="tiny">Sem goleiros isentos</span></div></div>
+    <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
+    <div class="admin-subnav"><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
+      <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
+    <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
+    ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
+}
+function adminTabContent(reg,m,data){
+ if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
+ if(state.adminTab==='classificacao'){
+   const paid=reg.filter(r=>r.status==='paid'&&r.role==='linha').sort((a,b)=>(a.paid_at||'').localeCompare(b.paid_at||'')||a.id-b.id);
+   const roster=paid.map((r,i)=>({...r,rank:i+1}));
+   const table=(title,players)=>`<div class="roster-group"><h3>${title} <span>${players.length}</span></h3>${players.length?players.map(r=>`<div class="roster-person"><span class="roster-index">${r.rank}º</span><span class="roster-name">${escapeHTML(r.name)}<small>${r.paid_at?fullDate(r.paid_at):'Sem confirmação'}</small></span><button class="button button-sm button-outline" data-action="correct-payment" data-id="${r.id}">Corrigir horário</button></div>`).join(''):'<p class="muted">Aguardando os pagamentos.</p>'}</div>`;
+   const goalies=reg.filter(r=>r.status==='paid'&&r.role==='goleiro');
+   return `<section class="panel">${panelTitle('Classificação por pagamento',`${paid.length} jogadores de linha pagos. A ordem não depende da inscrição.`)}
+      <div class="roster-grid">${table('1º a 10º: começam jogando',roster.slice(0,10))}${table('11º em diante: rodízio',roster.slice(10))}</div>
+      <div class="highlight-bar"><b>Goleiros aprovados:</b> ${goalies.map(r=>escapeHTML(r.name)).join(', ')||'nenhum'}. Isentos de Pix e classificados separadamente.</div></section>`;
+ }
+ if(state.adminTab==='estatisticas'){
+   const stats=Object.fromEntries((data.stats||[]).map(s=>[s.registration_id,s]));
+   const confirmed=reg.filter(r=>r.status==='paid');
+   return `<section class="panel">${panelTitle('Gols, assistências e MVP','Registre os números da partida e libere uma votação entre jogadores confirmados.')}
+      <div class="admin-tools"><div class="row"><span class="pill ${m.voting_enabled?'paid':'neutral'}">${m.voting_enabled?'VOTAÇÃO ABERTA':'VOTAÇÃO FECHADA'}</span><button class="button button-sm ${m.voting_enabled?'button-secondary':'button-outline'}" data-action="toggle-voting">${m.voting_enabled?'Encerrar votação':'Liberar votação'}</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Jogador</th><th>Gols</th><th>Assistências</th><th>Ação</th></tr></thead><tbody>${confirmed.map(r=>`<tr><td>${escapeHTML(r.name)}</td><td>${stats[r.id]?.goals||0}</td><td>${stats[r.id]?.assists||0}</td><td><button class="button button-sm button-secondary" data-action="edit-stats" data-id="${r.id}">Editar números</button></td></tr>`).join('')||'<tr><td colspan="4">Nenhum confirmado.</td></tr>'}</tbody></table></div>
+      <p class="notice">Cada jogador confirmado pode votar em outro participante depois do início do jogo. O voto é individual e pode ser alterado enquanto a votação estiver aberta.</p></section>`;
+ }
+ if(state.adminTab==='whatsapp'){
+   const message=`⚽ ${m.title} | ${shortDate(m.starts_at)} às ${clock(m.starts_at)}. Confira seu status e prazo de pagamento no site: ${siteLink}`;
+   const approved=data.members||[];
+   const consented=new Set(approved.filter(x=>x.whatsapp_opt_in&&x.active).map(x=>x.phone));
+   const targets=reg.filter(r=>['paid','reserved','waitlist'].includes(r.status)&&consented.has(r.phone));
+   return `<section class="panel">${panelTitle('Console de comunicação','Abrir o WhatsApp Web, preparar mensagens e convocar os membros com autorização.')}
+      <div class="row mb"><a href="https://web.whatsapp.com/" target="_blank" rel="noopener noreferrer" class="button button-sm">Abrir meu WhatsApp Web ↗</a><span class="pill neutral">${escapeHTML(data.whatsapp_provider||'manual')}</span>${data.whatsapp_provider==='evolution'&&data.whatsapp_ready?'<button class="button button-sm button-outline" data-action="wa-connection">Consultar conexão / QR</button>':''}</div>
+      <p class="notice">O WhatsApp Web abre em outra aba. Ele não pode ser controlado integralmente dentro do site. Envio automático requer integração configurada e consentimento. Não envie mensagens para quem recusou os avisos.</p>
+      <div class="wa-server-panel"><strong>Servidor de integração não oficial</strong><span>Provedor: ${escapeHTML(data.whatsapp_provider==='evolution'?'Evolution API':'Não configurado')}</span><span>Servidor: ${escapeHTML(data.whatsapp_server||'Não configurado na hospedagem')}</span><span>Instância: ${escapeHTML(data.whatsapp_instance||'Não configurada')}</span><small>Credenciais e endereço HTTPS são definidos no servidor por variáveis de ambiente. A chave privada nunca aparece aqui.</small></div>
+      <form id="broadcast-form"><div class="form-grid"><div class="form-group"><label>Público</label><select name="audience" class="form-control"><option value="all">Todos os ativos</option><option value="paid">Confirmados</option><option value="reserved">Pendentes do Pix</option><option value="waitlist">Lista de espera</option></select></div><div class="form-group"><label>Envio por API</label><input class="form-control" value="${data.whatsapp_provider==='evolution'&&data.whatsapp_ready?'Evolution configurada':'Usar links manuais'}" disabled /></div></div>
+      <div class="form-group mt"><label>Mensagem do comunicado</label><textarea class="form-control broadcast-message" name="message" minlength="10" maxlength="500" rows="4" required>${escapeHTML(message)}</textarea></div>
+      <div class="row mt"><button type="button" class="button button-secondary button-sm" data-action="copy-broadcast">Copiar texto</button><button type="submit" class="button button-sm" ${data.whatsapp_provider==='evolution'&&data.whatsapp_ready?'':'disabled'}>Programar envio aos autorizados</button></div></form>
+      <h3 class="admin-mini-heading">Destinatários que autorizaram WhatsApp (${targets.length})</h3>
+      <div class="table-wrap"><table><thead><tr><th>Membro</th><th>Status</th><th>WhatsApp</th></tr></thead><tbody>${targets.map(r=>`<tr data-wa-status="${r.status}"><td>${escapeHTML(r.name)}</td><td>${statusPill(r.status)}</td><td><a class="button button-sm button-outline" target="_blank" rel="noopener noreferrer" data-wa-link="${r.phone}" href="https://wa.me/55${r.phone}?text=${encodeURIComponent(message)}">Conversar ↗</a></td></tr>`).join('')||'<tr><td colspan="3">Nenhum membro com autorização para mensagens.</td></tr>'}</tbody></table></div>
+    ${(data.broadcast_history||[]).filter(n=>n.match_id===m.id).length?`<h3 class="admin-mini-heading">Histórico de comunicados</h3><div class="table-wrap"><table><thead><tr><th>Membro</th><th>Solicitado</th><th>Envio à API</th></tr></thead><tbody>${data.broadcast_history.filter(n=>n.match_id===m.id).map(n=>`<tr><td>${escapeHTML(n.name)}</td><td>${shortDate(n.created_at)} ${clock(n.created_at)}</td><td>${n.wa_sent_at?'Aceito pela API':n.wa_attempts>=3?'Falhou (3 tentativas)':'Na fila / tentativa '+n.wa_attempts}</td></tr>`).join('')}</tbody></table></div>`:''}</section>`;
+ }
+ if(state.adminTab==='interesses'){
+  const items=(data.historical_interests||[]).filter(x=>x.match_id===m.id);
+  return `<section class="panel">${panelTitle('Histórico de interessados',`${items.length} registros somente para histórico. Não são reservas nem integram a fila de espera.`)}<div class="table-wrap"><table><thead><tr><th>Membro</th><th>Celular</th><th>Posição</th><th>Registrado em</th></tr></thead><tbody>${items.map(i=>`<tr><td>${escapeHTML(i.name)}</td><td>${escapeHTML(phoneMask(i.phone))}</td><td>${escapeHTML(i.position)}</td><td>${fullDate(i.created_at)}</td></tr>`).join('')||'<tr><td colspan="4">Nenhum interesse histórico.</td></tr>'}</tbody></table></div></section>`;
+ }
+ if(state.adminTab==='membros')return `<section class="panel">${panelTitle('Cadastros individuais','Celulares validados por SMS. Apenas o Master acessa os dados completos.')}
+ <div class="table-wrap"><table><thead><tr><th>Membro</th><th>Telefone</th><th>E-mail</th><th>Verificado</th><th>Acesso</th></tr></thead><tbody>
+ ${(data.members||[]).map(x=>`<tr><td><strong>${escapeHTML(x.name||'Cadastro incompleto')}</strong></td><td>${escapeHTML(phoneMask(x.phone))}</td><td>${escapeHTML(x.email||'—')}</td><td>${shortDate(x.verified_at)}</td><td><button class="button button-sm ${x.active?'button-danger':'button-secondary'}" data-action="member-access" data-id="${x.id}" data-active="${x.active?0:1}">${x.active?'Bloquear':'Reativar'}</button></td></tr>`).join('')||'<tr><td colspan="5">Nenhum membro cadastrado.</td></tr>'}</tbody></table></div></section>`;
+ if(state.adminTab==='times'){
+   const teams=data.teams.filter(x=>x.match_id===m?.id);
+   const grouped={};teams.forEach(t=>(grouped[t.label] ||= []).push(t));
+   return `<section class="panel">${panelTitle('Sorteio dos times','Distribuição aleatória com goleiros espalhados entre os times.')}
+       <div class="row mb"><label class="muted" style="font-size:12px">Número de times</label><select id="team-count" class="form-control" style="max-width:110px"><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option></select>
+       <button class="button button-sm" data-action="draw-teams">Sortear agora ⚽</button></div>
+       ${Object.keys(grouped).length?`<div class="team-grid">${Object.entries(grouped).map(([label,items])=>`<div class="team-card"><strong>${escapeHTML(label)}</strong><ol>${items.map(it=>`<li>${escapeHTML(it.name)} ${it.role==='goleiro'?'🧤':''}</li>`).join('')}</ol></div>`).join('')}</div>`:empty('⚽','Times ainda não sorteados','Confirme os pagamentos e clique em Sortear agora.')}
+       <p class="notice">Refazer o sorteio substitui os times anteriores. Para compartilhar, use a lista gerada no painel.</p></section>`;
+ }
+ if(state.adminTab==='avisos'){
+   const notices=data.notifications.filter(x=>x.match_id===m?.id);
+   return `<section class="panel">${panelTitle('Convocações da fila','Mensagens prontas para enviar pelo WhatsApp.')}
+    ${notices.length?notices.map(n=>`<div class="upcoming-row"><div style="max-width:70%"><strong>${escapeHTML(n.name)}</strong><p class="status-text">${escapeHTML(n.message)}</p><small class="muted">${n.wa_sent_at?'WhatsApp automático enviado':n.wa_attempts?'Envio automático tentado: confira o resultado':'Envio manual disponível'}</small></div><div class="row"><a class="button button-sm button-secondary" target="_blank" rel="noopener" href="https://wa.me/55${encodeURIComponent(n.phone)}?text=${encodeURIComponent(n.message+' '+location.origin+'/?inscricao='+n.token)}">WhatsApp ↗</a><button class="button button-sm button-outline" data-action="dismiss-notice" data-id="${n.id}">Enviado ✓</button></div></div>`).join(''):empty('✓','Tudo em dia','Não há convocações pendentes no momento.')}</section>`;
+ }
+ const orderedRegs=[...reg].sort((a,b)=>{
+    const weight={paid:0,reserved:1,waitlist:2,expired:3,cancelled:4};
+    return (weight[a.status]??9)-(weight[b.status]??9) ||
+      (a.status==='paid'?((a.paid_at||'').localeCompare(b.paid_at||'')):(a.created_at||'').localeCompare(b.created_at||'')) ||a.id-b.id;
+ });
+ const filteredRegs=orderedRegs.filter(r=>state.adminFilter==='all'||(state.adminFilter==='goleiro'?r.status==='reserved'&&r.role==='goleiro':state.adminFilter==='reserved'?r.status==='reserved'&&r.role!=='goleiro':r.status===state.adminFilter));
+ const mobileCards=[];
+ const rows=filteredRegs.map(r=>{
+   const queueActions=r.status==='waitlist'?`<button class="button button-sm button-secondary" data-action="promote-queue" data-id="${r.id}">Promover</button>${r.queue_hold?`<button class="button button-sm button-outline" data-action="release-queue" data-id="${r.id}">Voltar à fila automática</button>`:''}<button class="button button-sm button-danger" data-action="remove-queue" data-id="${r.id}">Remover da fila</button>`:r.status==='reserved'?`<button class="button button-sm button-outline" data-action="move-to-queue" data-id="${r.id}">Mover à fila</button>`:'';
+   const statusActions=r.status==='reserved'?`<button class="button button-sm" data-action="confirm" data-id="${r.id}">${r.role==='goleiro'?'Aprovar goleiro':'Confirmar Pix'}</button>`:'';
+   const cancelAction=!['cancelled','expired'].includes(r.status)?`<button class="button button-sm button-danger" data-action="cancel-admin" data-id="${r.id}">Remover</button>`:'';
+   const attendanceAction=r.status==='paid'?`<button class="button button-sm button-secondary" data-action="attendance" data-id="${r.id}" data-attended="${r.attended?0:1}">${r.attended?'✓ Presente':'Marcar presença'}</button>`:'';
+   mobileCards.push(`<article class="mobile-player"><div class="row-between"><strong>${escapeHTML(r.name)}</strong>${statusPill(r.status)}</div><div class="mobile-player-detail">${escapeHTML(phoneMask(r.phone))} · ${escapeHTML(r.position==='indefinido'?'Sem preferência':r.position)}${r.queue_hold?' · Espera manual':''}</div><div class="mobile-player-actions">${statusActions}${queueActions}${attendanceAction}${r.status==='waitlist'?'':cancelAction}</div></article>`);
+   return `<tr><td><strong>${r.status==='paid'&&r.role==='linha'?orderedRegs.filter(t=>t.status==='paid'&&t.role==='linha').findIndex(t=>t.id===r.id)+1:'•'}</strong></td><td><strong>${escapeHTML(r.name)}</strong><br><small class="muted">${escapeHTML(phoneMask(r.phone))}</small></td><td>${r.position==='goleiro'?'🧤 Goleiro':r.position==='atacante'?'⚽ Atacante':r.position==='zagueiro'?'🛡 Zagueiro':'⚽ Sem preferência'}</td><td>${r.role==='goleiro'&&r.status==='reserved'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}${r.review_reason?`<br><small style="color:var(--red)">${escapeHTML(r.review_reason)}</small>`:''}</td><td><small>${r.reserved_until?`${clock(r.reserved_until)} • ${shortDate(r.reserved_until)}`:'—'}</small></td><td><div class="table-actions">${statusActions}${queueActions}${attendanceAction}${r.status==='waitlist'?'':cancelAction}</div></td></tr>`;
+ }).join('');
+ return `<section class="panel" id="admin-players-list">${panelTitle('Lista de jogadores',`${filteredRegs.length} de ${reg.length} inscrições exibidas. Somente o pagamento confirmado garante vaga.`,
+    `<a class="button button-sm button-secondary" href="/api/admin/matches/${m?.id}/export">Exportar CSV ↗</a>`)}
+    <div class="row mb admin-list-filters"><label for="admin-status-filter">Situação</label><select id="admin-status-filter" class="form-control" aria-label="Filtrar jogadores por status">${[['all','Todos'],['paid','Confirmados'],['reserved','Pendentes do Pix'],['waitlist','Lista de espera'],['goleiro','Goleiros pendentes']].map(([v,label])=>`<option value="${v}" ${state.adminFilter===v?'selected':''}>${label}</option>`).join('')}</select><span class="muted">Clique nos indicadores acima para filtrar.</span></div>
+    <div class="mobile-players">${mobileCards.join('')||'<p class="muted">Nenhum jogador nesta situação.</p>'}</div>
+    <div class="table-wrap"><table><thead><tr><th>#</th><th>Jogador</th><th>Posição</th><th>Situação</th><th>Prazo</th><th>Ações</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Nenhum jogador nesta situação.</td></tr>'}</tbody></table></div>
+    <p class="notice">Ao confirmar manualmente, confira o Pix na conta do organizador. Não confirme apenas com base em comprovante enviado pelo jogador.</p></section>`;
+}
+function matchForm(edit){
+ const m=edit?state.activeMatch:null;
+ modal(edit?'Editar partida':'Criar nova partida','Personalize regras, horários, valores e número de vagas.',
+ `<form id="match-form"><input type="hidden" name="id" value="${m?.id||''}"/><div class="form-grid">
+   <div class="form-group"><label>Nome da partida</label><input class="form-control" name="title" required value="${escapeHTML(m?.title||'Futebol de Sábado')}"/></div>
+   <div class="form-group"><label>Local</label><input class="form-control" name="venue" required value="${escapeHTML(m?.venue||'Farofa Society')}"/></div>
+   <div class="form-group"><label>Início do jogo</label><input type="datetime-local" class="form-control" name="starts_at" required value="${inputDate(m?.starts_at)}"/></div>
+   <div class="form-group"><label>Abertura das inscrições</label><input type="datetime-local" class="form-control" name="opens_at" required value="${inputDate(m?.opens_at)}"/></div>
+   <div class="form-group"><label>02 · Data e horário limite do Pix</label><input type="datetime-local" class="form-control" name="payment_deadline" required value="${inputDate(m?.payment_deadline)}"/></div>
+   <div class="form-group"><label>03 · Data e horário para liberar a fila</label><input type="datetime-local" class="form-control" name="waitlist_releases_at" required value="${inputDate(m?.waitlist_releases_at||m?.payment_deadline)}"/><small class="muted">Pode ser às 20h ou depois do prazo do pagamento.</small></div>
+   <div class="form-group full"><label>Texto informativo da liberação da fila</label><input class="form-control" name="waitlist_note" maxlength="240" placeholder="Ex.: Não pagou? A vaga será oferecida ao próximo da fila." value="${escapeHTML(m?.waitlist_note||'')}"/></div>
+   <div class="form-group"><label>Encerramento das inscrições</label><input type="datetime-local" class="form-control" name="signup_closes_at" required value="${inputDate(m?.signup_closes_at)}"/></div>
+   <div class="form-group"><label>Quantidade máxima de jogadores (editável, sem teto fixo)</label><input type="number" class="form-control" name="capacity" min="2" step="1" required value="${m?.capacity??20}"/><small class="muted">Defina qualquer quantidade a partir de 2. Goleiros entram nesse total.</small></div>
+   <div class="form-group"><label>Preço (R$)</label><input type="number" class="form-control" name="price" step="0.01" min="0" required value="${(m?.price_cents??1500)/100}"/></div>
+   <div class="form-group full"><label>Vagas para goleiros (incluídas no total)</label><input type="number" class="form-control" name="goalie_limit" min="0" required value="${m?.goalie_limit??2}"/></div></div>
+   <div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Cancelar</button><button class="button" type="submit">Salvar partida ↗</button></div></form>`,true);
+}
+async function submitMatch(form){
+ const d=new FormData(form);const id=d.get('id');const b=form.querySelector('[type=submit]');setLoading(b,true);
+ const payload={title:d.get('title'),venue:d.get('venue'),starts_at:offsetDate(d.get('starts_at')),opens_at:offsetDate(d.get('opens_at')),
+     payment_deadline:offsetDate(d.get('payment_deadline')),waitlist_releases_at:offsetDate(d.get('waitlist_releases_at')||d.get('payment_deadline')),waitlist_note:d.get('waitlist_note')||'',signup_closes_at:offsetDate(d.get('signup_closes_at')),
+     capacity:Number(d.get('capacity')),price_cents:Math.round(Number(d.get('price'))*100),goalie_limit:Number(d.get('goalie_limit'))};
+ try{
+   const result=await api(id?`/api/admin/matches/${id}`:'/api/admin/matches',{method:id?'PATCH':'POST',body:JSON.stringify(payload)});
+   if(!id)state.activeMatch={id:result.id};closeModal();await reloadAdmin();await reloadMatches();toast('Partida salva com sucesso.');
+ }catch(e){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(e.message)}</div>`}finally{setLoading(b,false)}
+}
+async function adminAction(action,id,extra){
+ try{
+  if(action==='sim-full-paid'){await api('/api/admin/demo/full-paid',{method:'POST',body:JSON.stringify({match_id:state.activeMatch.id})});await reloadAdmin();await reloadMatches();toast('Lotação de jogadores de linha simulada. Teste o popup em Início.');return;}
+  if(action==='sim-deadline'){await api('/api/admin/demo/expire',{method:'POST',body:JSON.stringify({match_id:state.activeMatch.id})});await reloadAdmin();await reloadMatches();toast('Prazo simulado! Fila atualizada.');return;}
+  if(action==='logout'){await api('/api/admin/logout',{method:'POST'});state.admin=null;toast('Sessão encerrada.');return renderAdmin()}
+  if(action==='confirm'&&!confirm('Se for goleiro, confirme a isenção. Para jogador de linha, confirme que o Pix realmente entrou na conta. Prosseguir?'))return;
+  if(action==='cancel-admin'&&!confirm('Deseja realmente remover esta inscrição? Se ela estiver paga, o reembolso será tratado manualmente.'))return;
+  if(action==='draw-teams'&&!confirm('Sortear/recriar os times desta partida?'))return;
+  const endpoint=action==='draw-teams'?`/api/admin/matches/${state.activeMatch.id}/draw`:
+    action==='dismiss-notice'?`/api/admin/notifications/${id}/dismiss`:
+    action==='attendance'?`/api/admin/registrations/${id}/attendance`:
+    `/api/admin/registrations/${id}/${action==='confirm'?'confirm':'cancel'}`;
+  const body=action==='draw-teams'?{team_count:Number($('#team-count').value)}:action==='attendance'?{attended:Boolean(Number(extra))}:undefined;
+  await api(endpoint,{method:'POST',body:body?JSON.stringify(body):undefined});await reloadAdmin();await reloadMatches();toast('Alteração realizada.');
+ }catch(e){toast(e.message,true)}
+}
+function openMemberLogin(){
+  modal('Acesso de membro','Cada pessoa precisa confirmar o próprio número. Não é possível inscrever amigos pelo mesmo acesso.',
+    `<form id="member-phone-form"><div class="form-group"><label>Seu celular com DDD</label><input class="form-control" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(62) 99999-9999" required minlength="15" maxlength="15" aria-describedby="phone-helper" /></div>
+    <p class="notice" id="phone-helper">Formato: (DDD) 9XXXX-XXXX. Apenas 11 números. Enviaremos um código por SMS para validar sua conta.</p><div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Voltar</button><button class="button" type="submit">Receber código ↗</button></div></form>`);
+}
+function openMemberCode(phone, demoCode){
+  modal('Validar meu celular',`Código enviado para ${escapeHTML(phone)}`,
+  `<form id="member-code-form"><input type="hidden" name="phone" value="${escapeHTML(phone)}"/><div class="form-group"><label>Código de 6 dígitos</label><input class="form-control otp-input" name="code" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000" /></div>
+  ${demoCode?`<div class="highlight-bar">Somente teste local: código <strong>${escapeHTML(demoCode)}</strong>. Nenhum SMS real foi enviado.</div>`:''}<div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="member-login">Voltar</button><button class="button" type="submit">Validar e entrar ↗</button></div></form>`);
+}
+function openProfile(){
+  if(!state.member)return openMemberLogin();
+  modal('Meu cadastro','Informe seus dados uma única vez. Apenas você poderá reservar sua vaga.',
+  `<form id="member-profile-form"><div class="member-identity"><span class="member-avatar">✓</span><div><strong>Celular confirmado</strong><p>${escapeHTML(phoneMask(state.member.phone))}</p></div></div>
+   <div class="form-group mt"><label>Nome completo</label><input class="form-control" name="name" autocomplete="name" required minlength="5" maxlength="90" value="${escapeHTML(state.member.name)}" placeholder="Nome e sobrenome" /></div>
+   <div class="form-group mt"><label>E-mail</label><input class="form-control" type="email" name="email" autocomplete="email" required maxlength="160" value="${escapeHTML(state.member.email)}" placeholder="voce@email.com" /></div>
+   <label class="consent-check"><input type="checkbox" name="whatsapp_opt_in" ${state.member.whatsapp_opt_in?'checked':''}/><span>Quero receber pelo WhatsApp avisos sobre minha inscrição, pagamento e convocação da fila. Posso desativar quando quiser.</span></label>
+   <p class="notice">O sistema verifica que seu celular pertence a você. O nome e o e-mail são vinculados à sua conta. Não cadastre informações de terceiros.</p>
+   <div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Voltar</button><button type="submit" class="button">Salvar cadastro ↗</button></div></form>`);
+}
+async function memberLogout(){try{await api('/api/member/logout',{method:'POST'});state.member=null;state.my=[];state.pendingMatchID=null;nav('my');toast('Você saiu da conta.')}catch(e){toast(e.message,true)}}
+async function startup(){
+ try{
+  state.config=await api('/api/config');await reloadMatches();try{state.member=(await api('/api/member/me')).member}catch{state.member=null}
+  const token=new URLSearchParams(location.search).get('inscricao');
+  if(token){nav('my');if(state.member){await loadMy();showMyDetails(token)}else{openMemberLogin()}}
+  else if(location.pathname==='/admin')nav('admin');else if(location.pathname==='/ranking')nav('ranking');else if(location.search.includes('pagina=minhas-inscricoes'))nav('my');else nav('home');
+  state.autoRefresh=setInterval(async()=>{try{if(state.view==='home'||state.view==='my')await refresh();else if(state.view==='admin'&&state.admin&&!$('#modal-root .modal-overlay'))await reloadAdmin();}catch(e){console.warn('Atualização automática indisponível',e)}},20000);
+ }catch(e){content(empty('⚠','Não foi possível carregar',escapeHTML(e.message),'<button class="button" onclick="location.reload()">Tentar novamente</button>'))}
+}
+document.addEventListener('click',async e=>{
+ const target=e.target.closest('[data-action],[data-nav]');
+ if(!target)return;
+ if(target.matches('a[data-nav]'))e.preventDefault();
+ const action=target.dataset.action;const view=target.dataset.nav;
+ if(view){nav(view);return}
+ const id=target.dataset.id;const token=target.dataset.token;
+ switch(action){
+  case 'close':closeModal();break;
+  case 'open-register':registerModal(id);break;
+  case 'member-login':openMemberLogin();break;
+  case 'member-profile':openProfile();break;
+  case 'member-logout':await memberLogout();break;
+  case 'member-access':
+    if(confirm(target.dataset.active==='1'?'Reativar este membro?':'Bloquear a conta? Ele perderá acesso à área de membros.')){
+      try{await api(`/api/admin/members/${id}/access`,{method:'POST',body:JSON.stringify({active:target.dataset.active==='1'})});await reloadAdmin();toast('Acesso do membro atualizado.')}catch(err){toast(err.message,true)}
+    }break;
+  case 'role':state.selectedRole=target.dataset.role;$$('.role-option').forEach(b=>b.classList.toggle('active',b.dataset.role===state.selectedRole));break;
+  case 'my-detail':await showMyDetails(token);break;
+  case 'get-pix':await getPix(token);break;
+  case 'self-cancel':
+   if(confirm('Deseja cancelar sua inscrição? Se houver fila, outra pessoa poderá ocupar sua vaga.')){
+     try{await api(`/api/registration/${token}/cancel`,{method:'POST'});closeModal();await refresh();toast('Inscrição cancelada.')}catch(err){toast(err.message,true)}
+   }break;
+  case 'copy':
+   try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
+  case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
+  case 'admin-filter':state.adminTab='jogadores';state.adminFilter=target.dataset.filter;drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+  case 'home-filter':state.homeFilter=target.dataset.filter;if(!state.member){state.pendingMatchID=null;openMemberLogin()}else{await loadHomeRoster(Number(id));$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});}break;
+  case 'run-queue':if(confirm('Executar agora a verificação de prazos e convocar a fila automaticamente, mesmo fora do horário agendado?')){try{const r=await api(`/api/admin/matches/${state.activeMatch.id}/queue/run`,{method:'POST'});await reloadAdmin();toast(r.notice)}catch(err){toast(err.message,true)}}break;
+  case 'move-to-queue':case 'release-queue':case 'remove-queue':case 'promote-queue':{
+    const r=state.admin?.registrations.find(x=>x.id===Number(id));if(!r)break;
+    if(action==='promote-queue'){const occupied=state.admin.registrations.filter(x=>x.match_id===r.match_id&&['paid','reserved'].includes(x.status)).length;
+      const m=state.activeMatch;const reserved=state.admin.registrations.filter(x=>x.match_id===r.match_id&&x.status==='reserved');
+      const isFull=occupied>=m.capacity;
+      const options=reserved.map(x=>`<option value="${x.id}">${escapeHTML(x.name)} (${x.role==='goleiro'?'Goleiro':'Pix pendente'})</option>`).join('');
+      modal('Promover da lista de espera',escapeHTML(r.name),`<form id="manual-promotion-form"><input type="hidden" name="reg_id" value="${r.id}"/>
+        <p class="notice">${isFull?'Partida lotada. Escolha qual reserva sem Pix será substituída.':'Há vaga livre. O jogador receberá um prazo individual de 30 minutos para pagar.'} Não é permitido retirar pagantes sem tratar o reembolso.</p>
+        ${isFull?`<div class="form-group"><label>Substituir reserva pendente</label><select class="form-control" name="replace_registration_id" required><option value="">Selecione um jogador</option>${options}</select></div>`:''}
+        <div id="form-error"></div><div class="form-actions"><button class="button button-secondary" type="button" data-action="close">Cancelar</button><button class="button" type="submit">Confirmar promoção</button></div></form>`);break;
+    }
+    const act=action==='move-to-queue'?'waitlist':action==='release-queue'?'release':'remove';
+    const message=act==='waitlist'?`Mover ${r.name} para a lista de espera manual? A reserva de Pix será cancelada, e o jogador só volta à fila automática quando você liberar.`:act==='release'?`Devolver ${r.name} à fila automática? Se houver vaga livre, poderá ser convocado imediatamente.`:`Remover ${r.name} da fila de espera e cancelar a inscrição?`;
+    if(!confirm(message))break;
+    try{await api(`/api/admin/registrations/${r.id}/queue`,{method:'POST',body:JSON.stringify({action:act})});await reloadAdmin();toast('Lista atualizada.')}catch(err){toast(err.message,true)}break;
+  }
+  case 'add-match':matchForm(false);break;
+  case 'edit-match':matchForm(true);break;
+  case 'archive-match':
+    if(state.activeMatch&&confirm(`Excluir/arquivar a partida ${state.activeMatch.title}? O histórico será preservado; confirme reembolsos manualmente quando houver Pix.`)){
+      try{const result=await api(`/api/admin/matches/${state.activeMatch.id}`,{method:'DELETE'});state.activeMatch=null;await reloadAdmin();await reloadMatches();toast(result.notice);}catch(err){toast(err.message,true)}
+    }break;
+  case 'restore-match':
+    if(confirm('Restaurar esta partida arquivada?')){try{await api(`/api/admin/matches/${id}/restore`,{method:'POST'});await reloadAdmin();await reloadMatches();toast('Partida restaurada.')}catch(err){toast(err.message,true)}}break;
+  case 'correct-payment':{
+    const r=state.admin?.registrations.find(r=>r.id===Number(id));if(!r)return;
+    modal('Corrigir confirmação do Pix',escapeHTML(r.name),`<form id="payment-time-form"><input type="hidden" name="reg_id" value="${r.id}"/>
+      <p class="notice">Use o horário real do Pix conforme o extrato bancário. Isso altera a posição na classificação dos primeiros 10. A correção fica registrada na auditoria.</p>
+      <div class="form-group"><label>Data e hora real do pagamento</label><input class="form-control" name="paid_at" type="datetime-local" required value="${inputDate(r.paid_at)}"/></div>
+      <div id="form-error"></div><div class="form-actions"><button type="submit" class="button">Salvar horário</button></div></form>`);break;
+  }
+  case 'edit-stats':{
+    const r=state.admin?.registrations.find(r=>r.id===Number(id));const st=state.admin?.stats.find(x=>x.registration_id===Number(id));if(!r)return;
+    modal('Estatísticas do jogador',escapeHTML(r.name),`<form id="stats-form"><input type="hidden" name="reg_id" value="${id}"/><div class="form-grid"><div class="form-group"><label>Gols</label><input type="number" class="form-control" name="goals" min="0" max="100" value="${st?.goals||0}" required/></div><div class="form-group"><label>Assistências</label><input type="number" class="form-control" name="assists" min="0" max="100" value="${st?.assists||0}" required/></div></div><div class="form-actions"><button type="submit" class="button">Salvar números</button></div><div id="form-error"></div></form>`);break;
+  }
+  case 'toggle-voting':
+    try{await api(`/api/admin/matches/${state.activeMatch.id}/voting`,{method:'POST',body:JSON.stringify({enabled:!state.activeMatch.voting_enabled})});await reloadAdmin();await reloadMatches();toast('Votação atualizada.')}catch(err){toast(err.message,true)}break;
+  case 'vote-mvp':
+    if(!confirm('Confirmar seu voto para MVP? Você poderá alterá-lo enquanto a votação estiver aberta.'))break;
+    try{await api(`/api/matches/${target.dataset.match}/vote`,{method:'POST',body:JSON.stringify({registration_id:Number(id)})});await loadCommunity(Number(target.dataset.match));toast('Voto registrado!')}catch(err){toast(err.message,true)}break;
+  case 'wa-connection':
+    try{const status=await api('/api/admin/whatsapp/status');
+      if(status.connection==='open')return modal('WhatsApp conectado','Evolution API',`<div class="success-box">✓ Seu número está conectado à instância configurada. Os envios permanecem sujeitos a consentimento e regras de comunicação.</div>`);
+      const connect=await api('/api/admin/whatsapp/connect',{method:'POST'});
+      modal('Conectar WhatsApp','Acesse WhatsApp > Aparelhos conectados > Conectar dispositivo.',
+        `${connect.qr?`<img src="${connect.qr}" alt="Código QR de pareamento" class="wa-qr"/>`:'<div class="notice">A instância não retornou uma imagem de QR válida. Confira os logs do provedor e tente novamente.</div>'}<p class="notice">Conexão não oficial. Use de preferência um número separado e não compartilhe o QR.</p><button class="button button-sm" data-action="wa-connection">Atualizar QR / status</button>`);
+    }catch(err){toast(err.message,true)}break;
+  case 'copy-broadcast':
+    try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
+  case 'logout':await adminAction('logout');break;
+  case 'sim-deadline':await adminAction('sim-deadline');break;
+  case 'sim-full-paid':await adminAction('sim-full-paid');break;
+  case 'confirm':case 'cancel-admin':case 'attendance':case 'draw-teams':case 'dismiss-notice':
+    await adminAction(action,id,target.dataset.attended);break;
+ }
+});
+document.addEventListener('submit',async e=>{
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form'].includes(e.target.getAttribute('id')))return;
+ e.preventDefault();const form=e.target;
+ if(form.getAttribute('id')==='manual-promotion-form'){
+   const d=new FormData(form);const body={action:'promote'};if(d.get('replace_registration_id'))body.replace_registration_id=Number(d.get('replace_registration_id'));
+   try{await api(`/api/admin/registrations/${d.get('reg_id')}/queue`,{method:'POST',body:JSON.stringify(body)});closeModal();await reloadAdmin();toast('Jogador promovido. A fila e as vagas foram atualizadas.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`;}return;
+ }
+ if(form.getAttribute('id')==='payment-time-form'){
+   const f=new FormData(form);try{await api(`/api/admin/registrations/${f.get('reg_id')}/payment-time`,{method:'PUT',body:JSON.stringify({paid_at:offsetDate(f.get('paid_at'))})});closeModal();await reloadAdmin();toast('Horário do Pix corrigido e posição recalculada.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}return;
+ }
+ if(form.getAttribute('id')==='stats-form'){
+   const f=new FormData(form);try{await api(`/api/admin/registrations/${f.get('reg_id')}/stats`,{method:'PUT',body:JSON.stringify({goals:Number(f.get('goals')),assists:Number(f.get('assists'))})});closeModal();await reloadAdmin();toast('Estatísticas registradas.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}return;
+ }
+ if(form.getAttribute('id')==='broadcast-form'){
+   const f=new FormData(form);if(!confirm('Programar este comunicado somente para membros que autorizaram WhatsApp? O envio pode gerar restrições no número se usar uma integração não oficial.'))return;
+   try{const res=await api('/api/admin/whatsapp/broadcast',{method:'POST',body:JSON.stringify({match_id:state.activeMatch.id,audience:f.get('audience'),message:f.get('message'),confirm:true})});await reloadAdmin();toast(`${res.queued} mensagens foram enfileiradas. Entrega não garantida.`);}catch(err){toast(err.message,true)}return;
+ }
+ if(form.getAttribute('id')==='member-phone-form'){
+   const b=form.querySelector('[type=submit]');setLoading(b,true);try{const phone=phoneDigits(new FormData(form).get('phone'));if(phone.length!==11||phone[2]!=='9')throw new Error('Digite um celular válido com DDD e 9 dígitos.');const res=await api('/api/member/otp/start',{method:'POST',body:JSON.stringify({phone})});openMemberCode(phoneMask(phone),res.demo_code);}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
+ }
+ if(form.getAttribute('id')==='member-code-form'){
+   const b=form.querySelector('[type=submit]');setLoading(b,true);try{const f=new FormData(form);const res=await api('/api/member/otp/verify',{method:'POST',body:JSON.stringify({phone:f.get('phone'),code:f.get('code')})});state.member=res.member;closeModal();if(res.needs_profile)openProfile();else if(state.pendingMatchID){const mid=state.pendingMatchID;state.pendingMatchID=null;registerModal(mid)}else{nav('my');toast('Acesso autorizado.')}}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
+ }
+ if(form.getAttribute('id')==='member-profile-form'){
+   const b=form.querySelector('[type=submit]');setLoading(b,true);try{const f=new FormData(form);const res=await api('/api/member/profile',{method:'PUT',body:JSON.stringify({name:f.get('name'),email:f.get('email'),whatsapp_opt_in:f.get('whatsapp_opt_in')==='on'})});state.member=res.member;closeModal();if(state.pendingMatchID){const mid=state.pendingMatchID;state.pendingMatchID=null;registerModal(mid)}else nav('my');toast('Cadastro salvo.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
+ }
+ if(form.getAttribute('id')==='registration-form')return sendRegistration(form);
+ if(form.getAttribute('id')==='pix-form'){const f=new FormData(form);return showPix(f.get('token'),f.get('cpf'))}
+ if(form.getAttribute('id')==='match-form')return submitMatch(form);
+ if(form.getAttribute('id')==='admin-login-form'){
+   const button=form.querySelector('[type=submit]');setLoading(button,true);
+   try{await api('/api/admin/login',{method:'POST',body:JSON.stringify({password:new FormData(form).get('password'),email:new FormData(form).get('email')||''})});state.admin=await api('/api/admin/overview');drawAdmin();toast('Acesso liberado.');}
+   catch(err){$('#admin-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(button,false)}
+ }
+});
+document.addEventListener('input',e=>{
+ if(e.target.matches('#broadcast-form [name=message]')){
+    const msg=e.target.value;
+    $$('[data-wa-link]').forEach(link=>{link.href=`https://wa.me/55${link.dataset.waLink}?text=${encodeURIComponent(msg)}`});
+ }
+ if(e.target.matches('input[name="phone"]')){
+   const before=e.target.value;
+   const masked=phoneMask(before);
+   if(before!==masked)e.target.value=masked;
+   e.target.setCustomValidity(phoneDigits(masked).length===11&&phoneDigits(masked)[2]==='9'?'':'Informe DDD e 9 dígitos.');
+ }
+});
+document.addEventListener('change',e=>{
+ if(e.target.matches('#broadcast-form [name=audience]')){
+   const selected=e.target.value;
+   $$('[data-wa-status]').forEach(row=>{row.style.display=selected==='all'||row.dataset.waStatus===selected?'':'none'});
+   return;
+ }
+ if(e.target.id==='admin-status-filter'){state.adminFilter=e.target.value;drawAdmin();$('#admin-players-list')?.scrollIntoView({block:'start'});return;}
+ if(e.target.id==='community-match'){loadCommunity(Number(e.target.value));return;}
+ if(e.target.id==='admin-match-select'){
+   const m=state.admin?.matches.find(x=>x.id===Number(e.target.value));if(m){state.activeMatch=m;drawAdmin()}
+ }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay'))closeModal()});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}
+startup();
+
+</script></body></html>
