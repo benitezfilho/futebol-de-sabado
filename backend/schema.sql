@@ -59,3 +59,13 @@ CREATE TABLE IF NOT EXISTS outbox (
  sent_at TEXT,
  UNIQUE(registration_id,kind,created_at)
 );
+
+-- Protecao inicial contra abuso do envio de SMS, por telefone e origem.
+CREATE TABLE IF NOT EXISTS otp_rate_events (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ phone_hash TEXT NOT NULL,
+ ip_hash TEXT NOT NULL,
+ created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS otp_events_phone ON otp_rate_events(phone_hash,created_at);
+CREATE INDEX IF NOT EXISTS otp_events_ip ON otp_rate_events(ip_hash,created_at);
