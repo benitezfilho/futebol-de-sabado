@@ -1,0 +1,35 @@
+name: Validar backend Cloudflare
+
+on:
+  push:
+    paths:
+      - "cloudflare/**"
+      - ".github/workflows/cloudflare-checks.yml"
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloudflare
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verificar sintaxe do Worker
+        run: node --check src/index.js
+      - name: Rodar testes sem dependências
+        run: node --test tests/*.test.js
+      - name: Verificar estrutura do SQL D1
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          conn=sqlite3.connect(":memory:")
+          conn.executescript(Path("migrations/0001_initial.sql").read_text())
+          for table in ("members","matches","registrations","payments","audit_log"):
+              assert conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+          print("Banco D1/SQLite: tabelas criadas com sucesso")
+          PY
