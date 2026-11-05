@@ -333,7 +333,7 @@ window.fetch=async function mockedFetch(input, options={}){
   const ahead=DEMO.regs.filter(x=>x.match_id===m.id&&x.status==='waitlist');
   return json({registration:r,match:statuses(m),queue_position:ahead.findIndex(x=>x.id===r.id)+1});
  }
- if(path==='/api/admin/login'){if(body.password==='demo123'){DEMO.adminLogged=true;saveDemo();return json({ok:true})}return fault('Senha da demonstração: demo123',401)}
+ if(path==='/api/admin/login'){if(body.preview===true){DEMO.adminLogged=true;saveDemo();return json({ok:true,demo:true})}return fault('Acesso administrativo real não está ativo nesta demonstração.',403)}
  if(path==='/api/admin/logout'){DEMO.adminLogged=false;saveDemo();return json({ok:true})}
  if(path==='/api/admin/demo/full-paid'&&method==='POST'){
    if(!DEMO.adminLogged)return fault('Somente Master.',401);
@@ -362,7 +362,7 @@ window.fetch=async function mockedFetch(input, options={}){
   promote(m.id,true);saveDemo();return json({ok:true});
  }
  if(path==='/api/admin/overview'){
-  if(!DEMO.adminLogged)return fault('Entre com a senha demo123',401);
+  if(!DEMO.adminLogged)return fault('Abra o painel de demonstração.',401);
   const teams=DEMO.teams.flatMap(t=>t.players.map(id=>({...t,name:DEMO.regs.find(r=>r.id===id)?.name||'Jogador',role:DEMO.regs.find(r=>r.id===id)?.role||'linha'})));
   return json({matches:DEMO.matches.filter(m=>!m.deleted_at).map(statuses),archived_matches:DEMO.matches.filter(m=>m.deleted_at).map(statuses),registrations:DEMO.regs,historical_interests:DEMO.interests.map(i=>({...i,...((member)=>({name:member.name,phone:member.phone,email:member.email}))(DEMO.members.find(m=>m.id===i.member_id))})),teams,notifications:DEMO.notices,broadcast_history:[],members:DEMO.members,stats:DEMO.stats,role:'master',whatsapp_provider:'manual',whatsapp_ready:false,whatsapp_server:null,whatsapp_instance:null});
  }
@@ -591,7 +591,7 @@ function renderRosterSections(roster,filter='all'){
   return `<div class="roster-grid">${[...([['titulares','Primeiros 10 pagantes'],['rodizio','Rodízio de jogadores'],['goleiros','Goleiros confirmados'],['pendentes','Aguardando pagamento'],['fila','Lista de espera']])].filter(([group])=>active.includes(group)).map(([group,title])=>two(title,part(group))).join('')}</div><p class="notice">A classificação dos jogadores de linha considera a hora da confirmação do Pix. Goleiros são isentos e aparecem separados.</p>`;
 }
 async function loadHomeRoster(matchId){
-  try{const result=await api(`/api/matches/${matchId}/roster`);if(state.view==='home'&&$('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação da próxima partida','Lista atualizada por status e ordem de confirmação.')+renderRosterSections(result.roster,state.homeFilter);}
+  try{const result=await api(`/api/matches/${matchId}/roster`);if(state.view==='home'&&$('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação da próxima partida','Lista atualizada por status e ordem de confirmação.')+`<div class="row mb"><button type="button" class="button button-sm button-outline" data-action="clear-home-filter" ${state.homeFilter==='all'?'disabled':''}>Ver todos os jogadores</button></div>`+renderRosterSections(result.roster,state.homeFilter);}
   catch(e){if($('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação','Entre novamente para consultar.')+`<button class="button button-sm" data-action="member-login">Entrar</button>`}
 }
 function registerModal(matchID) {
@@ -725,6 +725,14 @@ async function loadCommunity(matchId){
 
 async function renderAdmin(){
   if(!state.admin){
+    if(state.config.demo){
+      try{
+        await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
+        state.admin=await api('/api/admin/overview');
+        drawAdmin();
+      }catch(e){content(empty('⚠','Painel de demonstração indisponível',escapeHTML(e.message)));}
+      return;
+    }
     content(`${headline('ÁREA RESTRITA','Painel do <span>Admin Master.</span>','Controle de jogadores, vagas, pagamentos, sorteio e histórico.')}
       <section class="panel admin-login">${panelTitle('Entrar na administração','Acesso exclusivo do Admin Master.')}
         <form id="admin-login-form"><div class="form-group"><label>E-mail do Admin Master</label><input type="email" name="email" class="form-control" autocomplete="username" ${state.config.demo?'':'required'} placeholder="seu@email.com"/></div><div class="form-group mt"><label>Senha de acesso</label><input type="password" name="password" class="form-control" autocomplete="current-password" required placeholder="Digite a senha do organizador"/></div>
@@ -750,6 +758,7 @@ function drawAdmin(){
   const matchesOptions=data.matches.map(m=>`<option ${m.id===selected?.id?'selected':''} value="${m.id}">${shortDate(m.starts_at)} • ${escapeHTML(m.title)}</option>`).join('');
   const orderedPaid=paid.filter(x=>x.role==='linha').sort((a,b)=>(a.paid_at||'').localeCompare(b.paid_at||'')||a.id-b.id);
   content(`${headline('CENTRAL DE CONTROLE','Painel <span>administrativo.</span>','Você comanda a partida. O sistema cuida da lista, da fila e das confirmações.')}
+    <div class="highlight-bar"><strong>APENAS DEMONSTRAÇÃO:</strong> as informações são fictícias e alterações ficam somente neste navegador. O acesso Master de produção terá autenticação no servidor.</div>
     <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button>
     <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
     <div class="kpi-grid"><button type="button" class="kpi kpi-link ${state.adminFilter==='paid'?'kpi-active':''}" data-action="admin-filter" data-filter="paid" aria-label="Abrir lista de confirmados"><small>VAGAS CONFIRMADAS</small><strong>${paid.length}<span class="muted">/${selected?.capacity??'—'}</span></strong><span class="tiny">Ver confirmados →</span></button>
@@ -835,7 +844,7 @@ function adminTabContent(reg,m,data){
  }).join('');
  return `<section class="panel" id="admin-players-list">${panelTitle('Lista de jogadores',`${filteredRegs.length} de ${reg.length} inscrições exibidas. Somente o pagamento confirmado garante vaga.`,
     `<a class="button button-sm button-secondary" href="/api/admin/matches/${m?.id}/export">Exportar CSV ↗</a>`)}
-    <div class="row mb admin-list-filters"><label for="admin-status-filter">Situação</label><select id="admin-status-filter" class="form-control" aria-label="Filtrar jogadores por status">${[['all','Todos'],['paid','Confirmados'],['reserved','Pendentes do Pix'],['waitlist','Lista de espera'],['goleiro','Goleiros pendentes']].map(([v,label])=>`<option value="${v}" ${state.adminFilter===v?'selected':''}>${label}</option>`).join('')}</select><span class="muted">Clique nos indicadores acima para filtrar.</span></div>
+    <div class="row mb admin-list-filters"><label for="admin-status-filter">Situação</label><select id="admin-status-filter" class="form-control" aria-label="Filtrar jogadores por status">${[['all','Todos'],['paid','Confirmados'],['reserved','Pendentes do Pix'],['waitlist','Lista de espera'],['goleiro','Goleiros pendentes']].map(([v,label])=>`<option value="${v}" ${state.adminFilter===v?'selected':''}>${label}</option>`).join('')}</select><button type="button" class="button button-sm button-outline" data-action="clear-admin-filter" ${state.adminFilter==='all'?'disabled':''}>Ver todos os jogadores</button><span class="muted">Clique nos indicadores acima para filtrar.</span></div>
     <div class="mobile-players">${mobileCards.join('')||'<p class="muted">Nenhum jogador nesta situação.</p>'}</div>
     <div class="table-wrap"><table><thead><tr><th>#</th><th>Jogador</th><th>Posição</th><th>Situação</th><th>Prazo</th><th>Ações</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Nenhum jogador nesta situação.</td></tr>'}</tbody></table></div>
     <p class="notice">Ao confirmar manualmente, confira o Pix na conta do organizador. Não confirme apenas com base em comprovante enviado pelo jogador.</p></section>`;
@@ -941,6 +950,8 @@ document.addEventListener('click',async e=>{
    try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
   case 'admin-filter':state.adminTab='jogadores';state.adminFilter=target.dataset.filter;drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+  case 'clear-admin-filter':state.adminTab='jogadores';state.adminFilter='all';drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+  case 'clear-home-filter':state.homeFilter='all';if(state.matches.length)await loadHomeRoster(state.matches[0].id);$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'home-filter':state.homeFilter=target.dataset.filter;if(!state.member){state.pendingMatchID=null;openMemberLogin()}else{await loadHomeRoster(Number(id));$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});}break;
   case 'run-queue':if(confirm('Executar agora a verificação de prazos e convocar a fila automaticamente, mesmo fora do horário agendado?')){try{const r=await api(`/api/admin/matches/${state.activeMatch.id}/queue/run`,{method:'POST'});await reloadAdmin();toast(r.notice)}catch(err){toast(err.message,true)}}break;
   case 'move-to-queue':case 'release-queue':case 'remove-queue':case 'promote-queue':{
