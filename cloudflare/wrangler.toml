@@ -11,7 +11,7 @@ PAYMENT_PROVIDER = "manual"
 [[d1_databases]]
 binding = "DB"
 database_name = "futebol-de-sabado-db"
-database_id = "COLE_AQUI_O_DATABASE_ID"
+database_id = "dba8a618-3645-475e-a596-c0d7104a227f"
 migrations_dir = "migrations"
 
 [triggers]
