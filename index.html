@@ -582,7 +582,7 @@ function renderHome() {
   if(main && state.member)loadHomeRoster(main.id);
 }
 function rosterRows(rows,emptyCopy='Nenhum jogador neste grupo.'){
-  return rows.length?rows.map(x=>`<div class="roster-person"><span class="roster-index">${x.rank?`${x.rank}º`:x.role==='goleiro'?'🧤':'•'}</span><span class="roster-name">${escapeHTML(x.name)}<small>${escapeHTML(x.position==='indefinido'?'Sem preferência':x.position)}</small></span><span>${statusPill(x.status)}</span></div>`).join(''):`<p class="muted">${emptyCopy}</p>`;
+  return rows.length?rows.map(x=>`<div class="roster-person"><span class="roster-index">${x.rank?`${x.rank}º`:x.role==='goleiro'?'🧤':'•'}</span><span class="roster-name">${window.FUTEBOL_avatar(x,28)}${escapeHTML(x.name)}<small>${escapeHTML(window.FUTEBOL_positionLabel(x.position))}</small></span><span>${statusPill(x.status)}</span></div>`).join(''):`<p class="muted">${emptyCopy}</p>`;
 }
 function renderRosterSections(roster,filter='all'){
   const part=group=>roster.filter(x=>x.group===group);
@@ -644,14 +644,14 @@ async function renderMy() {
     <section class="panel admin-login">${panelTitle('Acesso individual','Código de verificação por SMS, sem senha.')}<button class="button button-block" data-action="member-login">Entrar ou criar minha conta ↗</button></section>`);return}
   if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Seu celular já foi validado. Falta só nome completo e e-mail.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
   content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Suas inscrições acompanham sua conta, em qualquer celular onde você entrar.')}
-    <div class="member-account-bar"><div><strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div><div id="my-container">${empty('◷','Carregando inscrições...','Buscando suas vagas.')}</div>`);
+    <div class="member-account-bar"><div>${window.FUTEBOL_avatar(state.member,34)}<strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div><div id="my-container">${empty('◷','Carregando inscrições...','Buscando suas vagas.')}</div>`);
   await loadMy();if(state.view!=='my')return;
   $('#my-container').innerHTML=(state.my.length?state.my.map(x=>{
     const r=x.registration,m=x.match;
     const waiting=r.status==='waitlist'?`<div class="row mt"><strong>Posição na fila:</strong><strong class="queue-num">#${x.queue_position}</strong></div>`:'';
     const expiry=r.status==='reserved'&&r.role!=='goleiro'?`<div class="highlight-bar">Você tem até <b>${fullDate(r.reserved_until)}</b> para confirmar o pagamento.</div>`:'';
     return `<section class="panel registration-card">${panelTitle(escapeHTML(m.title),`${shortDate(m.starts_at)} • ${clock(m.starts_at)} • ${escapeHTML(m.venue)}`,r.status==='reserved'&&r.role==='goleiro'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status))}
-      <div class="meta-row"><span class="meta-chip">◉ ${escapeHTML(r.name)}</span><span class="meta-chip">${r.position==='goleiro'?'🧤 Goleiro':r.position==='atacante'?'⚽ Atacante':r.position==='zagueiro'?'🛡 Zagueiro':'⚽ Sem preferência'}</span><span class="meta-chip">${money(r.role==='goleiro'?0:m.price_cents)}</span></div>
+      <div class="meta-row"><span class="meta-chip">◉ ${escapeHTML(r.name)}</span><span class="meta-chip">${escapeHTML(window.FUTEBOL_positionLabel(r.position))}</span><span class="meta-chip">${money(r.role==='goleiro'?0:m.price_cents)}</span></div>
       ${waiting}${expiry}${r.status==='reserved'&&r.role==='goleiro'?'<div class="highlight-bar">🧤 Goleiro isento. Aguardando aprovação do Admin Master.</div>':''}${r.status==='paid'?'<div class="success-box">✓ Sua vaga está confirmada. Boa partida!</div>':''}
       ${r.status==='waitlist'?'<p class="status-text">Quando uma vaga abrir, você entra na próxima convocação. Volte a esta página para consultar o status.</p>':''}
       ${r.status==='expired'?'<div class="error-box">O prazo terminou antes da confirmação. Se houve pagamento, procure o organizador.</div>':''}
@@ -836,8 +836,8 @@ function adminTabContent(reg,m,data){
    const restoreAction=['cancelled','expired'].includes(r.status)?`<button class="button button-sm button-secondary" data-action="restore-registration" data-id="${r.id}">Restaurar inscrição</button>`:'';
    const cancelAction=!['cancelled','expired'].includes(r.status)?`<button class="button button-sm button-danger" data-action="cancel-admin" data-id="${r.id}">Remover</button>`:'';
    const attendanceAction=r.status==='paid'?`<button class="button button-sm button-secondary" data-action="attendance" data-id="${r.id}" data-attended="${r.attended?0:1}">${r.attended?'✓ Presente':'Marcar presença'}</button>`:'';
-   mobileCards.push(`<article class="mobile-player"><div class="row-between"><strong>${escapeHTML(r.name)}</strong>${statusPill(r.status)}</div><div class="mobile-player-detail">${escapeHTML(phoneMask(r.phone))} · ${escapeHTML(r.position==='indefinido'?'Sem preferência':r.position)}${r.queue_hold?' · Espera manual':''}</div><div class="mobile-player-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></article>`);
-   return `<tr><td><strong>${r.status==='paid'&&r.role==='linha'?orderedRegs.filter(t=>t.status==='paid'&&t.role==='linha').findIndex(t=>t.id===r.id)+1:'•'}</strong></td><td><strong>${escapeHTML(r.name)}</strong><br><small class="muted">${escapeHTML(phoneMask(r.phone))}</small></td><td>${r.position==='goleiro'?'🧤 Goleiro':r.position==='atacante'?'⚽ Atacante':r.position==='zagueiro'?'🛡 Zagueiro':'⚽ Sem preferência'}</td><td>${r.role==='goleiro'&&r.status==='reserved'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}${r.review_reason?`<br><small style="color:var(--red)">${escapeHTML(r.review_reason)}</small>`:''}</td><td><small>${r.reserved_until?`${clock(r.reserved_until)} • ${shortDate(r.reserved_until)}`:'—'}</small></td><td><div class="table-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></td></tr>`;
+   mobileCards.push(`<article class="mobile-player"><div class="row-between"><strong>${window.FUTEBOL_avatar(r,32)}${escapeHTML(r.name)}</strong>${statusPill(r.status)}</div><div class="mobile-player-detail">${escapeHTML(phoneMask(r.phone))} · ${escapeHTML(r.position==='indefinido'?'Sem preferência':r.position)}${r.queue_hold?' · Espera manual':''}</div><div class="mobile-player-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></article>`);
+   return `<tr><td><strong>${r.status==='paid'&&r.role==='linha'?orderedRegs.filter(t=>t.status==='paid'&&t.role==='linha').findIndex(t=>t.id===r.id)+1:'•'}</strong></td><td>${window.FUTEBOL_avatar(r,27)}<strong>${escapeHTML(r.name)}</strong><br><small class="muted">${escapeHTML(phoneMask(r.phone))}</small></td><td>${escapeHTML(window.FUTEBOL_positionLabel(r.position))}</td><td>${r.role==='goleiro'&&r.status==='reserved'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}${r.review_reason?`<br><small style="color:var(--red)">${escapeHTML(r.review_reason)}</small>`:''}</td><td><small>${r.reserved_until?`${clock(r.reserved_until)} • ${shortDate(r.reserved_until)}`:'—'}</small></td><td><div class="table-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></td></tr>`;
  }).join('');
  return `<section class="panel" id="admin-players-list">${panelTitle('Lista de jogadores',`${filteredRegs.length} de ${reg.length} inscrições exibidas. Somente o pagamento confirmado garante vaga.`,
     `<a class="button button-sm button-secondary" href="/api/admin/matches/${m?.id}/export">Exportar CSV ↗</a>`)}
@@ -1002,6 +1002,7 @@ document.addEventListener('click',async e=>{
   case 'copy-broadcast':
     try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
   case 'logout':await adminAction('logout');break;
+  case 'restore-registration':if(confirm('Restaurar a inscrição? A vaga paga só será recuperada se houver capacidade.')){try{await api(`/api/admin/registrations/${id}/restore`,{method:'POST'});await reloadAdmin();toast('Inscrição restaurada e registrada no histórico.')}catch(err){toast(err.message,true)}}break;
   case 'sim-deadline':await adminAction('sim-deadline');break;
   case 'sim-full-paid':await adminAction('sim-full-paid');break;
   case 'confirm':case 'cancel-admin':case 'attendance':case 'draw-teams':case 'dismiss-notice':
@@ -1009,8 +1010,12 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(form.getAttribute('id')==='rotation-form'){
+  const winner=new FormData(form).get('winner');
+  try{await api('/api/admin/matches/'+state.activeMatch.id+'/rotation',{method:'POST',body:JSON.stringify({winner})});await reloadAdmin();toast('Resultado registrado. Próximo time convocado!')}catch(err){toast(err.message,true)}return;
+ }
  if(form.getAttribute('id')==='manual-promotion-form'){
    const d=new FormData(form);const body={action:'promote'};if(d.get('replace_registration_id'))body.replace_registration_id=Number(d.get('replace_registration_id'));
    try{await api(`/api/admin/registrations/${d.get('reg_id')}/queue`,{method:'POST',body:JSON.stringify(body)});closeModal();await reloadAdmin();toast('Jogador promovido. A fila e as vagas foram atualizadas.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`;}return;
@@ -1070,6 +1075,23 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 document.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay'))closeModal()});
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}
+
+document.addEventListener('change',async e=>{
+ if(e.target.id!=='member-photo-input'||!e.target.files?.length)return;
+ const info=$('#photo-status');
+ try{
+  const optimized=await window.FUTEBOL_demoPhoto(e.target.files[0]);
+  const member=DEMO.members.find(x=>x.id===state.member?.id);
+  if(!member)throw new Error('Entre como membro para adicionar uma foto.');
+  member.photo_data=optimized;
+  state.member.photo_data=optimized;
+  saveDemo();
+  if(info)info.innerHTML='<div class="success-box">Foto registrada nesta demonstração. Ela aparecerá no seu perfil e nas listas deste navegador.</div>';
+ }catch(error){
+  if(info)info.innerHTML='<div class="error-box">'+escapeHTML(error.message)+'</div>';
+  e.target.value='';
+ }
+});
 startup();
 
 </script></body></html>
