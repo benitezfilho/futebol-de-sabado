@@ -473,7 +473,7 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const BR_TZ = 'America/Sao_Paulo';
 const siteLink = location.origin && location.origin!=='null' ? location.origin : '[link público após publicação]';
-const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'jogadores', adminFilter: 'all', homeFilter: 'all', activeMatch: null,
+const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'jogadores', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null,
   my: [], interests: [], member: null, pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
 const storeKey = 'racha_minhas_inscricoes_v1';
 const savedTokens = () => { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch { return []; } };
@@ -591,6 +591,7 @@ function renderRosterSections(roster,filter='all'){
   return `<div class="roster-grid">${[...([['titulares','Primeiros 10 pagantes'],['rodizio','Rodízio de jogadores'],['goleiros','Goleiros confirmados'],['pendentes','Aguardando pagamento'],['fila','Lista de espera']])].filter(([group])=>active.includes(group)).map(([group,title])=>two(title,part(group))).join('')}</div><p class="notice">A classificação dos jogadores de linha considera a hora da confirmação do Pix. Goleiros são isentos e aparecem separados.</p>`;
 }
 async function loadHomeRoster(matchId){
+  state.homeRosterMatchId=Number(matchId);
   try{const result=await api(`/api/matches/${matchId}/roster`);if(state.view==='home'&&$('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação da próxima partida','Lista atualizada por status e ordem de confirmação.')+`<div class="row mb"><button type="button" class="button button-sm button-outline" data-action="clear-home-filter" ${state.homeFilter==='all'?'disabled':''}>Ver todos os jogadores</button></div>`+renderRosterSections(result.roster,state.homeFilter);}
   catch(e){if($('#public-roster'))$('#public-roster').innerHTML=panelTitle('Escalação','Entre novamente para consultar.')+`<button class="button button-sm" data-action="member-login">Entrar</button>`}
 }
@@ -951,7 +952,7 @@ document.addEventListener('click',async e=>{
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
   case 'admin-filter':state.adminTab='jogadores';state.adminFilter=target.dataset.filter;drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'clear-admin-filter':state.adminTab='jogadores';state.adminFilter='all';drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
-  case 'clear-home-filter':state.homeFilter='all';if(state.matches.length)await loadHomeRoster(state.matches[0].id);$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+  case 'clear-home-filter':state.homeFilter='all';if(state.homeRosterMatchId||state.matches.length)await loadHomeRoster(state.homeRosterMatchId||state.matches[0].id);$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'home-filter':state.homeFilter=target.dataset.filter;if(!state.member){state.pendingMatchID=null;openMemberLogin()}else{await loadHomeRoster(Number(id));$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});}break;
   case 'run-queue':if(confirm('Executar agora a verificação de prazos e convocar a fila automaticamente, mesmo fora do horário agendado?')){try{const r=await api(`/api/admin/matches/${state.activeMatch.id}/queue/run`,{method:'POST'});await reloadAdmin();toast(r.notice)}catch(err){toast(err.message,true)}}break;
   case 'move-to-queue':case 'release-queue':case 'remove-queue':case 'promote-queue':{
