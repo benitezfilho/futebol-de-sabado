@@ -33,6 +33,10 @@ jobs:
               Path(f"script{i}.mjs").write_text(script,encoding="utf-8")
           PY
           for file in script*.mjs; do node --check "$file"; done
+      - name: Validar funcionalidades V8
+        run: |
+          node --check features-v8.js
+          node --test tests/v8.test.mjs
       - name: Testar botão para ver todos
         run: |
           grep -q "clear-admin-filter" index.html
