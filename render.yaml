@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: futebol-de-sabado-api
+    runtime: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    disk:
+      name: futebol-dados
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: futebol-de-sabado-api
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: MASTER_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_VERIFY_SERVICE_SID
+        sync: false
+      - key: AUTO_PIX_ENABLED
+        value: '0'
+      - key: WHATSAPP_PROVIDER
+        value: manual
