@@ -28,8 +28,9 @@ jobs:
           import sqlite3
           from pathlib import Path
           conn=sqlite3.connect(":memory:")
-          conn.executescript(Path("migrations/0001_initial.sql").read_text())
-          for table in ("members","matches","registrations","payments","audit_log"):
+          for migration in sorted(Path("migrations").glob("*.sql")):
+              conn.executescript(migration.read_text())
+          for table in ("members","matches","registrations","payments","audit_log","historical_interests","team_draws","team_players","team_reserves","match_rotation_events","player_match_stats","mvp_votes","notifications"):
               assert conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
           print("Banco D1/SQLite: tabelas criadas com sucesso")
           PY
