@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "index.html"
+      - "features-v8.js"
+      - "tests/v8.test.mjs"
       - ".github/workflows/site-checks.yml"
   workflow_dispatch:
 
