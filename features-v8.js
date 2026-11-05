@@ -249,4 +249,76 @@
       return result;
     }finally{URL.revokeObjectURL(url)}
   };
+
+  window.FUTEBOL_positionLabel=function(value){
+    return positions.find(p=>p[0]===value)?.[1]||String(value||"Sem preferência").replace(/_/g," ");
+  };
+  window.FUTEBOL_avatar=function(person,size){
+    const value=person?.photo_data||"";
+    const initials=String(person?.name||"J").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+    const base='display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:'+size+'px;height:'+size+'px;border-radius:50%;vertical-align:middle;background:#2c4832;border:1px solid #63855a;color:#d6ffb2;font-weight:800;font-size:11px;overflow:hidden;margin-right:7px';
+    if(/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(value))
+      return '<span style="'+base+'"><img src="'+value+'" width="'+size+'" height="'+size+'" alt="" style="width:100%;height:100%;object-fit:cover"></span>';
+    return '<span aria-hidden="true" style="'+base+'">'+initials+'</span>';
+  };
+  window.FUTEBOL_renderHistoryV8=function(data,m){
+    const events=(data.events||[]).filter(x=>x.match_id===m.id);
+    let cards=events.map(x=>'<div class="upcoming-row"><div><strong>'+escapeHTML(x.action.replace(/_/g," "))+
+      '</strong><p class="status-text">'+escapeHTML(x.detail||"Movimentação registrada")+
+      '</p></div><small>'+escapeHTML(dateBR(x.at,{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}))+'</small></div>').join("");
+    return '<section class="panel">'+panelTitle("Histórico de movimentações",
+      "Inscrições, pagamentos, cancelamentos, fila, promoções e alterações, preservados para consulta.")+
+      (cards||empty("◷","Sem movimentações novas","O histórico começa a ser registrado com esta versão da demonstração."))+'</section>';
+  };
+  window.FUTEBOL_renderTeamsV8=function(reg,m,data){
+    const teams=(data.teams||[]).filter(t=>t.match_id===m.id);
+    const grouped={};
+    for(const t of teams)(grouped[t.label]||=[]).push(t);
+    const labels=Object.keys(grouped).sort();
+    const invalid=labels.some(label=>grouped[label].length!==5||grouped[label].some(x=>x.role==="goleiro"));
+    const reserves=(data.bench?.[m.id]||[]).map(id=>reg.find(x=>x.id===id)).filter(Boolean);
+    const goalies=reg.filter(r=>r.role==="goleiro"&&r.status==="paid");
+    const rotation=data.rotation?.[m.id];
+    const displayTeam=label=>{
+      const players=grouped[label]||[];
+      return '<div class="team-card"><strong>'+escapeHTML(label)+'</strong><small style="display:block;color:#bce6ba">5 jogadores de linha</small><ol>'+
+        players.map(p=>'<li>'+window.FUTEBOL_avatar(p,24)+escapeHTML(p.name)+'</li>').join("")+'</ol></div>';
+    };
+    const limit=Math.floor(reg.filter(r=>r.role==="linha"&&r.status==="paid").length/5);
+    let options='';
+    for(let n=2;n<=Math.min(8,Math.max(4,limit));n++)
+      options+='<option value="'+n+'" '+(n===Math.min(4,Math.max(2,limit))?'selected':'')+'>'+n+' times ('+(n*5)+' jogadores)</option>';
+    let html='<section class="panel">'+panelTitle("Sorteio dos times",
+      "Exatamente cinco jogadores de linha por time. Goleiros são coringas fixos e NÃO entram nas 22 vagas.")+
+      '<div class="row mb"><label>Número de times</label><select class="form-control" style="max-width:190px" id="team-count">'+options+
+      '</select><button class="button button-sm" data-action="draw-teams">Sortear times completos</button></div>'+
+      '<p class="notice">Os primeiros 10 pagantes são distribuídos entre os times A e B. Os próximos formam C, D e assim por diante; quem sobrar fica no banco.</p>';
+    if(invalid)html+='<div class="error-box">Atenção: o sorteio antigo não respeita cinco jogadores de linha por time. Refazer o sorteio.</div>';
+    if(labels.length)html+='<div class="team-grid">'+labels.map(displayTeam).join("")+'</div>';
+    else html+=empty("⚽","Times ainda não sorteados","Confirme cinco jogadores de linha para cada time e realize o sorteio.");
+    html+='<div class="roster-grid mt"><div class="roster-group"><h3>Reservas da linha <span>'+reserves.length+'</span></h3>'+
+      (reserves.length?reserves.map((r,i)=>'<div class="roster-person"><span class="roster-index">'+(i+1)+'</span>'+window.FUTEBOL_avatar(r,25)+
+      '<span class="roster-name">'+escapeHTML(r.name)+'</span></div>').join(""):'<p class="muted">Nenhum reserva fora dos times sorteados.</p>')+
+      '</div><div class="roster-group"><h3>Goleiros coringas <span>'+goalies.length+'</span></h3>'+
+      (goalies.length?goalies.map(r=>'<div class="roster-person">'+window.FUTEBOL_avatar(r,25)+
+      '<span class="roster-name">'+escapeHTML(r.name)+'<small>Goleiro fixo, isento, fora do limite de linha</small></span></div>').join(""):
+      '<p class="muted">Nenhum goleiro aprovado.</p>')+'</div></div>';
+    if(rotation?.playing?.length===2){
+      const a=rotation.playing[0],b=rotation.playing[1];
+      html+='<div class="highlight-bar mt"><b>Jogo '+rotation.game_number+': '+escapeHTML(a)+' × '+escapeHTML(b)+'</b>'+
+        '<div class="status-text">Próximo na espera: '+escapeHTML(rotation.waiting?.[0]||"Nenhum")+
+        '. O vencedor permanece e o perdedor vai para o fim da fila. Em caso de empate, sortearemos quem sai.</div></div>'+
+        '<form id="rotation-form" class="row mt" style="align-items:flex-end;gap:10px"><div class="form-group"><label>Resultado do jogo</label>'+
+        '<select class="form-control" name="winner" required><option value="'+escapeHTML(a)+'">'+escapeHTML(a)+' venceu</option>'+
+        '<option value="'+escapeHTML(b)+'">'+escapeHTML(b)+' venceu</option>'+
+        '<option value="empate">Empate (sortear quem sai)</option></select></div>'+
+        '<button class="button" type="submit">Registrar resultado e chamar próximo</button></form>';
+      const played=rotation.games||[];
+      if(played.length)html+='<div class="mt">'+panelTitle("Histórico do rodízio")+
+        played.slice().reverse().map(x=>'<div class="upcoming-row"><strong>Jogo '+x.number+': '+escapeHTML(x.playing.join(" × "))+
+        '</strong><small>Saiu '+escapeHTML(x.leaves)+' · Entrou '+escapeHTML(x.enters||"Ninguém")+'</small></div>').join("")+'</div>';
+    }
+    return html+'</section>';
+  };
+
 })();
