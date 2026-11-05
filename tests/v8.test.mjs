@@ -46,8 +46,8 @@ test("rodízio começa A x B; perdedor sai, C entra e vai para fim da fila",asyn
  await x.fetch("/api/admin/matches/1/draw",{method:"POST",body:JSON.stringify({team_count:4})});
  const result=await x.fetch("/api/admin/matches/1/rotation",{method:"POST",body:JSON.stringify({winner:"Time A"})});
  assert.equal(result.status,200);
- assert.deepEqual(x.demo.rotation[1].playing,["Time A","Time C"]);
- assert.deepEqual(x.demo.rotation[1].waiting,["Time D","Time B"]);
+ assert.deepEqual(Array.from(x.demo.rotation[1].playing),["Time A","Time C"]);
+ assert.deepEqual(Array.from(x.demo.rotation[1].waiting),["Time D","Time B"]);
  assert.equal(x.demo.rotation[1].games[0].leaves,"Time B");
 });
 test("cancela e restaura pagante quando existe vaga",async()=>{
