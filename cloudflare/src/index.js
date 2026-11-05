@@ -86,7 +86,7 @@ async function changeReg(db,id,action) {
  return {id,status:target};
 }
 export default {
- async fetch(request,env) {
+ async fetch(request,env,ctx) {
    const headers=cors(request,env);
    if(!headers)return fail("Origem não autorizada",403);
    if(request.method==="OPTIONS")return new Response(null,{status:204,headers});
@@ -104,6 +104,13 @@ export default {
      }
      if(path==="/api/member/register")return fail("Inscrições reais bloqueadas até ativar verificação segura do membro",503,headers);
      if(!path.startsWith("/api/admin/"))return fail("Rota não encontrada",404,headers);
+     // Fail closed: todo acesso Master exige sessão verificada pelo Cloudflare Access.
+     // A política de Access deve proteger /api/admin/* no hostname real do Worker.
+     const masterEmail=String(env.MASTER_EMAIL||"").trim().toLowerCase();
+     if(!masterEmail || !ctx?.access)return fail("Cloudflare Access exigido para o Master",403,headers);
+     let verified=null;
+     try{verified=await ctx.access.getIdentity()}catch{return fail("Sessão Access inválida",403,headers)}
+     if(String(verified?.email||"").trim().toLowerCase()!==masterEmail)return fail("Identidade Master não autorizada",403,headers);
      if(!env.MASTER_API_KEY || env.MASTER_API_KEY.length<32)return fail("Segredo MASTER_API_KEY não configurado",503,headers);
      if(!await allowMaster(request,env))return fail("Master não autorizado",401,headers);
      if(request.method==="POST" && path==="/api/admin/matches")return reply({id:await createMatch(env.DB,await body(request))},201,headers);
