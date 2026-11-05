@@ -43,3 +43,41 @@ jobs:
         run: |
           grep -q "clear-admin-filter" index.html
           grep -q "clear-home-filter" index.html
+      - name: Conferir telas da demonstração no Chrome
+        run: |
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            echo "Chrome não está instalado no runner. Os testes Node continuam válidos."
+            exit 0
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          html=Path("index.html").read_text()
+          addon="""<script>
+          setTimeout(() => {
+            const admin = document.querySelector('[data-nav="admin"]');
+            if (!admin) { document.body.setAttribute('data-v8-test','nav-missing'); return; }
+            admin.click();
+            setTimeout(() => {
+              const times=document.querySelector('[data-tab="times"]');
+              if (!times) { document.body.setAttribute('data-v8-test','tab-missing'); return; }
+              times.click();
+              setTimeout(() => {
+                const ok=!!document.querySelector('[data-action="draw-teams"]') &&
+                         document.body.innerText.includes('Goleiros coringas') &&
+                         document.body.innerText.includes('Reservas da linha');
+                document.body.setAttribute('data-v8-test',ok?'ok':'render-failed');
+              },400);
+            },600);
+          },600);
+          </script>"""
+          Path(".smoke-index.html").write_text(html.replace("</body>",addon+"</body>"))
+          PY
+          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
+            --allow-file-access-from-files --virtual-time-budget=6000 \
+            --dump-dom "file://$PWD/.smoke-index.html" > /tmp/futebol-smoke.html 2>/tmp/futebol-chrome.log
+          grep -q 'data-v8-test="ok"' /tmp/futebol-smoke.html || {
+            echo "Teste visual de navegação falhou."
+            grep -o 'data-v8-test="[^"]*"' /tmp/futebol-smoke.html | head || true
+            tail -20 /tmp/futebol-chrome.log || true
+            exit 1
+          }
