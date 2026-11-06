@@ -142,7 +142,7 @@ window.history.replaceState=()=>{};
 try { localStorage.getItem('__test__'); } catch {
  const mem = new Map();Object.defineProperty(window, 'localStorage', {configurable:true,value:{getItem:k=>mem.has(k)?mem.get(k):null,setItem:(k,v)=>mem.set(k,String(v)),removeItem:k=>mem.delete(k)}});
 }
-const DBKEY='futebol_demo_membros_v7';
+const DBKEY='futebol_demo_07nov2026_v1';
 const DEMO=(function(){
  const old=(()=>{try{return JSON.parse(localStorage.getItem(DBKEY))}catch{return null}})();
  if(old){
@@ -177,20 +177,51 @@ const DEMO=(function(){
 })();
 DEMO.interests ||= [];DEMO.members ||= [];DEMO.memberLogged ||= null;DEMO.stats ||= [];DEMO.votes ||= [];
 if(!DEMO.regs.length){
- const names=['João Pedro','Eduardo Costa','Heitor Silva','Caio Oliveira','Hadrian Souza','Rodrigo Alves','Lucas Ribeiro','Alexandre Lima','Gustavo Santos','Ferreira Lopes','Yan Pereira','Paulo Gomes','Darwin Silva','Gabriel Moura','Matheus Carvalho','Bruno Freitas','André Nunes','Pedro Henrique','Marcos Vinicius','Rafael Dias','Thiago Almeida','Felipe Campos','Kayo Matos','Renan Rocha','Igor Martins'];
- const m=DEMO.matches[0];m.capacity=22;m.voting_enabled=true;
- names.forEach((name,i)=>{
-    const mid=i+1,phone=`6299${String(2000000+i).padStart(7,'0')}`,role=i>=18&&i<20?'goleiro':'linha';
-    const member={id:mid,name,phone,email:`exemplo${i+1}@example.com`,verified_at:m.opens_at,active:true,whatsapp_opt_in:i%4!==0};
-    DEMO.members.push(member);
-    const status=i<20?'paid':i<22?'reserved':'waitlist';
-    const paid_at=status==='paid'?new Date(Date.now()-86400000+(i*60000)).toISOString():null;
-    DEMO.regs.push({id:mid,token:'exemplo-'+mid,match_id:m.id,member_id:mid,name,phone,email:member.email,role,
-      position:role==='goleiro'?'goleiro':i%2?'atacante':'zagueiro',status,paid_at,
-      reserved_until:status==='reserved'?m.payment_deadline:null,created_at:new Date(Date.now()-3600000+(i*1000)).toISOString(),attended:status==='paid'?1:0,
-      pix_code:null,pix_qr_image:null,review_reason:''});
-    if(status==='paid')DEMO.stats.push({registration_id:mid,goals: i%4===0?2:i%5===0?1:0,assists:i%3===0?1:0});
- });
+ // Escalação informada pelo organizador, exclusivamente para simulação.
+ // Sem CPF, chave Pix, telefones verdadeiros ou e-mails dos jogadores no site.
+ const orderedNames=[
+  'Benitez','João','Ferreira','CH','Alan','Pinguim','Gustavo',
+  'Wallyson','Eduardo','Luis Fabiano','Alexandre','Yuri','Yan',
+  'Caio Cabeça','Rodrigo','Hadrian','Heitor','Pedro Augusto',
+  'Kayo Oreia','Marcos Felipe'
+ ];
+ const firstTen=['Hadrian','Yuri','João','Heitor','Eduardo','Luis Fabiano','Alexandre','Benitez','Rodrigo','Marcos Felipe'];
+ const otherTen=['CH','Alan','Pinguim','Ferreira','Gustavo','Wallyson','Yan','Pedro Augusto','Caio Cabeça','Kayo Oreia'];
+ const payOrder=[...firstTen,...otherTen];
+ const fixture=DEMO.matches[0];
+ fixture.title='Futebol de Sábado | Simulação 07/11';
+ fixture.venue='Farofa Society';
+ fixture.capacity=22;
+ fixture.goalie_limit=2;
+ fixture.price_cents=1500;
+ fixture.starts_at='2026-11-07T12:00:00.000Z';
+ fixture.opens_at='2026-11-05T15:00:00.000Z';
+ fixture.payment_deadline='2026-11-05T23:00:00.000Z';
+ fixture.waitlist_releases_at='2026-11-05T23:00:00.000Z';
+ fixture.signup_closes_at='2026-11-07T11:00:00.000Z';
+ fixture.voting_enabled=true;
+ fixture.waitlist_note='JV Negro está sem prioridade. Duas vagas de linha continuam abertas para novos pagantes.';
+ function addDemoMember(name,options={}){
+   const id=DEMO.members.length+1;
+   const member={id,name,phone:'',email:'simulacao'+id+'@example.invalid',
+     verified_at:null,active:true,whatsapp_opt_in:false};
+   DEMO.members.push(member);
+   const paymentPosition=payOrder.indexOf(name);
+   const role=options.role||'linha',status=options.status||'paid';
+   const paid_at=role==='linha'&&paymentPosition>=0
+       ?new Date(Date.parse('2026-11-05T15:00:00Z')+paymentPosition*60_000).toISOString():null;
+   const created_at=new Date(Date.parse('2026-11-05T15:00:00Z')+id*1000).toISOString();
+   DEMO.regs.push({id,token:'simulacao-0711-'+id,match_id:fixture.id,member_id:id,
+     name,phone:'',email:member.email,role,position:role==='goleiro'?'goleiro':'indefinido',
+     status,paid_at,reserved_until:null,created_at,
+     queue_entered_at:status==='waitlist'?created_at:null,
+     queue_hold:options.queue_hold||0,queue_note:options.queue_note||'',
+     attended:0,pix_code:null,pix_qr_image:null,review_reason:''});
+ }
+ orderedNames.forEach(name=>addDemoMember(name));
+ addDemoMember('Terror do Ferreira',{role:'goleiro',status:'paid'});
+ addDemoMember('JV Negro',{role:'linha',status:'waitlist',queue_hold:1,
+   queue_note:'Sem prioridade. Não promover automaticamente; se dois novos jogadores pagarem primeiro, fica fora.'});
  saveDemo();
 }
 
@@ -211,7 +242,7 @@ function processDemo(){
  if(changed)saveDemo();
 }
 function statuses(match){const regs=DEMO.regs.filter(r=>r.match_id===match.id);const paid=regs.filter(r=>r.status==='paid'&&r.role==='linha').length;const reserved=regs.filter(r=>r.status==='reserved'&&r.role==='linha').length;const waiting=regs.filter(r=>r.status==='waitlist'&&r.role==='linha').length;
-return {...match,paid,reserved,waiting,goalie_paid:regs.filter(r=>r.status==='paid'&&r.role==='goleiro').length,goalie_pending:regs.filter(r=>r.status==='reserved'&&r.role==='goleiro').length,interest_count:DEMO.interests.filter(i=>i.match_id===match.id).length,spots_left:Math.max(0,match.capacity-paid-reserved),state:match.status!=='active'||match.deleted_at?'cancelled':Date.now()>=new Date(match.signup_closes_at).getTime()?'closed':Date.now()<new Date(match.opens_at).getTime()?'scheduled':paid>=match.capacity?'fully_paid':paid+reserved>=match.capacity||waiting>0?'waitlist':'open'};}
+return {...match,paid,reserved,waiting,goalie_paid:regs.filter(r=>r.status==='paid'&&r.role==='goleiro').length,goalie_pending:regs.filter(r=>r.status==='reserved'&&r.role==='goleiro').length,interest_count:DEMO.interests.filter(i=>i.match_id===match.id).length,spots_left:Math.max(0,match.capacity-paid-reserved),state:match.status!=='active'||match.deleted_at?'cancelled':Date.now()>=new Date(match.signup_closes_at).getTime()?'closed':Date.now()<new Date(match.opens_at).getTime()?'scheduled':paid>=match.capacity?'fully_paid':paid+reserved>=match.capacity||regs.some(r=>r.status==='waitlist'&&r.role==='linha'&&!r.queue_hold)?'waitlist':'open'};}
 
 
 function demoRoster(matchId){
@@ -318,7 +349,7 @@ window.fetch=async function mockedFetch(input, options={}){
    if(role==='linha'&&paidLine>=m.capacity){const id=DEMO.interests.length+1;DEMO.interests.push({id,match_id:m.id,member_id:member.id,position:body.position||'indefinido',created_at:new Date().toISOString()});saveDemo();return json({status:'interest',interest_id:id,match_id:m.id,historical_only:true},201);}
    const count=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha'&&['paid','reserved'].includes(r.status)).length;
    const goalies=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='goleiro'&&['paid','reserved'].includes(r.status)).length;
-   const queued=DEMO.regs.some(r=>r.match_id===m.id&&r.status==='waitlist'&&r.role===role);const hold=Date.now()>=new Date(m.payment_deadline).getTime()&&Date.now()<new Date(m.waitlist_releases_at||m.payment_deadline).getTime();const fits=!queued&&!hold&&((role==='linha'&&count<m.capacity)||(role==='goleiro'&&goalies<m.goalie_limit));
+   const queued=DEMO.regs.some(r=>r.match_id===m.id&&r.status==='waitlist'&&!r.queue_hold&&r.role===role);const hold=Date.now()>=new Date(m.payment_deadline).getTime()&&Date.now()<new Date(m.waitlist_releases_at||m.payment_deadline).getTime();const fits=!queued&&!hold&&((role==='linha'&&count<m.capacity)||(role==='goleiro'&&goalies<m.goalie_limit));
    const status=fits?'reserved':'waitlist',id=DEMO.regs.length+1;
    const token='demo'+id+'-'+Math.random().toString(36).slice(2,18);
    const expiry=role==='goleiro'?null:new Date(Math.min(Date.now()<new Date(m.payment_deadline)?new Date(m.payment_deadline).getTime():Date.now()+30*60000,new Date(m.starts_at).getTime())).toISOString();
@@ -569,7 +600,7 @@ function renderHome() {
       <div class="hero-actions"><button class="button" data-action="open-register" data-id="${main?.id||0}">Quero jogar <span>↗</span></button><button class="button button-secondary" data-nav="my">Minhas inscrições</button></div></div>
       <div class="hero-graphic" aria-hidden="true"><div class="field"><span class="field-end top"></span><span class="field-end bottom"></span></div><span class="field-ball">⚽</span></div></section>
       ${state.config.demo?'<div class="highlight-bar">MODO DEMONSTRAÇÃO: respeite o calendário de abertura configurado para cada partida. Pagamentos reais não estão ativos.</div>':''}
-      <div class="highlight-bar"><strong>REGRAS DO FUTEBOL DE SÁBADO · V8</strong><p>As vagas de linha são configuráveis pelo Master (22 neste exemplo). <b>Goleiros fixos são isentos e não ocupam vagas de linha.</b> Cada time recebe cinco jogadores de linha; os demais ficam como reservas. Os primeiros dez pagantes abrem o jogo com os times A e B. O time seguinte entra no lugar do perdedor; empate tem sorteio de saída.</p><p>Inscrições canceladas podem ser restauradas pelo Master quando houver vaga. Quem foi convocado e teve o Pix confirmado sai das convocações ativas; a movimentação fica em Histórico. Após a lotação paga, novas tentativas de linha são registradas apenas como interesse, até o horário de encerramento.</p></div>
+      <div class="highlight-bar"><strong>SIMULAÇÃO DA ESCALAÇÃO · 07/11/2026</strong><p>Escalação importada: 20 jogadores de linha pagos, 2 vagas de linha disponíveis, Terror do Ferreira confirmado como goleiro isento, e JV Negro na lista de espera sem prioridade automática. As vagas de linha são configuráveis pelo Master (22 neste exemplo). <b>Goleiros fixos são isentos e não ocupam vagas de linha.</b> Cada time recebe cinco jogadores de linha; os demais ficam como reservas. Os primeiros dez pagantes abrem o jogo com os times A e B. O time seguinte entra no lugar do perdedor; empate tem sorteio de saída.</p><p>Inscrições canceladas podem ser restauradas pelo Master quando houver vaga. Quem foi convocado e teve o Pix confirmado sai das convocações ativas; a movimentação fica em Histórico. Após a lotação paga, novas tentativas de linha são registradas apenas como interesse, até o horário de encerramento.</p></div>
       <div class="content-grid"><div class="content-col">${main?matchCard(main,true):empty('⚽','Sem partidas','Uma nova partida aparecerá aqui em breve.')}
        ${main?`<section class="panel" id="public-roster">${panelTitle('Escalação e lista','Pagos, pendentes e fila de espera em um só lugar.')}${state.member?'<p class="muted">Carregando os jogadores...</p>':`<p class="notice">Para proteger os dados dos jogadores, entre como membro para consultar os nomes completos e os status.</p><button class="button button-sm" data-action="member-login">Entrar e ver a lista</button>`}</section>`:''}
        <section class="panel">${panelTitle('Como funciona','Três passos para entrar em campo.')}
@@ -764,7 +795,7 @@ function drawAdmin(){
   content(`${headline('CENTRAL DE CONTROLE','Painel <span>administrativo.</span>','Você comanda a partida. O sistema cuida da lista, da fila e das confirmações.')}
     <div class="highlight-bar"><strong>APENAS DEMONSTRAÇÃO:</strong> as informações são fictícias e alterações ficam somente neste navegador. O acesso Master de produção terá autenticação no servidor.</div>
     <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button>
-    <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
+    <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-outline" data-action="reset-simulacao">Reiniciar escalação 07/11</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
     <div class="kpi-grid"><button type="button" class="kpi kpi-link ${state.adminFilter==='paid'?'kpi-active':''}" data-action="admin-filter" data-filter="paid" aria-label="Abrir lista de confirmados"><small>VAGAS CONFIRMADAS</small><strong>${paid.length}<span class="muted">/${selected?.capacity??'—'}</span></strong><span class="tiny">Ver confirmados →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='reserved'?'kpi-active':''}" data-action="admin-filter" data-filter="reserved" aria-label="Abrir lista de pendentes"><small>AGUARDANDO PIX</small><strong>${pending.length}</strong><span class="tiny">Ver pendentes →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
@@ -1004,6 +1035,7 @@ document.addEventListener('click',async e=>{
     try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
   case 'logout':await adminAction('logout');break;
   case 'restore-registration':if(confirm('Restaurar a inscrição? A vaga paga só será recuperada se houver capacidade.')){try{await api(`/api/admin/registrations/${id}/restore`,{method:'POST'});await reloadAdmin();toast('Inscrição restaurada e registrada no histórico.')}catch(err){toast(err.message,true)}}break;
+  case 'reset-simulacao':if(confirm('Reiniciar a simulação de 07/11? As mudanças feitas neste navegador serão descartadas, sem afetar o banco real.')){localStorage.removeItem('futebol_demo_07nov2026_v1');location.reload()}break;
   case 'sim-deadline':await adminAction('sim-deadline');break;
   case 'sim-full-paid':await adminAction('sim-full-paid');break;
   case 'confirm':case 'cancel-admin':case 'attendance':case 'draw-teams':case 'dismiss-notice':
