@@ -49,7 +49,12 @@
   if(actual.length!==expected.length)return false;
   let diff=0;for(let i=0;i<actual.length;i++)diff|=actual[i]^expected[i];return diff===0;
  }
- function memberById(id){return DEMO.members.find(x=>String(x.id)===String(id))}
+ // Bloqueia sessões legadas iniciadas pelo antigo SMS simulado sem senha cadastrada.
+ if(DEMO.memberLogged && !load().users[DEMO.memberLogged]){
+  DEMO.memberLogged=null;
+  saveDemo();
+ }
+  function memberById(id){return DEMO.members.find(x=>String(x.id)===String(id))}
  function current(){
   const m=memberById(DEMO.memberLogged);
   if(!m||!m.active)throw Error("Entre com e-mail e senha para acessar a conta.");
