@@ -10,6 +10,7 @@ on:
       - "features-admin-member.js"
       - "features-demo-auth.js"
       - "tests/manual-draw-admin.test.mjs"
+      - "tests/demo-auth.test.mjs"
       - "tests/v8.test.mjs"
       - "tests/lista-0711.test.mjs"
       - "tests/ranking-periods.test.mjs"
