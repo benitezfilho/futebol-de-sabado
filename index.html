@@ -503,7 +503,7 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const BR_TZ = 'America/Sao_Paulo';
 const siteLink = location.origin && location.origin!=='null' ? location.origin : '[link público após publicação]';
-const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'jogadores', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null,
+const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'visao', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null,
   my: [], interests: [], member: null, pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
 const storeKey = 'racha_minhas_inscricoes_v1';
 const savedTokens = () => { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch { return []; } };
@@ -800,13 +800,66 @@ function drawAdmin(){
     <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='goleiro'?'kpi-active':''}" data-action="admin-filter" data-filter="goleiro" aria-label="Abrir lista de goleiros pendentes"><small>GOLEIROS PENDENTES</small><strong>${goalkeepers.length}</strong><span class="tiny">Ver goleiros →</span></button><div class="kpi"><small>ARRECADAÇÃO</small><strong>${money(revenue)}</strong><span class="tiny">Sem goleiros isentos</span></div></div>
     <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
-    <div class="admin-subnav"><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
+    <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
       <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
     <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
     ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
 }
+function renderAdminOverview(reg,m,data) {
+  // A tela do Master espelha a escalação pública, com dados da partida selecionada.
+  // Não depende de sessão de membro: apenas de overview autenticado do Master.
+  const ordered = reg.filter(r=>r.role==='linha' && r.status==='paid')
+    .sort((a,b)=>String(a.paid_at||'').localeCompare(String(b.paid_at||'')) || a.id-b.id);
+  const goalies = reg.filter(r=>r.role==='goleiro' && r.status==='paid')
+    .sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')) || a.id-b.id);
+  const waiting = reg.filter(r=>r.role==='linha' && r.status==='waitlist')
+    .sort((a,b)=>Number(!!a.queue_hold)-Number(!!b.queue_hold) ||
+      String(a.queue_entered_at||a.created_at||'').localeCompare(String(b.queue_entered_at||b.created_at||'')) ||
+      a.id-b.id);
+  const pending = reg.filter(r=>r.role==='linha' && r.status==='reserved')
+    .sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')) || a.id-b.id);
+  const allRoster=[
+    ...ordered.map((r,i)=>({...r,group:i<10?'titulares':'rodizio',rank:i+1})),
+    ...goalies.map(r=>({...r,group:'goleiros',rank:null})),
+    ...pending.map(r=>({...r,group:'pendentes',rank:null})),
+    ...waiting.map((r,i)=>({...r,group:'fila',rank:r.queue_hold?null:waiting.slice(0,i+1).filter(x=>!x.queue_hold).length}))
+  ];
+  const occupied=ordered.length+pending.length;
+  const free=Math.max(0,m.capacity-occupied);
+  const nextMatches=data.matches.filter(x=>x.id!==m.id && x.status==='active')
+    .sort((a,b)=>String(a.starts_at||'').localeCompare(String(b.starts_at||''))).slice(0,4);
+  return '<div class="content-grid"><div class="content-col">'+
+    '<section class="panel" id="admin-home-roster">'+
+    panelTitle('Escalação da partida selecionada','A mesma visão da página inicial, com os primeiros pagantes, rodízio, goleiros e fila.')+
+    '<div class="row mb"><button class="button button-sm button-secondary" data-action="admin-tab" data-tab="jogadores">Gerenciar jogadores</button>'+
+    '<button class="button button-sm button-outline" data-action="admin-tab" data-tab="classificacao">Corrigir classificação</button></div>'+
+    renderRosterSections(allRoster,'all')+
+    '</section>'+
+    '</div><div class="content-col">'+
+    '<section class="panel">'+panelTitle('Situação da partida','Informações atualizadas do jogo selecionado.')+
+    '<div class="upcoming-row"><strong>'+escapeHTML(m.title)+'</strong>'+statusPill(m.state)+'</div>'+
+    '<div class="upcoming-row"><strong>Data e horário</strong><span>'+shortDate(m.starts_at)+' · '+clock(m.starts_at)+'</span></div>'+
+    '<div class="upcoming-row"><strong>Local</strong><span>'+escapeHTML(m.venue)+'</span></div>'+
+    '<div class="upcoming-row"><strong>Confirmados de linha</strong><span>'+ordered.length+' / '+m.capacity+'</span></div>'+
+    '<div class="upcoming-row"><strong>Vagas de linha disponíveis</strong><span>'+free+'</span></div>'+
+    '<div class="upcoming-row"><strong>Goleiros confirmados</strong><span>'+goalies.length+' (isentos)</span></div>'+
+    '<div class="upcoming-row"><strong>Valor por jogador</strong><span>'+money(m.price_cents)+'</span></div>'+
+    '<div class="upcoming-row"><strong>Prazo do pagamento</strong><span>'+fullDate(m.payment_deadline)+'</span></div>'+
+    '<p class="notice">Goleiros não ocupam as vagas de linha. A ordem do Top 10 segue a confirmação dos pagamentos.</p>'+
+    '</section>'+
+    '<section class="panel mt">'+panelTitle('Próximas partidas','Escolha outra partida para ver sua escalação.')+
+    (nextMatches.length?nextMatches.map(n=>'<div class="upcoming-row"><div><strong>'+
+       shortDate(n.starts_at)+' · '+clock(n.starts_at)+'</strong><small class="muted">'+escapeHTML(n.venue)+
+       '</small></div><button class="button button-sm button-secondary" data-action="admin-select-match" data-id="'+
+       n.id+'">Ver escalação</button></div>').join(''):
+       '<p class="muted">Não há outras partidas cadastradas.</p>')+
+    '</section>'+
+    '</div></div>';
+}
+
 function adminTabContent(reg,m,data){
  if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
+ if(state.adminTab==='visao')return renderAdminOverview(reg,m,data);
  if(state.adminTab==='classificacao'){
    const paid=reg.filter(r=>r.status==='paid'&&r.role==='linha').sort((a,b)=>(a.paid_at||'').localeCompare(b.paid_at||'')||a.id-b.id);
    const roster=paid.map((r,i)=>({...r,rank:i+1}));
@@ -991,6 +1044,7 @@ document.addEventListener('click',async e=>{
   case 'copy':
    try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
+  case 'admin-select-match':{const selected=state.admin?.matches.find(m=>m.id===Number(id));if(selected){state.activeMatch=selected;state.adminTab='visao';drawAdmin();$('#admin-home-roster')?.scrollIntoView({behavior:'smooth',block:'start'});}break;}
   case 'admin-filter':state.adminTab='jogadores';state.adminFilter=target.dataset.filter;drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'clear-admin-filter':state.adminTab='jogadores';state.adminFilter='all';drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'clear-home-filter':state.homeFilter='all';if(state.homeRosterMatchId||state.matches.length)await loadHomeRoster(state.homeRosterMatchId||state.matches[0].id);$('#public-roster')?.scrollIntoView({behavior:'smooth',block:'start'});break;
