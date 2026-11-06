@@ -34,13 +34,13 @@ test("20 jogadores de linha pagos, duas vagas livres, sem reservas pendentes",()
 test("ordem 1 a 20 da lista original preservada",()=>{
  const m=loadSeed().demo;
  const line=m.regs.filter(x=>x.role==="linha"&&x.status==="paid");
- assert.deepEqual(line.map(x=>x.name),originalList);
+ assert.deepEqual(Array.from(line,x=>x.name),originalList);
 });
 test("top 10 e demais 10 seguem a ordem exata do pagamento",()=>{
  const m=loadSeed().demo;
  const ordered=m.regs.filter(x=>x.role==="linha"&&x.status==="paid").sort((a,b)=>a.paid_at.localeCompare(b.paid_at));
- assert.deepEqual(ordered.slice(0,10).map(x=>x.name),firstTen);
- assert.deepEqual(ordered.slice(10,20).map(x=>x.name),otherTen);
+ assert.deepEqual(Array.from(ordered.slice(0,10),x=>x.name),firstTen);
+ assert.deepEqual(Array.from(ordered.slice(10,20),x=>x.name),otherTen);
  assert.equal(new Set(ordered.map(x=>x.paid_at)).size,20);
 });
 test("JV Negro na lista de espera sem prioridade, fora das 22 vagas",()=>{
