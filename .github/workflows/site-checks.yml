@@ -6,6 +6,7 @@ on:
       - "index.html"
       - "features-v8.js"
       - "tests/v8.test.mjs"
+      - "tests/lista-0711.test.mjs"
       - ".github/workflows/site-checks.yml"
   workflow_dispatch:
 
@@ -39,6 +40,7 @@ jobs:
         run: |
           node --check features-v8.js
           node --test tests/v8.test.mjs
+          node --test tests/lista-0711.test.mjs
       - name: Testar botão para ver todos
         run: |
           grep -q "clear-admin-filter" index.html
