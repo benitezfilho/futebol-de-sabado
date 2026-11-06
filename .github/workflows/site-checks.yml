@@ -69,6 +69,9 @@ jobs:
             const admin = document.querySelector('[data-nav="admin"]');
             if (!admin) { document.body.setAttribute('data-v8-test','nav-missing'); return; }
             admin.click();
+            const enterDemo=document.querySelector('[data-action="enter-demo-admin"]');
+            if(!enterDemo){document.body.setAttribute('data-v8-test','entry-demo-missing');return;}
+            enterDemo.click();
             setTimeout(() => {
               const start=document.querySelector('[data-tab="visao"].active');
               const roster=document.querySelector('#admin-home-roster');
@@ -160,7 +163,11 @@ jobs:
               await delay(600);
               if(document.querySelector('#demo-badge'))return failure('badge-still-fixed');
               document.querySelector('[data-nav="admin"]').click();
-              await delay(800);
+              await delay(150);
+              const enter=document.querySelector('[data-action="enter-demo-admin"]');
+              if(!enter)return failure('explicit-entry-missing');
+              enter.click();
+              await delay(700);
               const tab=document.querySelector('[data-tab="manual"]');
               if(!tab)return failure('manual-tab-missing');
               tab.click();await delay(200);
@@ -203,7 +210,17 @@ jobs:
               document.querySelector('[data-action="logout"]').click();
               document.querySelector('#modal-root [data-action="logout-yes"]').click();
               await delay(250);
-              if(state.view!=='home'||DEMO.adminLogged)return failure('logout-confirm-failed');
+              if(state.view!=='home'||DEMO.adminLogged||state.admin)return failure('logout-confirm-failed');
+              document.querySelector('[data-nav="admin"]').click();
+              await delay(200);
+              if(!document.querySelector('[data-action="enter-demo-admin"]')||
+                  state.admin!==null || DEMO.adminLogged ||
+                  document.querySelector('#admin-home-roster'))
+                 return failure('admin-auto-login-after-exit');
+              document.querySelector('[data-action="enter-demo-admin"]').click();
+              await delay(300);
+              if(!state.admin||!DEMO.adminLogged||!document.querySelector('[data-tab="visao"]'))
+                return failure('manual-reentry-failed');
               document.body.setAttribute('data-v9-test','ok');
             }catch(err){failure('unexpected-'+String(err.message).slice(0,80).replace(/[^a-zA-Z0-9-]/g,'-'));}
           })();
