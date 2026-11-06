@@ -101,7 +101,7 @@ select.form-control option,select.form-control optgroup{background:#fff!importan
 /* V7: aviso explícito de lotação com pagamento confirmado. */
 .pill.fully_paid{background:#33482a;color:#d2ff9d}.pill.interest{background:#2b3842;color:#d1e0ec}
 </style></head>
-<body><div id="demo-badge" role="status" style="position:fixed;bottom:12px;right:12px;z-index:99999;max-width:350px;background:#172c21;color:#d9f4de;border:1px solid #9eec64;border-radius:12px;padding:10px 14px;font:600 12px system-ui,sans-serif;box-shadow:0 5px 30px #0008;pointer-events:none">DEMONSTRAÇÃO V7 · Não cadastre dados reais. Pix, SMS e WhatsApp são simulados.</div>
+<body>
  <div class="app-shell">
    <aside class="sidebar">
      <a class="brand" href="/" data-nav="home" aria-label="Início Futebol de Sábado">
@@ -497,7 +497,7 @@ window.fetch=async function mockedFetch(input, options={}){
  return fault('Recurso não disponível na demonstração local.',404);
 };
 
-</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
+</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script src="features-manual-draw.js"></script><script src="features-admin-member.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
 'use strict';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -796,14 +796,14 @@ function drawAdmin(){
   const orderedPaid=paid.filter(x=>x.role==='linha').sort((a,b)=>(a.paid_at||'').localeCompare(b.paid_at||'')||a.id-b.id);
   content(`${headline('CENTRAL DE CONTROLE','Painel <span>administrativo.</span>','Você comanda a partida. O sistema cuida da lista, da fila e das confirmações.')}
     <div class="highlight-bar"><strong>APENAS DEMONSTRAÇÃO:</strong> as informações são fictícias e alterações ficam somente neste navegador. O acesso Master de produção terá autenticação no servidor.</div>
-    <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button>
+    <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button><button class="button button-sm" data-action="add-manual-member">+ Jogador manual</button>
     <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-outline" data-action="reset-simulacao">Reiniciar escalação 07/11</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
     <div class="kpi-grid"><button type="button" class="kpi kpi-link ${state.adminFilter==='paid'?'kpi-active':''}" data-action="admin-filter" data-filter="paid" aria-label="Abrir lista de confirmados"><small>VAGAS CONFIRMADAS</small><strong>${paid.length}<span class="muted">/${selected?.capacity??'—'}</span></strong><span class="tiny">Ver confirmados →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='reserved'?'kpi-active':''}" data-action="admin-filter" data-filter="reserved" aria-label="Abrir lista de pendentes"><small>AGUARDANDO PIX</small><strong>${pending.length}</strong><span class="tiny">Ver pendentes →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='goleiro'?'kpi-active':''}" data-action="admin-filter" data-filter="goleiro" aria-label="Abrir lista de goleiros pendentes"><small>GOLEIROS PENDENTES</small><strong>${goalkeepers.length}</strong><span class="tiny">Ver goleiros →</span></button><div class="kpi"><small>ARRECADAÇÃO</small><strong>${money(revenue)}</strong><span class="tiny">Sem goleiros isentos</span></div></div>
     <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
-    <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='rankings'?'active':''}" data-action="admin-tab" data-tab="rankings">Ranking / Períodos</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
+    <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='rankings'?'active':''}" data-action="admin-tab" data-tab="rankings">Ranking / Períodos</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button><button class="tab ${state.adminTab==='manual'?'active':''}" data-action="admin-tab" data-tab="manual">Sorteio manual</button>
       <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
     <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
     ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
@@ -967,10 +967,12 @@ function adminTabContent(reg,m,data){
   const items=(data.historical_interests||[]).filter(x=>x.match_id===m.id);
   return `<section class="panel">${panelTitle('Histórico de interessados',`${items.length} registros somente para histórico. Não são reservas nem integram a fila de espera.`)}<div class="table-wrap"><table><thead><tr><th>Membro</th><th>Celular</th><th>Posição</th><th>Registrado em</th></tr></thead><tbody>${items.map(i=>`<tr><td>${escapeHTML(i.name)}</td><td>${escapeHTML(phoneMask(i.phone))}</td><td>${escapeHTML(i.position)}</td><td>${fullDate(i.created_at)}</td></tr>`).join('')||'<tr><td colspan="4">Nenhum interesse histórico.</td></tr>'}</tbody></table></div></section>`;
  }
- if(state.adminTab==='membros')return `<section class="panel">${panelTitle('Cadastros individuais','Celulares validados por SMS. Apenas o Master acessa os dados completos.')}
+ if(state.adminTab==='membros')return `<section class="panel">${panelTitle('Cadastros individuais','Visualização do Master. Cadastros manuais ficam sem SMS validado.')}
+ <div class="row mb"><button class="button button-sm" data-action="add-manual-member">+ Cadastrar jogador manualmente</button></div>
  <div class="table-wrap"><table><thead><tr><th>Membro</th><th>Telefone</th><th>E-mail</th><th>Verificado</th><th>Acesso</th></tr></thead><tbody>
  ${(data.members||[]).map(x=>`<tr><td><strong>${escapeHTML(x.name||'Cadastro incompleto')}</strong></td><td>${escapeHTML(phoneMask(x.phone))}</td><td>${escapeHTML(x.email||'—')}</td><td>${shortDate(x.verified_at)}</td><td><button class="button button-sm ${x.active?'button-danger':'button-secondary'}" data-action="member-access" data-id="${x.id}" data-active="${x.active?0:1}">${x.active?'Bloquear':'Reativar'}</button></td></tr>`).join('')||'<tr><td colspan="5">Nenhum membro cadastrado.</td></tr>'}</tbody></table></div></section>`;
  if(state.adminTab==='times')return window.FUTEBOL_renderTeamsV8(reg,m,data);
+ if(state.adminTab==='manual')return window.FUTEBOL_manualDraw.render(m.id);
  if(state.adminTab==='historico')return window.FUTEBOL_renderHistoryV8(data,m);
  if(state.adminTab==='avisos'){
    const notices=data.notifications.filter(x=>x.match_id===m?.id);
@@ -1099,7 +1101,7 @@ document.addEventListener('click',async e=>{
   case 'open-register':registerModal(id);break;
   case 'member-login':openMemberLogin();break;
   case 'member-profile':openProfile();break;
-  case 'member-logout':await memberLogout();break;
+  case 'member-logout':showLogoutDialog('member');break;
   case 'member-access':
     if(confirm(target.dataset.active==='1'?'Reativar este membro?':'Bloquear a conta? Ele perderá acesso à área de membros.')){
       try{await api(`/api/admin/members/${id}/access`,{method:'POST',body:JSON.stringify({active:target.dataset.active==='1'})});await reloadAdmin();toast('Acesso do membro atualizado.')}catch(err){toast(err.message,true)}
@@ -1148,6 +1150,44 @@ document.addEventListener('click',async e=>{
     if(!confirm(message))break;
     try{await api(`/api/admin/registrations/${r.id}/queue`,{method:'POST',body:JSON.stringify({action:act})});await reloadAdmin();toast('Lista atualizada.')}catch(err){toast(err.message,true)}break;
   }
+  case 'add-manual-member':openAdminManualMember();break;
+  case 'manual-import':{
+    if(!state.activeMatch)break;
+    const reg=state.admin?.registrations.filter(r=>r.match_id===state.activeMatch.id&&r.status==='paid')||[];
+    const lines=reg.filter(r=>r.role==='linha').map(r=>r.name);
+    const goalies=reg.filter(r=>r.role==='goleiro').map(r=>r.name);
+    const input=$('#manual-lines'),keep=$('#manual-goalies');
+    if(input&&keep){input.value=lines.join('\n');keep.value=goalies.join('\n');
+      const preview=$('#manual-preview');if(preview)preview.textContent=window.FUTEBOL_manualDraw.summary(input.value,Number($('#manual-size')?.value)||5);
+      toast('Lista dos pagos carregada como sugestão. Retire quem ainda não chegou antes de sortear.');}
+    break;
+  }
+  case 'manual-save':case 'manual-draw':{
+    if(!state.activeMatch)break;
+    const payload={lines:$('#manual-lines')?.value||'',goalies:$('#manual-goalies')?.value||'',size:Number($('#manual-size')?.value||5)};
+    try{
+      if(action==='manual-save'){
+        window.FUTEBOL_manualDraw.parse(payload.lines,payload.goalies);
+        window.FUTEBOL_manualDraw.persist(state.activeMatch.id,payload);
+        toast('Lista de presentes salva neste navegador.');
+      }else{
+        window.FUTEBOL_manualDraw.draw(state.activeMatch.id,payload);
+        await reloadAdmin();toast('Times sorteados apenas entre os presentes.');
+      }
+    }catch(err){toast(err.message,true);}
+    break;
+  }
+  case 'manual-clear':{
+    if(!state.activeMatch||!confirm('Limpar a lista e o resultado do sorteio manual desta partida? O sorteio oficial não será alterado.'))break;
+    window.FUTEBOL_manualDraw.clear(state.activeMatch.id);drawAdmin();toast('Sorteio manual reiniciado.');
+    break;
+  }
+  case 'manual-copy':{
+    try{const text=window.FUTEBOL_manualDraw.clipboard(state.activeMatch.id,state.activeMatch.title);
+      await navigator.clipboard.writeText(text);toast('Times copiados. Cole no grupo do WhatsApp.');
+    }catch(err){toast('Não foi possível copiar automaticamente: '+err.message,true);}
+    break;
+  }
   case 'add-match':matchForm(false);break;
   case 'edit-match':matchForm(true);break;
   case 'archive-match':
@@ -1181,7 +1221,22 @@ document.addEventListener('click',async e=>{
     }catch(err){toast(err.message,true)}break;
   case 'copy-broadcast':
     try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
-  case 'logout':await adminAction('logout');break;
+  case 'logout':showLogoutDialog('master');break;
+  case 'logout-no':closeModal();break;
+  case 'logout-yes':{
+    const who=target.dataset.who;
+    try{
+      if(who==='master'){
+        await api('/api/admin/logout',{method:'POST'});
+        state.admin=null;closeModal();nav('home');toast('Você saiu do painel demonstrativo.');
+      }else{
+        await api('/api/member/logout',{method:'POST'});
+        state.member=null;state.my=[];state.pendingMatchID=null;
+        closeModal();nav('home');toast('Você saiu da área do membro.');
+      }
+    }catch(err){toast(err.message,true)}
+    break;
+  }
   case 'restore-registration':if(confirm('Restaurar a inscrição? A vaga paga só será recuperada se houver capacidade.')){try{await api(`/api/admin/registrations/${id}/restore`,{method:'POST'});await reloadAdmin();toast('Inscrição restaurada e registrada no histórico.')}catch(err){toast(err.message,true)}}break;
   case 'reset-simulacao':if(confirm('Reiniciar a simulação de 07/11? As mudanças feitas neste navegador serão descartadas, sem afetar o banco real.')){localStorage.removeItem('futebol_demo_07nov2026_v1');location.reload()}break;
   case 'sim-deadline':await adminAction('sim-deadline');break;
