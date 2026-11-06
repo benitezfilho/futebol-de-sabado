@@ -84,6 +84,37 @@ jobs:
                   const restored=!!document.querySelector('#admin-home-roster') &&
                     document.querySelector('[data-tab="visao"]').classList.contains('active');
                   document.body.setAttribute('data-v8-test',restored?'ok':'home-return-failed');
+                  if(!restored)return;
+                  const periodTab=document.querySelector('[data-tab="rankings"]');
+                  if(!periodTab){document.body.setAttribute('data-ranking-test','tab-missing');return;}
+                  periodTab.click();
+                  setTimeout(() => {
+                    const btn=document.querySelector('[data-action="rank-new"]');
+                    if(!btn){document.body.setAttribute('data-ranking-test','create-missing');return;}
+                    btn.click();
+                    const form=document.querySelector('#ranking-period-form');
+                    if(!form){document.body.setAttribute('data-ranking-test','form-missing');return;}
+                    form.querySelector('[name="title"]').value='Ranking retroativo de setembro';
+                    form.querySelector('[name="start_date"]').value='2026-09-01';
+                    form.querySelector('[name="end_date"]').value='2026-09-30';
+                    form.requestSubmit();
+                    setTimeout(() => {
+                      const open=document.querySelector('[data-action="rank-open"]');
+                      if(!open){document.body.setAttribute('data-ranking-test','open-missing');return;}
+                      window.confirm=()=>true;
+                      open.click();
+                      setTimeout(() => {
+                        const close=document.querySelector('[data-action="rank-close"]');
+                        if(!close){document.body.setAttribute('data-ranking-test','close-missing');return;}
+                        close.click();
+                        setTimeout(() => {
+                          const closed=!!document.querySelector('[data-action="rank-open"]') &&
+                            document.body.textContent.includes('Ranking retroativo de setembro');
+                          document.body.setAttribute('data-ranking-test',closed?'ok':'closing-failed');
+                        },400);
+                      },400);
+                    },400);
+                  },400);
                 },350);
               },400);
             },750);
@@ -92,11 +123,17 @@ jobs:
           Path(".smoke-index.html").write_text(html.replace("</body>",addon+"</body>"))
           PY
           google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
-            --allow-file-access-from-files --virtual-time-budget=6000 \
+            --allow-file-access-from-files --virtual-time-budget=8000 \
             --dump-dom "file://$PWD/.smoke-index.html" > /tmp/futebol-smoke.html 2>/tmp/futebol-chrome.log
           grep -q 'data-v8-test="ok"' /tmp/futebol-smoke.html || {
             echo "Teste visual de navegação falhou."
             grep -o 'data-v8-test="[^"]*"' /tmp/futebol-smoke.html | head || true
+            tail -20 /tmp/futebol-chrome.log || true
+            exit 1
+          }
+          grep -q 'data-ranking-test="ok"' /tmp/futebol-smoke.html || {
+            echo "Teste do ranking retroativo falhou."
+            grep -o 'data-ranking-test="[^"]*"' /tmp/futebol-smoke.html | head || true
             tail -20 /tmp/futebol-chrome.log || true
             exit 1
           }
