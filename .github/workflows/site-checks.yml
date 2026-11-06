@@ -5,8 +5,10 @@ on:
     paths:
       - "index.html"
       - "features-v8.js"
+      - "features-ranking.js"
       - "tests/v8.test.mjs"
       - "tests/lista-0711.test.mjs"
+      - "tests/ranking-periods.test.mjs"
       - ".github/workflows/site-checks.yml"
   workflow_dispatch:
 
@@ -39,8 +41,10 @@ jobs:
       - name: Validar funcionalidades V8
         run: |
           node --check features-v8.js
+          node --check features-ranking.js
           node --test tests/v8.test.mjs
           node --test tests/lista-0711.test.mjs
+          node --test tests/ranking-periods.test.mjs
       - name: Testar botão para ver todos
         run: |
           grep -q "clear-admin-filter" index.html
