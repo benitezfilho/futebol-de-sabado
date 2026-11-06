@@ -23,20 +23,34 @@ async function derive(password,salt,rounds=ITERATIONS){
    {name:"PBKDF2",salt,iterations:rounds,hash:"SHA-256"},key,256));
 }
 function configured(){return Boolean(read())}
-async function setup(password,confirm){
- if(configured())throw new Error("A senha desta demonstração já foi configurada neste navegador.");
- if(password!==confirm)throw new Error("A confirmação não corresponde à senha.");
+function getEmail(){return String(read()?.email||"")}
+function normalizedEmail(email){
+ const result=String(email||"").trim().toLowerCase();
+ if(result.length>160||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result))
+   throw new Error("Informe um endereço de e-mail válido.");
+ return result;
+}
+function checkPassword(password,confirmation){
+ if(password!==confirmation)throw new Error("A confirmação não corresponde à senha.");
  if(typeof password!=="string"||password.length<MIN || password.length>128)
    throw new Error("Use uma senha de 10 a 128 caracteres.");
  if(!/[a-zA-ZÀ-ÿ]/.test(password)||!/\d/.test(password))
    throw new Error("Inclua pelo menos uma letra e um número.");
  if(/^(demo123|1234567890|admin123456|password123)$/i.test(password))
    throw new Error("Essa senha de teste é conhecida. Escolha outra.");
+}
+function write(record){
+ try{localStorage.setItem(KEY,JSON.stringify(record))}
+ catch{throw new Error("Não foi possível salvar as configurações neste navegador.");}
+}
+async function setup(password,confirm,email=null){
+ if(configured())throw new Error("A senha desta demonstração já foi configurada neste navegador.");
+ checkPassword(password,confirm);
  const salt=crypto.getRandomValues(new Uint8Array(16));
  const hash=await derive(password,salt);
- const record={version:1,salt:hex(salt),hash:hex(hash),iterations:ITERATIONS};
- try{localStorage.setItem(KEY,JSON.stringify(record))}
- catch{throw new Error("Não foi possível salvar o bloqueio neste navegador.");}
+ const record={version:1,salt:hex(salt),hash:hex(hash),iterations:ITERATIONS,
+  email:email===null?"":normalizedEmail(email)};
+ write(record);
  return true;
 }
 async function verify(password){
@@ -49,5 +63,28 @@ async function verify(password){
  for(let i=0;i<hash.length;i++)diff|=hash[i]^expected[i];
  return diff===0;
 }
-window.FUTEBOL_demoAuth=Object.freeze({configured,setup,verify});
+async function verifyCredentials(email,password){
+ const saved=read();
+ if(!saved)return false;
+ if(saved.email && saved.email!==String(email||"").trim().toLowerCase())return false;
+ return verify(password);
+}
+async function changePassword(currentPassword,newPassword,confirmation){
+ if(!await verify(currentPassword))throw new Error("A senha atual está incorreta.");
+ checkPassword(newPassword,confirmation);
+ if(newPassword===currentPassword)throw new Error("Escolha uma senha diferente da atual.");
+ const saved=read(),salt=crypto.getRandomValues(new Uint8Array(16));
+ const hash=await derive(newPassword,salt);
+ write({...saved,salt:hex(salt),hash:hex(hash),iterations:ITERATIONS});
+ return true;
+}
+async function changeEmail(currentPassword,newEmail){
+ if(!await verify(currentPassword))throw new Error("A senha atual está incorreta.");
+ const saved=read();
+ write({...saved,email:normalizedEmail(newEmail)});
+ return true;
+}
+window.FUTEBOL_demoAuth=Object.freeze({
+ configured,setup,verify,getEmail,verifyCredentials,changePassword,changeEmail
+});
 })();
