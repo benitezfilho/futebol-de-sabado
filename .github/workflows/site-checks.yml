@@ -166,10 +166,12 @@ jobs:
           html=Path("index.html").read_text()
           addon="""<script>
           (async function(){
+            document.body.setAttribute('data-v9-test','started');
+            const stage=value=>document.body.setAttribute('data-v9-stage',value);
             const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
             const failure=reason=>document.body.setAttribute('data-v9-test',reason);
             try{
-              await delay(600);
+              await delay(600);stage('startup-done');
               if(document.querySelector('#demo-badge'))return failure('badge-still-fixed');
               // A UI roda com verificador simulado; teste do derivador real roda no Node.
               window.FUTEBOL_demoAuth={
@@ -180,8 +182,8 @@ jobs:
               const form=document.querySelector('#demo-admin-lock-form');
               if(!form)return failure('password-form-missing');
               form.querySelector('[name="password"]').value='TesteDeSenha2026_';
-              form.requestSubmit();
-              await delay(1100);
+              form.requestSubmit();stage('login-submitted');
+              await delay(1100);stage('login-settled');
               if(!state.admin||!DEMO.adminLogged)return failure('first-demo-password-entry-failed');
               const tab=document.querySelector('[data-tab="manual"]');
               if(!tab)return failure('manual-tab-missing');
@@ -239,7 +241,7 @@ jobs:
               if(state.admin||DEMO.adminLogged)return failure('incorrect-password-accepted');
               login.querySelector('[name="password"]').value='TesteDeSenha2026_';
               login.requestSubmit();
-              await delay(1100);
+              await delay(1100);stage('relogin-settled');
               if(!state.admin||!DEMO.adminLogged||!document.querySelector('[data-tab="visao"]'))
                 return failure('correct-password-reentry-failed');
               document.body.setAttribute('data-v9-test','ok');
@@ -254,6 +256,7 @@ jobs:
           grep -q 'data-v9-test="ok"' /tmp/futebol-smoke-v9.html || {
             echo "Teste de navegador V9 falhou."
             grep -o 'data-v9-test="[^"]*"' /tmp/futebol-smoke-v9.html | head || true
+            grep -o 'data-v9-stage="[^"]*"' /tmp/futebol-smoke-v9.html | head || true
             tail -25 /tmp/futebol-chrome-v9.log || true
             exit 1
           }
