@@ -497,13 +497,13 @@ window.fetch=async function mockedFetch(input, options={}){
  return fault('Recurso não disponível na demonstração local.',404);
 };
 
-</script><script src="features-v8.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
+</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
 'use strict';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const BR_TZ = 'America/Sao_Paulo';
 const siteLink = location.origin && location.origin!=='null' ? location.origin : '[link público após publicação]';
-const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'visao', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null,
+const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'visao', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null, rankPeriodId: null, adminRankPeriodId: null,
   my: [], interests: [], member: null, pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
 const storeKey = 'racha_minhas_inscricoes_v1';
 const savedTokens = () => { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch { return []; } };
@@ -729,11 +729,14 @@ async function showPix(token,cpf) {
 async function renderRanking(){
   content(`${headline('COMUNIDADE DO FUTEBOL','Ranking e <span>MVP.</span>','Gols, assistências, presença e votação. A resenha também tem números.')}
      <section class="panel">${panelTitle('Melhores jogadores','3 pontos por gol, 2 por assistência, 5 por MVP e 1 por presença.')}
+     <div id="ranking-period-bar"></div>
      <div id="ranking-list"><p class="muted">Carregando classificação...</p></div></section>
      <section class="panel mt" id="community-panel">${panelTitle('Votação para MVP do dia','Cada membro confirmado pode votar em outro jogador quando o Master liberar.')}
       ${state.member?'<p class="muted">Carregando partidas...</p>':'<p class="notice">Entre na sua conta de membro para votar e consultar os resultados.</p><button class="button button-sm" data-action="member-login">Entrar como membro</button>'}</section>`);
   try{
-    const d=await api('/api/ranking');if(state.view!=='ranking')return;
+    const d=await api('/api/ranking'+(state.rankPeriodId?'?period='+encodeURIComponent(state.rankPeriodId):''));if(state.view!=='ranking')return;
+    if(d.period)state.rankPeriodId=d.period.id;
+    $('#ranking-period-bar').innerHTML=d.period?`<div class="highlight-bar"><div class="row-between"><div><strong>${escapeHTML(d.period.title)}</strong><p class="status-text">${dateBR(d.period.start_date+'T12:00:00-03:00',{day:'2-digit',month:'short',year:'numeric'})} a ${dateBR(d.period.end_date+'T12:00:00-03:00',{day:'2-digit',month:'short',year:'numeric'})}</p></div><span class="pill ${d.period.status==='open'?'paid':'neutral'}">${d.period.status==='open'?'ABERTO':'ENCERRADO'}</span></div><label class="mt" for="ranking-period-select">Selecionar período do ranking</label><select class="form-control" id="ranking-period-select">${d.periods.map(p=>`<option value="${escapeHTML(p.id)}" ${p.id===d.period.id?'selected':''}>${escapeHTML(p.title)} (${p.status==='open'?'aberto':'encerrado'})</option>`).join('')}</select><p class="notice">${d.period.status==='closed'?'Classificação encerrada e congelada. Somente o Admin Master pode reabri-la.':'Ranking aberto: estatísticas de partidas dentro dessas datas entram automaticamente na classificação.'}</p></div>`:'<p class="notice">O Master ainda não criou um período para o ranking.</p>';
     $('#ranking-list').innerHTML=d.ranking.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th>Membro</th><th>Pontos</th><th>Gols</th><th>Assist.</th><th>MVP</th><th>Jogos</th></tr></thead><tbody>
       ${d.ranking.map((r,i)=>`<tr><td><strong style="color:var(--lime)">${i+1}º</strong></td><td>${escapeHTML(r.name)}</td><td><strong>${r.pontos}</strong></td><td>${r.gols}</td><td>${r.assistencias}</td><td>${r.mvps}</td><td>${r.presencas}</td></tr>`).join('')}</tbody></table></div>`:
       empty('⚽','O ranking vai começar','Gols, assistências e presenças serão contabilizados após as partidas.');
@@ -800,7 +803,7 @@ function drawAdmin(){
     <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='goleiro'?'kpi-active':''}" data-action="admin-filter" data-filter="goleiro" aria-label="Abrir lista de goleiros pendentes"><small>GOLEIROS PENDENTES</small><strong>${goalkeepers.length}</strong><span class="tiny">Ver goleiros →</span></button><div class="kpi"><small>ARRECADAÇÃO</small><strong>${money(revenue)}</strong><span class="tiny">Sem goleiros isentos</span></div></div>
     <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
-    <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
+    <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='rankings'?'active':''}" data-action="admin-tab" data-tab="rankings">Ranking / Períodos</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button>
       <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
     <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
     ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
@@ -858,6 +861,7 @@ function renderAdminOverview(reg,m,data) {
 }
 
 function adminTabContent(reg,m,data){
+ if(state.adminTab==='rankings')return renderAdminRankingPeriods(data);
  if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
  if(state.adminTab==='visao')return renderAdminOverview(reg,m,data);
  if(state.adminTab==='classificacao'){
@@ -1044,6 +1048,17 @@ document.addEventListener('click',async e=>{
   case 'copy':
    try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
+  case 'rank-new':openRankingPeriodForm(false);break;
+  case 'rank-edit':openRankingPeriodForm(true);break;
+  case 'rank-open':case 'rank-close':{
+    const p=(state.admin?.ranking_periods||[]).find(x=>x.id===state.adminRankPeriodId);
+    if(!p)break;
+    const operation=action==='rank-open'?'open':'close';
+    if(!confirm(operation==='close'?'Encerrar e congelar a classificação deste período? Os resultados continuarão no histórico.':'Reabrir este período? O ranking será recalculado com os resultados existentes, incluindo partidas retroativas.'))break;
+    try{await api('/api/admin/ranking-periods/'+encodeURIComponent(p.id)+'/'+operation,{method:'POST'});await reloadAdmin();toast(operation==='close'?'Ranking encerrado e congelado.':'Ranking reaberto para correções.');}
+    catch(err){toast(err.message,true);}
+    break;
+  }
   case 'admin-select-match':{const selected=state.admin?.matches.find(m=>m.id===Number(id));if(selected){state.activeMatch=selected;state.adminTab='visao';drawAdmin();$('#admin-home-roster')?.scrollIntoView({behavior:'smooth',block:'start'});}break;}
   case 'admin-filter':state.adminTab='jogadores';state.adminFilter=target.dataset.filter;drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
   case 'clear-admin-filter':state.adminTab='jogadores';state.adminFilter='all';drawAdmin();$('#admin-players-list')?.scrollIntoView({behavior:'smooth',block:'start'});break;
@@ -1109,8 +1124,22 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(form.getAttribute('id')==='ranking-period-form'){
+   const d=new FormData(form),periodId=d.get('period_id');
+   const payload={title:d.get('title'),start_date:d.get('start_date'),end_date:d.get('end_date')};
+   const button=form.querySelector('[type=submit]');setLoading(button,true);
+   try{
+     const response=await api(periodId?'/api/admin/ranking-periods/'+encodeURIComponent(periodId):'/api/admin/ranking-periods',{
+       method:periodId?'PATCH':'POST',body:JSON.stringify(payload)});
+     state.adminRankPeriodId=response.period.id;
+     closeModal();await reloadAdmin();
+     toast(periodId?'Período atualizado.':'Período criado. Use Abrir ranking para ativar a apuração.');
+   }catch(err){const node=$('#form-error');if(node)node.innerHTML='<div class="error-box">'+escapeHTML(err.message)+'</div>'}
+   finally{setLoading(button,false)}
+   return;
+ }
  if(form.getAttribute('id')==='rotation-form'){
   const winner=new FormData(form).get('winner');
   try{await api('/api/admin/matches/'+state.activeMatch.id+'/rotation',{method:'POST',body:JSON.stringify({winner})});await reloadAdmin();toast('Resultado registrado. Próximo time convocado!')}catch(err){toast(err.message,true)}return;
