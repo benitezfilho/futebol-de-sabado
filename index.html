@@ -1079,6 +1079,49 @@ function openProfile(){
    <p class="notice">O sistema verifica que seu celular pertence a você. O nome e o e-mail são vinculados à sua conta. Não cadastre informações de terceiros.</p>
    <div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Voltar</button><button type="submit" class="button">Salvar cadastro ↗</button></div></form>`);
 }
+function showLogoutDialog(who){
+ const master=who==='master';
+ modal("Confirmar saída",master?"Admin Master":"Área do membro",
+  '<div class="highlight-bar"><strong>Tem certeza que deseja sair?</strong><p>'+
+  (master?"Você voltará para a página inicial. Ao entrar novamente no Admin Master, a demonstração poderá ser reaberta.":"Sua sessão de membro será encerrada neste navegador.")+
+  '</p></div><div class="form-actions">'+
+  '<button type="button" class="button button-secondary" data-action="logout-no">Não, continuar</button>'+
+  '<button type="button" class="button" data-action="logout-yes" data-who="'+(master?'master':'member')+'">Sim, sair</button></div>');
+}
+function openAdminManualMember(){
+ if(!state.config.demo){
+  return modal("Cadastro manual","Admin Master",
+   '<p class="notice">O cadastro real pelo administrador será habilitado depois da implantação da API autenticada e do D1.</p>'+
+   '<button class="button" data-action="close">Entendi</button>');
+ }
+ const list=(state.admin?.matches||[]).filter(x=>x.status==='active');
+ const matchOptions='<option value="">Somente cadastrar o membro (sem partida)</option>'+
+   list.map(m=>'<option value="'+m.id+'" '+(state.activeMatch?.id===m.id?'selected':'')+'>'+
+     escapeHTML(m.title)+' · '+shortDate(m.starts_at)+'</option>').join('');
+ modal('Cadastrar jogador manualmente','Acesso exclusivo do Admin Master. O jogador não precisa entrar no site para este cadastro.',
+  '<form id="admin-manual-member-form" autocomplete="off">'+
+   '<div class="highlight-bar"><strong>Cadastro pela organização</strong><p>O cadastro manual não verifica o telefone por SMS e nunca confirma o Pix sozinho. A vaga depende da capacidade da partida. Nesta demonstração, não informe dados pessoais reais.</p></div>'+
+   '<div class="form-group mt"><label>Nome completo</label><input class="form-control" type="text" name="name" minlength="5" maxlength="100" placeholder="Nome e sobrenome" required></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>E-mail</label><input class="form-control" name="email" type="email" maxlength="160" placeholder="jogador@exemplo.com" required></div>'+
+   '<div class="form-group"><label>Celular com DDD</label><input class="form-control" name="phone" type="tel" maxlength="17" placeholder="(62) 99999-9999" required></div></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>Tipo de jogador</label><select class="form-control" name="role">'+
+   '<option value="linha">Jogador de linha</option><option value="goleiro">Goleiro (isento, sujeito à aprovação)</option></select></div>'+
+   '<div class="form-group"><label>Posição (opcional)</label><select class="form-control" name="position">'+
+   '<option value="indefinido">Sem preferência</option><option value="atacante">Atacante</option>'+
+   '<option value="centroavante">Centroavante</option><option value="ponta_direita">Ponta direita</option>'+
+   '<option value="ponta_esquerda">Ponta esquerda</option><option value="meia">Meia</option>'+
+   '<option value="volante">Volante</option><option value="zagueiro">Zagueiro</option>'+
+   '<option value="lateral_direito">Lateral direito</option><option value="lateral_esquerdo">Lateral esquerdo</option>'+
+   '</select></div></div>'+
+   '<div class="form-group mt"><label>Vincular à partida (opcional)</label>'+
+   '<select class="form-control" name="match_id">'+matchOptions+'</select>'+
+   '<small class="muted">Com vaga de linha: aguardando Pix. Com lista cheia: fila ou interesse histórico. Goleiro: aguardando aprovação. O Master confirma pagamentos depois.</small></div>'+
+   '<div id="form-error"></div>'+
+   '<div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Cancelar</button>'+
+   '<button type="submit" class="button">Cadastrar jogador</button></div>'+
+  '</form>',true);
+}
+
 async function memberLogout(){try{await api('/api/member/logout',{method:'POST'});state.member=null;state.my=[];state.pendingMatchID=null;nav('my');toast('Você saiu da conta.')}catch(e){toast(e.message,true)}}
 async function startup(){
  try{
@@ -1246,8 +1289,22 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(form.getAttribute('id')==='admin-manual-member-form'){
+   const d=new FormData(form),button=form.querySelector('[type=submit]');
+   setLoading(button,true);
+   try{
+     const member=window.FUTEBOL_adminMember.add({
+       name:d.get('name'),email:d.get('email'),phone:d.get('phone'),
+       role:d.get('role'),position:d.get('position'),match_id:d.get('match_id')
+     });
+     closeModal();await reloadAdmin();
+     toast(member.message);
+   }catch(err){const area=$('#form-error');if(area)area.innerHTML='<div class="error-box">'+escapeHTML(err.message)+'</div>';}
+   finally{setLoading(button,false)}
+   return;
+ }
  if(form.getAttribute('id')==='ranking-period-form'){
    const d=new FormData(form),periodId=d.get('period_id');
    const payload={title:d.get('title'),start_date:d.get('start_date'),end_date:d.get('end_date')};
@@ -1299,6 +1356,10 @@ document.addEventListener('submit',async e=>{
  }
 });
 document.addEventListener('input',e=>{
+ if(e.target.id==='manual-lines'){
+   const preview=$('#manual-preview');
+   if(preview)preview.textContent=window.FUTEBOL_manualDraw.summary(e.target.value,Number($('#manual-size')?.value||5));
+ }
  if(e.target.matches('#broadcast-form [name=message]')){
     const msg=e.target.value;
     $$('[data-wa-link]').forEach(link=>{link.href=`https://wa.me/55${link.dataset.waLink}?text=${encodeURIComponent(msg)}`});
@@ -1319,6 +1380,7 @@ document.addEventListener('change',e=>{
  if(e.target.id==='admin-status-filter'){state.adminFilter=e.target.value;drawAdmin();$('#admin-players-list')?.scrollIntoView({block:'start'});return;}
  if(e.target.id==='ranking-period-select'){state.rankPeriodId=e.target.value;renderRanking();return;}
  if(e.target.id==='admin-rank-period-select'){state.adminRankPeriodId=e.target.value;drawAdmin();return;}
+ if(e.target.id==='manual-size'){const preview=$('#manual-preview');if(preview)preview.textContent=window.FUTEBOL_manualDraw.summary($('#manual-lines')?.value||'',Number(e.target.value));return;}
  if(e.target.id==='community-match'){loadCommunity(Number(e.target.value));return;}
  if(e.target.id==='admin-match-select'){
    const m=state.admin?.matches.find(x=>x.id===Number(e.target.value));if(m){state.activeMatch=m;drawAdmin()}
