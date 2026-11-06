@@ -143,3 +143,79 @@ jobs:
             tail -20 /tmp/futebol-chrome.log || true
             exit 1
           }
+      - name: Verificar sorteio manual, cadastro e logout no Chrome
+        run: |
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            echo "Chrome não disponível, verificações Node já realizadas."
+            exit 0
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          html=Path("index.html").read_text()
+          addon="""<script>
+          (async function(){
+            const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+            const failure=reason=>document.body.setAttribute('data-v9-test',reason);
+            try{
+              await delay(600);
+              if(document.querySelector('#demo-badge'))return failure('badge-still-fixed');
+              document.querySelector('[data-nav="admin"]').click();
+              await delay(800);
+              const tab=document.querySelector('[data-tab="manual"]');
+              if(!tab)return failure('manual-tab-missing');
+              tab.click();await delay(200);
+              const list=document.querySelector('#manual-lines');
+              if(!list)return failure('manual-list-missing');
+              const names=n=>Array.from({length:n},(_,i)=>'Pessoa '+(i+1)).join('\\n');
+              list.value=names(15);
+              document.querySelector('#manual-size').value='5';
+              document.querySelector('#manual-goalies').value='Terror do Ferreira';
+              document.querySelector('[data-action="manual-draw"]').click();
+              await delay(450);
+              const id=state.activeMatch.id;
+              if(DEMO.manualDraws[id]?.result.teams.length!==3||
+                 DEMO.manualDraws[id]?.result.reserves.length!==0)
+                   return failure('draw-15-failed');
+              document.querySelector('#manual-lines').value=names(17);
+              document.querySelector('[data-action="manual-draw"]').click();
+              await delay(450);
+              if(DEMO.manualDraws[id]?.result.teams.length!==3||
+                 DEMO.manualDraws[id]?.result.reserves.length!==2)
+                   return failure('draw-17-failed');
+              document.querySelector('[data-action="add-manual-member"]').click();
+              await delay(100);
+              const form=document.querySelector('#admin-manual-member-form');
+              if(!form)return failure('member-form-missing');
+              form.querySelector('[name="name"]').value='Pessoa Simulação';
+              form.querySelector('[name="email"]').value='simulacao.v9@example.com';
+              form.querySelector('[name="phone"]').value='(62) 99999-5432';
+              form.requestSubmit();
+              await delay(600);
+              if(!DEMO.members.some(x=>x.email==='simulacao.v9@example.com'&&x.admin_created))
+                return failure('manual-register-failed');
+              document.querySelector('[data-action="logout"]').click();
+              await delay(100);
+              if(!document.querySelector('#modal-root [data-action="logout-yes"]')||
+                 !document.querySelector('#modal-root [data-action="logout-no"]'))
+                return failure('logout-dialog-missing');
+              document.querySelector('[data-action="logout-no"]').click();
+              if(state.view!=='admin')return failure('cancel-logout-failed');
+              document.querySelector('[data-action="logout"]').click();
+              document.querySelector('#modal-root [data-action="logout-yes"]').click();
+              await delay(250);
+              if(state.view!=='home'||DEMO.adminLogged)return failure('logout-confirm-failed');
+              document.body.setAttribute('data-v9-test','ok');
+            }catch(err){failure('unexpected-'+String(err.message).slice(0,80).replace(/[^a-zA-Z0-9-]/g,'-'));}
+          })();
+          </script>"""
+          Path(".smoke-v9.html").write_text(html.replace("</body>",addon+"</body>"))
+          PY
+          google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
+            --allow-file-access-from-files --virtual-time-budget=9000 \
+            --dump-dom "file://$PWD/.smoke-v9.html" > /tmp/futebol-smoke-v9.html 2>/tmp/futebol-chrome-v9.log
+          grep -q 'data-v9-test="ok"' /tmp/futebol-smoke-v9.html || {
+            echo "Teste de navegador V9 falhou."
+            grep -o 'data-v9-test="[^"]*"' /tmp/futebol-smoke-v9.html | head || true
+            tail -25 /tmp/futebol-chrome-v9.log || true
+            exit 1
+          }
