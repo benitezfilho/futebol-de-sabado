@@ -228,7 +228,6 @@ if(!DEMO.regs.length){
 }
 
 function currentMember(){return DEMO.members.find(x=>x.id===DEMO.memberLogged&&x.active)!==undefined?DEMO.members.find(x=>x.id===DEMO.memberLogged):null}
-let lastOTP=null;
 function saveDemo(){try{localStorage.setItem(DBKEY,JSON.stringify(DEMO))}catch{}}
 function processDemo(){
  let changed=false;
@@ -307,22 +306,6 @@ window.fetch=async function mockedFetch(input, options={}){
  }
  if((path==='/api/member/otp/start'||path==='/api/member/otp/verify')&&method==='POST')
   return fault('SMS em stand-by. Utilize e-mail e senha na demonstração.',410);
-  if(path==='/api/member/otp/start'&&method==='POST'){
-    const phone=String(body.phone||'').replace(/\D/g,'').replace(/^55(?=\d{11}$)/,'');
-    if(!/^\d{11}$/.test(phone))return fault('Informe celular com DDD.',422);
-    const code=String(Math.floor(100000+Math.random()*900000));lastOTP={phone,code};
-    return json({ok:true,delivery:'simulado',demo_code:code});
- }
- if(path==='/api/member/otp/verify'&&method==='POST'){
-    const phone=String(body.phone||'').replace(/\D/g,'').replace(/^55(?=\d{11}$)/,'');
-    if(!lastOTP||phone!==lastOTP.phone||body.code!==lastOTP.code)return fault('Código incorreto (demonstração local).',401);
-    let member=DEMO.members.find(x=>x.phone===phone);
-    if(member&&!member.active)return fault('Membro bloqueado pelo Master.',403);
-    if(!member){member={id:DEMO.members.length+1,name:'',phone,email:'',verified_at:new Date().toISOString(),active:true,whatsapp_opt_in:false};DEMO.members.push(member)}
-    // OTP local simulado registra confirmação apenas na demonstração.
-    member.verified_at ||= new Date().toISOString();
-    DEMO.memberLogged=member.id;lastOTP=null;saveDemo();return json({ok:true,member,needs_profile:!member.name||!member.email});
- }
  if(path==='/api/member/me'){
     const member=currentMember();return member?json({member,needs_profile:!member.name||!member.email}):fault('Entre com seu e-mail e senha.',401);
  }
@@ -1216,11 +1199,6 @@ async function adminAction(action,id,extra){
  }catch(e){toast(e.message,true)}
 }
 function openMemberLogin(){return openMemberEmailLogin()}
-function openMemberCode(phone, demoCode){
-  modal('Validar meu celular',`Código enviado para ${escapeHTML(phone)}`,
-  `<form id="member-code-form"><input type="hidden" name="phone" value="${escapeHTML(phone)}"/><div class="form-group"><label>Código de 6 dígitos</label><input class="form-control otp-input" name="code" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000" /></div>
-  ${demoCode?`<div class="highlight-bar">Somente teste local: código <strong>${escapeHTML(demoCode)}</strong>. Nenhum SMS real foi enviado.</div>`:''}<div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="member-login">Voltar</button><button class="button" type="submit">Validar e entrar ↗</button></div></form>`);
-}
 function openProfile(){
   if(!state.member)return openMemberLogin();
   modal('Meu cadastro','Informe seus dados uma única vez. Apenas você poderá reservar sua vaga.',
@@ -1601,12 +1579,6 @@ document.addEventListener('submit',async e=>{
  if(form.getAttribute('id')==='broadcast-form'){
    const f=new FormData(form);if(!confirm('Programar este comunicado somente para membros que autorizaram WhatsApp? O envio pode gerar restrições no número se usar uma integração não oficial.'))return;
    try{const res=await api('/api/admin/whatsapp/broadcast',{method:'POST',body:JSON.stringify({match_id:state.activeMatch.id,audience:f.get('audience'),message:f.get('message'),confirm:true})});await reloadAdmin();toast(`${res.queued} mensagens foram enfileiradas. Entrega não garantida.`);}catch(err){toast(err.message,true)}return;
- }
- if(form.getAttribute('id')==='member-phone-form'){
-   const b=form.querySelector('[type=submit]');setLoading(b,true);try{const phone=phoneDigits(new FormData(form).get('phone'));if(phone.length!==11||phone[2]!=='9')throw new Error('Digite um celular válido com DDD e 9 dígitos.');const res=await api('/api/member/otp/start',{method:'POST',body:JSON.stringify({phone})});openMemberCode(phoneMask(phone),res.demo_code);}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
- }
- if(form.getAttribute('id')==='member-code-form'){
-   const b=form.querySelector('[type=submit]');setLoading(b,true);try{const f=new FormData(form);const res=await api('/api/member/otp/verify',{method:'POST',body:JSON.stringify({phone:f.get('phone'),code:f.get('code')})});state.member=res.member;closeModal();if(res.needs_profile)openProfile();else if(state.pendingMatchID){const mid=state.pendingMatchID;state.pendingMatchID=null;registerModal(mid)}else{nav('my');toast('Acesso autorizado.')}}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
  }
  if(form.getAttribute('id')==='member-profile-form'){
    const b=form.querySelector('[type=submit]');setLoading(b,true);try{const f=new FormData(form);const res=await api('/api/member/profile',{method:'PUT',body:JSON.stringify({name:f.get('name'),email:f.get('email'),whatsapp_opt_in:f.get('whatsapp_opt_in')==='on'})});state.member=res.member;closeModal();if(state.pendingMatchID){const mid=state.pendingMatchID;state.pendingMatchID=null;registerModal(mid)}else nav('my');toast('Cadastro salvo.')}catch(err){$('#form-error').innerHTML=`<div class="error-box">${escapeHTML(err.message)}</div>`}finally{setLoading(b,false)}return;
