@@ -60,6 +60,13 @@ jobs:
             if (!admin) { document.body.setAttribute('data-v8-test','nav-missing'); return; }
             admin.click();
             setTimeout(() => {
+              const start=document.querySelector('[data-tab="visao"].active');
+              const roster=document.querySelector('#admin-home-roster');
+              if (!start || !roster || !roster.textContent.includes('Hadrian') ||
+                  !roster.textContent.includes('Terror do Ferreira') ||
+                  !roster.textContent.includes('Primeiros 10 pagantes')) {
+                document.body.setAttribute('data-v8-test','master-home-missing');return;
+              }
               const times=document.querySelector('[data-tab="times"]');
               if (!times) { document.body.setAttribute('data-v8-test','tab-missing'); return; }
               times.click();
@@ -67,9 +74,15 @@ jobs:
                 const ok=!!document.querySelector('[data-action="draw-teams"]') &&
                          document.body.innerText.includes('Goleiros coringas') &&
                          document.body.innerText.includes('Reservas da linha');
-                document.body.setAttribute('data-v8-test',ok?'ok':'render-failed');
+                if (!ok) {document.body.setAttribute('data-v8-test','teams-missing');return;}
+                document.querySelector('[data-tab="visao"]').click();
+                setTimeout(() => {
+                  const restored=!!document.querySelector('#admin-home-roster') &&
+                    document.querySelector('[data-tab="visao"]').classList.contains('active');
+                  document.body.setAttribute('data-v8-test',restored?'ok':'home-return-failed');
+                },350);
               },400);
-            },600);
+            },750);
           },600);
           </script>"""
           Path(".smoke-index.html").write_text(html.replace("</body>",addon+"</body>"))
