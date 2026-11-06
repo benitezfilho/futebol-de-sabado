@@ -42,3 +42,43 @@ test("bloqueio por navegador é demonstrativo e não é autorização de servido
  assert.equal(a.lock.configured(),false);
  assert.equal(b.lock.configured(),false);
 });
+
+test("e-mail local é exigido junto da senha quando configurado",async()=>{
+ const {lock,saved}=auth();
+ await lock.setup("SenhaLocalTeste2026","SenhaLocalTeste2026","Master@Example.COM");
+ assert.equal(lock.getEmail(),"master@example.com");
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaLocalTeste2026"),true);
+ assert.equal(await lock.verifyCredentials("outro@example.com","SenhaLocalTeste2026"),false);
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaIncorreta2026"),false);
+ assert.equal(JSON.stringify([...saved.values()]).includes("SenhaLocalTeste2026"),false);
+});
+test("alteração de senha exige senha antiga e invalida a anterior",async()=>{
+ const {lock}=auth();
+ await lock.setup("SenhaLocalTeste2026","SenhaLocalTeste2026","master@example.com");
+ await assert.rejects(lock.changePassword("Errada","SenhaNova2026","SenhaNova2026"),/senha atual/);
+ await assert.rejects(lock.changePassword("SenhaLocalTeste2026","SenhaNova2026","Outra2026"),/confirmação/);
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaLocalTeste2026"),true);
+ await lock.changePassword("SenhaLocalTeste2026","SenhaNova2026","SenhaNova2026");
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaLocalTeste2026"),false);
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaNova2026"),true);
+ assert.equal(lock.getEmail(),"master@example.com");
+});
+test("troca de e-mail local requer senha e mantém a senha existente",async()=>{
+ const {lock}=auth();
+ await lock.setup("SenhaLocalTeste2026","SenhaLocalTeste2026","master@example.com");
+ await assert.rejects(lock.changeEmail("Errada","novo@example.com"),/senha atual/);
+ await assert.rejects(lock.changeEmail("SenhaLocalTeste2026","e-mail-invalido"),/e-mail válido/);
+ await lock.changeEmail("SenhaLocalTeste2026"," Novo@Example.com ");
+ assert.equal(lock.getEmail(),"novo@example.com");
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaLocalTeste2026"),false);
+ assert.equal(await lock.verifyCredentials("novo@example.com","SenhaLocalTeste2026"),true);
+});
+test("senha antiga sem e-mail continua acessível e permite vincular e-mail depois",async()=>{
+ const {lock}=auth();
+ await lock.setup("SenhaLocalTeste2026","SenhaLocalTeste2026");
+ assert.equal(lock.getEmail(),"");
+ assert.equal(await lock.verifyCredentials("","SenhaLocalTeste2026"),true);
+ await lock.changeEmail("SenhaLocalTeste2026","master@example.com");
+ assert.equal(await lock.verifyCredentials("","SenhaLocalTeste2026"),false);
+ assert.equal(await lock.verifyCredentials("master@example.com","SenhaLocalTeste2026"),true);
+});
