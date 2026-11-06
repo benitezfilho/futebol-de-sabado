@@ -1295,7 +1295,33 @@ document.addEventListener('click',async e=>{
  switch(action){
   case 'close':closeModal();break;
   case 'open-register':registerModal(id);break;
-  case 'member-login':openMemberLogin();break;
+  case 'member-login':case 'member-email-login':openMemberEmailLogin();break;
+  case 'member-create':openMemberSignup();break;
+  case 'member-reset':openMemberReset();break;
+  case 'member-tab':state.memberTab=target.dataset.tab;await renderMy();break;
+  case 'toggle-account-password':{
+    const possible=['user-new-password','user-old-password','user-confirm-password'];
+    if(!possible.includes(target.dataset.target))break;
+    const el=document.getElementById(target.dataset.target);if(!el)break;
+    el.type=el.type==='password'?'text':'password';
+    target.textContent=el.type==='text'?'Ocultar senha':'Mostrar senha';break;
+  }
+  case 'admin-reset-member':{
+    if(!confirm('Gerar um novo código de redefinição? A senha anterior será invalidada e o jogador precisará criar outra.'))break;
+    try{
+      const reset=await window.FUTEBOL_memberAccounts.adminReset(id);
+      await reloadAdmin();
+      modal('Código para redefinir senha','Entregue o código manualmente ao jogador, sem SMS.',
+       '<div class="highlight-bar"><strong>'+escapeHTML(reset.member.name||reset.member.email)+'</strong>'+
+       '<p>Este código aparece apenas agora, expira em 60 minutos e pode ser utilizado uma única vez.</p></div>'+
+       '<div class="form-group mt"><label>Código de recuperação</label>'+
+       '<input class="form-control" readonly value="'+escapeHTML(reset.code)+'"/></div>'+
+       '<p class="notice">Copie o código e compartilhe individualmente, por um canal de sua escolha. Não envie em grupo público.</p>'+
+       '<div class="form-actions"><button class="button button-secondary" data-action="close">Fechar</button>'+
+       '<button class="button" data-action="copy" data-text="'+escapeHTML(reset.code)+'">Copiar código</button></div>');
+    }catch(err){toast(err.message,true);}
+    break;
+  }
   case 'member-profile':openProfile();break;
   case 'member-logout':showLogoutDialog('member');break;
   case 'member-access':
@@ -1454,8 +1480,36 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','member-email-login-form','member-signup-form','member-reset-form','member-account-password-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(['member-email-login-form','member-signup-form','member-reset-form','member-account-password-form'].includes(form.id)){
+  const data=new FormData(form),button=form.querySelector('[type=submit]');setLoading(button,true);
+  const field=name=>String(data.get(name)||'');
+  const errTarget=form.id==='member-account-password-form'?'#member-account-error':'#member-auth-error';
+  try{
+    if(!state.config.demo)throw Error('Somente disponível na demonstração local.');
+    if(form.id==='member-account-password-form'){
+      await window.FUTEBOL_memberAccounts.changeMyPassword(field('current_password'),field('new_password'),field('confirm_password'));
+      await api('/api/member/logout',{method:'POST'});
+      state.member=null;state.my=[];state.memberTab='inscricoes';
+      nav('my');toast('Senha alterada. Entre novamente com a nova senha.');
+    }else{
+      let member;
+      if(form.id==='member-email-login-form')member=await window.FUTEBOL_memberAccounts.signIn(field('email'),field('password'));
+      else if(form.id==='member-signup-form')member=await window.FUTEBOL_memberAccounts.signup({
+       name:field('name'),email:field('email'),phone:field('phone'),password:field('password'),confirmation:field('confirm_password')
+      });
+      else member=await window.FUTEBOL_memberAccounts.redeemReset(field('email'),field('code'),field('password'),field('confirm_password'));
+      state.member=member;state.memberTab='inscricoes';
+      closeModal();
+      if(state.pendingMatchID){const matchId=state.pendingMatchID;state.pendingMatchID=null;registerModal(matchId)}
+      else nav('my');
+      toast('Acesso de demonstração autorizado.');
+    }
+  }catch(err){const box=$(errTarget);if(box)box.innerHTML='<div class="error-box">'+escapeHTML(err.message)+'</div>';else toast(err.message,true)}
+  finally{setLoading(button,false)}
+  return;
+ }
  if(form.id==='admin-security-password-form'||form.id==='admin-security-email-form'){
    const isPassword=form.id==='admin-security-password-form',button=form.querySelector('[type=submit]');
    const data=new FormData(form);
