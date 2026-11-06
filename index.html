@@ -257,7 +257,7 @@ function demoRoster(matchId){
  return regs.map(r=>{if(r.status==='paid'){
    if(r.role==='goleiro')return {...r,group:'goleiros',rank:null};
    paid++;return {...r,group:paid<=10?'titulares':'rodizio',rank:paid};
-  }if(r.status==='waitlist')return {...r,group:'fila',rank:++waiting};
+  }if(r.status==='waitlist')return {...r,group:'fila',rank:r.queue_hold?null:++waiting};
   return {...r,group:r.status==='reserved'?'pendentes':'inativos',rank:null};
  }).map(({phone,email,...publicRow})=>publicRow);
 }
@@ -614,7 +614,7 @@ function renderHome() {
   if(main && state.member)loadHomeRoster(main.id);
 }
 function rosterRows(rows,emptyCopy='Nenhum jogador neste grupo.'){
-  return rows.length?rows.map(x=>`<div class="roster-person"><span class="roster-index">${x.rank?`${x.rank}º`:x.role==='goleiro'?'🧤':'•'}</span><span class="roster-name">${window.FUTEBOL_avatar(x,28)}${escapeHTML(x.name)}<small>${escapeHTML(window.FUTEBOL_positionLabel(x.position))}</small></span><span>${statusPill(x.status)}</span></div>`).join(''):`<p class="muted">${emptyCopy}</p>`;
+  return rows.length?rows.map(x=>`<div class="roster-person"><span class="roster-index">${x.rank?`${x.rank}º`:x.role==='goleiro'?'🧤':'•'}</span><span class="roster-name">${window.FUTEBOL_avatar(x,28)}${escapeHTML(x.name)}<small>${escapeHTML(window.FUTEBOL_positionLabel(x.position))}</small></span><span>${x.queue_hold?'<span class="pill waitlist">SEM PRIORIDADE</span>':statusPill(x.status)}</span></div>`).join(''):`<p class="muted">${emptyCopy}</p>`;
 }
 function renderRosterSections(roster,filter='all'){
   const part=group=>roster.filter(x=>x.group===group);
@@ -868,10 +868,23 @@ function adminTabContent(reg,m,data){
    const restoreAction=['cancelled','expired'].includes(r.status)?`<button class="button button-sm button-secondary" data-action="restore-registration" data-id="${r.id}">Restaurar inscrição</button>`:'';
    const cancelAction=!['cancelled','expired'].includes(r.status)?`<button class="button button-sm button-danger" data-action="cancel-admin" data-id="${r.id}">Remover</button>`:'';
    const attendanceAction=r.status==='paid'?`<button class="button button-sm button-secondary" data-action="attendance" data-id="${r.id}" data-attended="${r.attended?0:1}">${r.attended?'✓ Presente':'Marcar presença'}</button>`:'';
-   mobileCards.push(`<article class="mobile-player"><div class="row-between"><strong>${window.FUTEBOL_avatar(r,32)}${escapeHTML(r.name)}</strong>${statusPill(r.status)}</div><div class="mobile-player-detail">${escapeHTML(phoneMask(r.phone))} · ${escapeHTML(r.position==='indefinido'?'Sem preferência':r.position)}${r.queue_hold?' · Espera manual':''}</div><div class="mobile-player-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></article>`);
-   return `<tr><td><strong>${r.status==='paid'&&r.role==='linha'?orderedRegs.filter(t=>t.status==='paid'&&t.role==='linha').findIndex(t=>t.id===r.id)+1:'•'}</strong></td><td>${window.FUTEBOL_avatar(r,27)}<strong>${escapeHTML(r.name)}</strong><br><small class="muted">${escapeHTML(phoneMask(r.phone))}</small></td><td>${escapeHTML(window.FUTEBOL_positionLabel(r.position))}</td><td>${r.role==='goleiro'&&r.status==='reserved'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}${r.review_reason?`<br><small style="color:var(--red)">${escapeHTML(r.review_reason)}</small>`:''}</td><td><small>${r.reserved_until?`${clock(r.reserved_until)} • ${shortDate(r.reserved_until)}`:'—'}</small></td><td><div class="table-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></td></tr>`;
+   mobileCards.push(`<article class="mobile-player"><div class="row-between"><strong>${window.FUTEBOL_avatar(r,32)}${escapeHTML(r.name)}</strong>${statusPill(r.status)}</div><div class="mobile-player-detail">${escapeHTML(phoneMask(r.phone))} · ${escapeHTML(r.position==='indefinido'?'Sem preferência':r.position)}${r.queue_hold?' · SEM PRIORIDADE':''}</div><div class="mobile-player-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></article>`);
+   return `<tr><td><strong>${r.status==='paid'&&r.role==='linha'?orderedRegs.filter(t=>t.status==='paid'&&t.role==='linha').findIndex(t=>t.id===r.id)+1:'•'}</strong></td><td>${window.FUTEBOL_avatar(r,27)}<strong>${escapeHTML(r.name)}</strong><br><small class="muted">${escapeHTML(phoneMask(r.phone))}</small></td><td>${escapeHTML(window.FUTEBOL_positionLabel(r.position))}</td><td>${r.role==='goleiro'&&r.status==='reserved'?'<span class="pill reserved">AGUARDANDO MASTER</span>':statusPill(r.status)}${r.queue_hold?'<br><small style="color:var(--lime)">SEM PRIORIDADE (sem convocação automática)</small>':''}${r.review_reason?`<br><small style="color:var(--red)">${escapeHTML(r.review_reason)}</small>`:''}</td><td><small>${r.reserved_until?`${clock(r.reserved_until)} • ${shortDate(r.reserved_until)}`:'—'}</small></td><td><div class="table-actions">${statusActions}${queueActions}${attendanceAction}${restoreAction}${r.status==='waitlist'?'':cancelAction}</div></td></tr>`;
  }).join('');
- return `<section class="panel" id="admin-players-list">${panelTitle('Lista de jogadores',`${filteredRegs.length} de ${reg.length} inscrições exibidas. Somente o pagamento confirmado garante vaga.`,
+ const signupList=reg.filter(r=>r.role==='linha'&&['paid','reserved'].includes(r.status))
+   .sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||''))||a.id-b.id);
+ const signupSummary=state.adminFilter==='all'?`<section class="panel">
+   ${panelTitle('Ordem da lista de jogadores','Numeração por entrada na lista. A classificação dos 10 primeiros é separada e considera a hora do Pix.')}
+   <div class="roster-grid"><div class="roster-group"><h3>Jogadores de linha <span>${signupList.length}/${m.capacity}</span></h3>
+     ${Array.from({length:m.capacity},(_,i)=>`<div class="roster-person"><span class="roster-index">${i+1}º</span>
+     <span class="roster-name">${signupList[i]?escapeHTML(signupList[i].name):'VAGA DISPONÍVEL'}</span>
+     <small>${signupList[i]?(signupList[i].status==='paid'?'PAGO':'AGUARDANDO PIX'):'LIVRE'}</small></div>`).join('')}
+   </div><div class="roster-group"><h3>Goleiros coringas (isentos)</h3>
+     ${reg.filter(r=>r.role==='goleiro'&&r.status==='paid').map(r=>`<div class="roster-person">🧤 ${escapeHTML(r.name)}</div>`).join('')||'<p class="muted">Nenhum goleiro confirmado.</p>'}
+     <h3 style="margin-top:20px">Lista de espera</h3>
+     ${reg.filter(r=>r.status==='waitlist'&&r.role==='linha').map(r=>`<div class="roster-person">${escapeHTML(r.name)} ${r.queue_hold?'<small class="pill waitlist">SEM PRIORIDADE</small>':'<small>AGUARDANDO VAGA</small>'}</div>`).join('')||'<p class="muted">Sem jogadores em espera.</p>'}
+   </div></div></section>`:'';
+ return `${signupSummary}<section class="panel" id="admin-players-list">${panelTitle('Lista de jogadores',`${filteredRegs.length} de ${reg.length} inscrições exibidas. Somente o pagamento confirmado garante vaga.`,
     `<a class="button button-sm button-secondary" href="/api/admin/matches/${m?.id}/export">Exportar CSV ↗</a>`)}
     <div class="row mb admin-list-filters"><label for="admin-status-filter">Situação</label><select id="admin-status-filter" class="form-control" aria-label="Filtrar jogadores por status">${[['all','Todos'],['paid','Confirmados'],['reserved','Pendentes do Pix'],['waitlist','Lista de espera'],['goleiro','Goleiros pendentes']].map(([v,label])=>`<option value="${v}" ${state.adminFilter===v?'selected':''}>${label}</option>`).join('')}</select><button type="button" class="button button-sm button-outline" data-action="clear-admin-filter" ${state.adminFilter==='all'?'disabled':''}>Ver todos os jogadores</button><span class="muted">Clique nos indicadores acima para filtrar.</span></div>
     <div class="mobile-players">${mobileCards.join('')||'<p class="muted">Nenhum jogador nesta situação.</p>'}</div>
