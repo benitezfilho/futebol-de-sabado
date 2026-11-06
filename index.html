@@ -860,6 +860,72 @@ function renderAdminOverview(reg,m,data) {
     '</div></div>';
 }
 
+function renderAdminRankingPeriods(data){
+  const periods=data.ranking_periods||[];
+  const selected=periods.find(x=>x.id===state.adminRankPeriodId)||periods.find(x=>x.status==='open')||periods[0];
+  if(selected)state.adminRankPeriodId=selected.id;
+  const options=periods.map(p=>'<option value="'+escapeHTML(p.id)+'" '+(p.id===selected?.id?'selected':'')+'>'+
+    escapeHTML(p.title)+' ('+(p.status==='open'?'aberto':'encerrado')+')</option>').join("");
+  const dateText=x=>dateBR(x+'T12:00:00-03:00',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const history=(data.events||[]).filter(e=>String(e.action||"").startsWith("RANKING_")).slice(0,25);
+  return '<section class="panel">'+panelTitle('Calendário e encerramento do ranking',
+    'Crie temporadas e intervalos por data, inclusive retroativos. Abra, encerre ou reabra a qualquer momento.')+
+    '<div class="row mb"><button class="button button-sm" data-action="rank-new">+ Novo período de ranking</button></div>'+
+    (selected?'<div class="form-group"><label for="admin-rank-period-select">Período para administrar</label>'+
+      '<select id="admin-rank-period-select" class="form-control" style="max-width:560px">'+options+'</select></div>'+
+      '<div class="highlight-bar mt">'+
+        '<div class="row-between"><div><strong>'+escapeHTML(selected.title)+'</strong>'+
+        '<p class="status-text">De '+dateText(selected.start_date)+' até '+dateText(selected.end_date)+' (datas inclusivas)</p></div>'+
+        '<span class="pill '+(selected.status==='open'?'paid':'neutral')+'">'+
+        (selected.status==='open'?'ABERTO':'ENCERRADO')+'</span></div>'+
+        '<p class="notice">'+(selected.status==='open'?
+          'O ranking está aberto: partidas dentro do intervalo entram no cálculo, mesmo se o período for retroativo.':
+          'O ranking está encerrado: a classificação ficou congelada. Reabra para editar as datas e recalcular os resultados.')+
+        '</p><div class="row mt" style="gap:9px;flex-wrap:wrap">'+
+          (selected.status==='open'?
+            '<button class="button button-sm" data-action="rank-close">Encerrar e congelar ranking</button>'+
+            '<button class="button button-sm button-outline" data-action="rank-edit">Editar nome / datas</button>':
+            '<button class="button button-sm" data-action="rank-open">Reabrir ranking</button>')+
+        '</div><p class="status-text mt">Último encerramento: '+(selected.closed_at?fullDate(selected.closed_at):'não encerrado')+
+        ' · Fechamentos registrados: '+(selected.previous_closures||0)+'</p></div>':
+      '<p class="muted">Nenhum período configurado. Crie um período para começar.</p>')+
+    '<div class="mt">'+panelTitle('Períodos cadastrados','Cada período mantém sua configuração e o histórico de encerramento.')+
+      (periods.length?periods.map(p=>'<div class="upcoming-row"><div><strong>'+escapeHTML(p.title)+'</strong>'+
+        '<small class="muted">'+dateText(p.start_date)+' a '+dateText(p.end_date)+'</small></div>'+
+        '<div class="row"><span class="pill '+(p.status==='open'?'paid':'neutral')+'">'+
+          (p.status==='open'?'Aberto':'Encerrado')+'</span>'+
+          '<button class="button button-sm button-outline" data-action="rank-select" data-id="'+escapeHTML(p.id)+'">Administrar</button></div></div>').join(''):
+       '<p class="muted">Nenhum período cadastrado.</p>')+
+    '</div><div class="mt">'+panelTitle('Histórico de alterações',
+      'Registros de abertura, encerramento, reabertura e alteração de datas.')+
+      (history.length?history.map(event=>'<div class="upcoming-row"><div><strong>'+
+        escapeHTML(String(event.action).replaceAll('_',' '))+'</strong><small class="muted">'+
+        escapeHTML(event.detail||'Período atualizado')+'</small></div><small>'+
+        (event.at?fullDate(event.at):'—')+'</small></div>').join(''):
+       '<p class="muted">Nenhuma alteração registrada ainda.</p>')+
+    '</div><p class="notice">Este controle é independente das inscrições e da votação MVP de cada jogo. Não altera pagamentos, vagas ou a ordem dos 10 primeiros pagantes.</p>'+
+    '</section>';
+}
+function openRankingPeriodForm(edit){
+  const periods=state.admin?.ranking_periods||[];
+  const period=edit?periods.find(p=>p.id===state.adminRankPeriodId):null;
+  if(edit&&(!period||period.status!=='open'))return toast('Reabra o ranking antes de alterar datas.',true);
+  const today=new Intl.DateTimeFormat('sv-SE',{timeZone:BR_TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const startDefault=today.slice(0,8)+'01';
+  const endDefault=today.slice(0,7)+'-'+String(new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7)),0)).getUTCDate()).padStart(2,'0');
+  modal(edit?'Editar período de ranking':'Criar período de ranking',
+    'As datas definem quais partidas entram na classificação, mesmo que já tenham acontecido.',
+    '<form id="ranking-period-form"><input type="hidden" name="period_id" value="'+escapeHTML(period?.id||'')+'"/>'+
+    '<div class="form-group"><label>Nome do ranking</label><input class="form-control" name="title" minlength="3" maxlength="100" required placeholder="Ex.: Ranking Novembro 2026" value="'+escapeHTML(period?.title||'Ranking '+today.slice(0,7))+'"/></div>'+
+    '<div class="form-grid mt"><div class="form-group"><label>Data inicial (inclusive)</label>'+
+    '<input type="date" class="form-control" name="start_date" required value="'+(period?.start_date||startDefault)+'"/></div>'+
+    '<div class="form-group"><label>Data final (inclusive)</label>'+
+    '<input type="date" class="form-control" name="end_date" required value="'+(period?.end_date||endDefault)+'"/></div></div>'+
+    '<p class="notice">Você pode informar datas passadas. Novos períodos são criados encerrados; depois use Reabrir ranking para ativar a apuração e Encerrar para congelar a classificação.</p>'+
+    '<div id="form-error"></div><div class="form-actions"><button type="button" data-action="close" class="button button-secondary">Cancelar</button>'+
+    '<button type="submit" class="button">Salvar período</button></div></form>',true);
+}
+
 function adminTabContent(reg,m,data){
  if(state.adminTab==='rankings')return renderAdminRankingPeriods(data);
  if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
@@ -1048,6 +1114,7 @@ document.addEventListener('click',async e=>{
   case 'copy':
    try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
+  case 'rank-select':state.adminRankPeriodId=id;drawAdmin();break;
   case 'rank-new':openRankingPeriodForm(false);break;
   case 'rank-edit':openRankingPeriodForm(true);break;
   case 'rank-open':case 'rank-close':{
@@ -1195,6 +1262,8 @@ document.addEventListener('change',e=>{
    return;
  }
  if(e.target.id==='admin-status-filter'){state.adminFilter=e.target.value;drawAdmin();$('#admin-players-list')?.scrollIntoView({block:'start'});return;}
+ if(e.target.id==='ranking-period-select'){state.rankPeriodId=e.target.value;renderRanking();return;}
+ if(e.target.id==='admin-rank-period-select'){state.adminRankPeriodId=e.target.value;drawAdmin();return;}
  if(e.target.id==='community-match'){loadCommunity(Number(e.target.value));return;}
  if(e.target.id==='admin-match-select'){
    const m=state.admin?.matches.find(x=>x.id===Number(e.target.value));if(m){state.activeMatch=m;drawAdmin()}
