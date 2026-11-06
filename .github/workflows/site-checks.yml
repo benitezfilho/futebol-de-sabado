@@ -9,6 +9,7 @@ on:
       - "features-manual-draw.js"
       - "features-admin-member.js"
       - "features-demo-auth.js"
+      - "features-member-accounts.js"
       - "tests/manual-draw-admin.test.mjs"
       - "tests/demo-auth.test.mjs"
       - "tests/v8.test.mjs"
@@ -50,6 +51,7 @@ jobs:
           node --check features-manual-draw.js
           node --check features-admin-member.js
           node --check features-demo-auth.js
+          node --check features-member-accounts.js
           node --test tests/demo-auth.test.mjs
           node --test tests/manual-draw-admin.test.mjs
           node --test tests/v8.test.mjs
