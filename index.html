@@ -176,6 +176,8 @@ const DEMO=(function(){
  return {matches,regs:[],interests:[],teams:[],notices:[],members:[],stats:[],votes:[],memberLogged:null,adminLogged:false};
 })();
 DEMO.interests ||= [];DEMO.members ||= [];DEMO.memberLogged ||= null;DEMO.stats ||= [];DEMO.votes ||= [];
+// Sempre exigir nova entrada ao recarregar: sessão demo antiga não autoriza acesso.
+DEMO.adminLogged=false;
 if(!DEMO.regs.length){
  // Escalação informada pelo organizador, exclusivamente para simulação.
  // Sem CPF, chave Pix, telefones verdadeiros ou e-mails dos jogadores no site.
@@ -497,7 +499,7 @@ window.fetch=async function mockedFetch(input, options={}){
  return fault('Recurso não disponível na demonstração local.',404);
 };
 
-</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script src="features-manual-draw.js"></script><script src="features-admin-member.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
+</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script src="features-manual-draw.js"></script><script src="features-admin-member.js"></script><script src="features-demo-auth.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
 'use strict';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -763,13 +765,21 @@ async function loadCommunity(matchId){
 async function renderAdmin(){
   if(!state.admin){
     if(state.config.demo){
-      // Acessar a aba Admin não reabre automaticamente uma sessão encerrada.
-      // Demonstração pública: entrada explícita, SEM credencial de produção.
-      content(`${headline('ACESSO DEMONSTRATIVO','Painel do <span>Admin Master.</span>','Acompanhe a organização e teste os recursos administrativos.')}
+      const configured=window.FUTEBOL_demoAuth?.configured();
+      content(`${headline('ACESSO DEMONSTRATIVO','Painel do <span>Admin Master.</span>','Entre com sua senha local para abrir o painel de testes.')}
         <section class="panel admin-login">
-          ${panelTitle('Entrar na demonstração','O botão Sair encerra a sessão do painel; para retornar é necessária uma nova ação explícita.')}
-          <div class="highlight-bar"><strong>Somente demonstração</strong><p>Este acesso não exige senha e não protege dados reais. A autenticação do Admin Master em produção será feita no servidor com verificação de identidade e MFA.</p></div>
-          <button class="button button-block mt" data-action="enter-demo-admin">Entrar no painel demonstrativo</button>
+          ${panelTitle(configured?'Senha da demonstração':'Definir senha da demonstração',configured?'Digite a senha definida neste navegador para entrar.':'Primeiro acesso neste navegador: crie sua senha, sem compartilhá-la na conversa.')}
+          <div class="highlight-bar"><strong>Proteção apenas da demonstração</strong><p>Esta senha é validada localmente neste navegador, não autentica pessoas no servidor e não restringe o site público em outros dispositivos. O acesso Master real dependerá do Cloudflare Access e MFA.</p></div>
+          <form id="demo-admin-lock-form">
+            <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 10 caracteres, letra e número)'}</label>
+              <input id="demo-admin-pass" name="password" type="password" class="form-control"
+                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'10'}" maxlength="128" required/></div>
+            ${configured?'':`<div class="form-group mt"><label for="demo-admin-confirm">Confirmar senha</label>
+              <input id="demo-admin-confirm" name="confirm_password" type="password" class="form-control"
+               autocomplete="new-password" minlength="10" maxlength="128" required/></div>`}
+            <div id="admin-error" role="alert"></div>
+            <button type="submit" class="button button-block mt">${configured?'Entrar no Admin Master':'Definir senha e entrar'}</button>
+          </form>
         </section>`);
       return;
     }
@@ -1267,16 +1277,6 @@ document.addEventListener('click',async e=>{
     }catch(err){toast(err.message,true)}break;
   case 'copy-broadcast':
     try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
-  case 'enter-demo-admin':{
-    if(!state.config.demo)return toast('Acesso demonstrativo indisponível.',true);
-    try{
-      await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
-      state.admin=await api('/api/admin/overview');
-      drawAdmin();
-      toast('Modo demonstração iniciado.');
-    }catch(err){toast(err.message,true)}
-    break;
-  }
   case 'logout':showLogoutDialog('master');break;
   case 'logout-no':closeModal();break;
   case 'logout-yes':{
@@ -1302,8 +1302,29 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(form.getAttribute('id')==='demo-admin-lock-form'){
+   const button=form.querySelector('[type=submit]');
+   const password=String(new FormData(form).get('password')||'');
+   const confirmation=String(new FormData(form).get('confirm_password')||'');
+   setLoading(button,true);
+   try{
+     if(!state.config.demo)throw new Error('Modo demonstração não está disponível.');
+     if(!window.FUTEBOL_demoAuth.configured()){
+       await window.FUTEBOL_demoAuth.setup(password,confirmation);
+     }else if(!await window.FUTEBOL_demoAuth.verify(password)){
+       throw new Error('Senha incorreta. Verifique e tente novamente.');
+     }
+     await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
+     state.admin=await api('/api/admin/overview');
+     form.reset();drawAdmin();toast('Acesso demonstrativo liberado.');
+   }catch(err){
+     const place=$('#admin-error');
+     if(place)place.innerHTML='<div class="error-box">'+escapeHTML(err.message)+'</div>';
+   }finally{setLoading(button,false)}
+   return;
+ }
  if(form.getAttribute('id')==='admin-manual-member-form'){
    const d=new FormData(form),button=form.querySelector('[type=submit]');
    setLoading(button,true);
