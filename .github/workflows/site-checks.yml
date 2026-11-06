@@ -208,12 +208,12 @@ jobs:
                    return failure('draw-17-failed');
               document.querySelector('[data-action="add-manual-member"]').click();
               await delay(100);
-              const form=document.querySelector('#admin-manual-member-form');
-              if(!form)return failure('member-form-missing');
-              form.querySelector('[name="name"]').value='Pessoa Simulação';
-              form.querySelector('[name="email"]').value='simulacao.v9@example.com';
-              form.querySelector('[name="phone"]').value='(62) 99999-5432';
-              form.requestSubmit();
+              const memberForm=document.querySelector('#admin-manual-member-form');
+              if(!memberForm)return failure('member-form-missing');
+              memberForm.querySelector('[name="name"]').value='Pessoa Simulação';
+              memberForm.querySelector('[name="email"]').value='simulacao.v9@example.com';
+              memberForm.querySelector('[name="phone"]').value='(62) 99999-5432';
+              memberForm.requestSubmit();
               await delay(600);
               if(!DEMO.members.some(x=>x.email==='simulacao.v9@example.com'&&x.admin_created))
                 return failure('manual-register-failed');
