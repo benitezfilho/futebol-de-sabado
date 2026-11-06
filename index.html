@@ -771,12 +771,20 @@ async function renderAdmin(){
           ${panelTitle(configured?'Senha da demonstração':'Definir senha da demonstração',configured?'Digite a senha definida neste navegador para entrar.':'Primeiro acesso neste navegador: crie sua senha, sem compartilhá-la na conversa.')}
           <div class="highlight-bar"><strong>Proteção apenas da demonstração</strong><p>Esta senha é validada localmente neste navegador, não autentica pessoas no servidor e não restringe o site público em outros dispositivos. O acesso Master real dependerá do Cloudflare Access e MFA.</p></div>
           <form id="demo-admin-lock-form">
+            ${!configured || window.FUTEBOL_demoAuth.getEmail?.()?`<div class="form-group mt">
+              <label for="demo-admin-email">E-mail do Admin Master (somente identificação local)</label>
+              <input id="demo-admin-email" name="email" type="email" maxlength="160" autocomplete="username" required
+                class="form-control" placeholder="seu@email.com" value="${configured?escapeHTML(window.FUTEBOL_demoAuth.getEmail()):''}"/>
+              <small class="muted">Este e-mail ainda não recebe códigos. A validação real será feita pela Cloudflare.</small></div>`:
+              '<p class="notice">Este navegador já possui senha da demonstração. Após entrar, acesse Segurança Master para vincular seu e-mail.</p>'}
             <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 10 caracteres, letra e número)'}</label>
               <input id="demo-admin-pass" name="password" type="password" class="form-control"
-                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'10'}" maxlength="128" required/></div>
+                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'10'}" maxlength="128" required/>
+              <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-pass" aria-pressed="false">Mostrar senha</button></div>
             ${configured?'':`<div class="form-group mt"><label for="demo-admin-confirm">Confirmar senha</label>
               <input id="demo-admin-confirm" name="confirm_password" type="password" class="form-control"
-               autocomplete="new-password" minlength="10" maxlength="128" required/></div>`}
+               autocomplete="new-password" minlength="10" maxlength="128" required/>
+              <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-confirm" aria-pressed="false">Mostrar senha</button></div>`}
             <div id="admin-error" role="alert"></div>
             <button type="submit" class="button button-block mt">${configured?'Entrar no Admin Master':'Definir senha e entrar'}</button>
           </form>
@@ -817,6 +825,7 @@ function drawAdmin(){
     <button type="button" class="kpi kpi-link ${state.adminFilter==='goleiro'?'kpi-active':''}" data-action="admin-filter" data-filter="goleiro" aria-label="Abrir lista de goleiros pendentes"><small>GOLEIROS PENDENTES</small><strong>${goalkeepers.length}</strong><span class="tiny">Ver goleiros →</span></button><div class="kpi"><small>ARRECADAÇÃO</small><strong>${money(revenue)}</strong><span class="tiny">Sem goleiros isentos</span></div></div>
     <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
     <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='rankings'?'active':''}" data-action="admin-tab" data-tab="rankings">Ranking / Períodos</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button><button class="tab ${state.adminTab==='manual'?'active':''}" data-action="admin-tab" data-tab="manual">Sorteio manual</button>
+      <button class="tab ${state.adminTab==='seguranca'?'active':''}" data-action="admin-tab" data-tab="seguranca">Segurança Master</button>
       <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
     <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
     ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
@@ -939,7 +948,50 @@ function openRankingPeriodForm(edit){
     '<button type="submit" class="button">Salvar período</button></div></form>',true);
 }
 
+function renderAdminSecurity(){
+ if(!state.config.demo){
+  return '<section class="panel">'+panelTitle('Segurança Master','A autenticação real será gerenciada pelo Cloudflare Access.')+
+    '<p class="notice">O console local não altera a senha de produção. Configure identidade e MFA no provedor de autenticação.</p></section>';
+ }
+ const email=window.FUTEBOL_demoAuth.getEmail?.()||'';
+ return '<section class="panel">'+
+   panelTitle('Segurança do Admin Master','Administre a senha local e o e-mail utilizado para identificar este navegador.')+
+   '<div class="highlight-bar"><strong>Modo demonstração</strong><p>A senha não pode ser recuperada ou visualizada depois de salva. Ela fica armazenada como hash. O botão Mostrar apenas revela o que você está digitando. O e-mail não é verificado e ainda não recebe código de acesso.</p></div>'+
+   '<div class="roster-grid mt"><div class="roster-group">'+
+    '<h3>Alterar senha de acesso</h3>'+
+    '<form id="admin-security-password-form" autocomplete="off">'+
+     '<div class="form-group mt"><label for="master-old-password">Senha atual</label>'+
+      '<input type="password" id="master-old-password" name="current_password" autocomplete="current-password" class="form-control" required>'+
+      '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-old-password" aria-pressed="false">Mostrar senha</button></div>'+
+     '<div class="form-group mt"><label for="master-new-password">Nova senha</label>'+
+      '<input type="password" id="master-new-password" name="new_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-new-password" aria-pressed="false">Mostrar senha</button></div>'+
+     '<div class="form-group mt"><label for="master-confirm-password">Confirmar nova senha</label>'+
+      '<input type="password" id="master-confirm-password" name="confirm_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-confirm-password" aria-pressed="false">Mostrar senha</button></div>'+
+     '<div id="admin-security-password-error" role="alert"></div>'+
+     '<button type="submit" class="button mt">Salvar nova senha</button>'+
+     '<p class="status-text mt">Após salvar, você será desconectado e entrará com a nova senha.</p>'+
+    '</form></div><div class="roster-group">'+
+     '<h3>E-mail de acesso</h3>'+
+     '<p class="status-text">E-mail atual: <strong>'+(email?escapeHTML(email):'Não configurado')+'</strong></p>'+
+     '<form id="admin-security-email-form">'+
+      '<div class="form-group mt"><label for="master-email-new">Cadastrar ou alterar e-mail</label>'+
+       '<input id="master-email-new" name="email" type="email" maxlength="160" class="form-control" value="'+escapeHTML(email)+'" autocomplete="username" required>'+
+       '<small class="muted">Esse endereço será solicitado na entrada deste navegador. Não enviamos mensagens nesta demonstração.</small></div>'+
+      '<div class="form-group mt"><label for="master-email-password">Confirmar senha atual</label>'+
+       '<input id="master-email-password" name="current_password" type="password" class="form-control" autocomplete="current-password" required>'+
+       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-email-password" aria-pressed="false">Mostrar senha</button></div>'+
+      '<div id="admin-security-email-error" role="alert"></div>'+
+      '<button type="submit" class="button mt">Salvar e-mail</button>'+
+     '</form></div></div>'+
+     '<div class="mt">'+panelTitle('Autenticação por código de e-mail e MFA','Próxima etapa da integração real.')+
+      '<p class="notice">O envio de código por e-mail ainda não está ativo. Quando o Cloudflare Access estiver configurado para o Admin Master, poderemos usar OTP no e-mail e um segundo fator independente para MFA. A senha local não será reutilizada na produção.</p>'+
+     '</div></section>';
+}
+
 function adminTabContent(reg,m,data){
+ if(state.adminTab==='seguranca')return renderAdminSecurity();
  if(state.adminTab==='rankings')return renderAdminRankingPeriods(data);
  if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
  if(state.adminTab==='visao')return renderAdminOverview(reg,m,data);
@@ -1171,6 +1223,18 @@ document.addEventListener('click',async e=>{
    }break;
   case 'copy':
    try{await navigator.clipboard.writeText(target.dataset.text);toast('Copiado!')}catch{toast('Não foi possível copiar automaticamente. Selecione e copie o texto.',true)}break;
+  case 'toggle-admin-password':{
+    const allowed=['demo-admin-pass','demo-admin-confirm','master-old-password','master-new-password','master-confirm-password','master-email-password'];
+    const targetId=target.dataset.target;
+    if(!allowed.includes(targetId))break;
+    const input=document.getElementById(targetId);
+    if(!input||!['password','text'].includes(input.type))break;
+    const reveal=input.type==='password';
+    input.type=reveal?'text':'password';
+    target.textContent=reveal?'Ocultar senha':'Mostrar senha';
+    target.setAttribute('aria-pressed',String(reveal));
+    break;
+  }
   case 'admin-tab':state.adminTab=target.dataset.tab;if(state.adminTab==='jogadores')state.adminFilter='all';drawAdmin();break;
   case 'rank-select':state.adminRankPeriodId=id;drawAdmin();break;
   case 'rank-new':openRankingPeriodForm(false);break;
@@ -1302,18 +1366,43 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
+ if(form.id==='admin-security-password-form'||form.id==='admin-security-email-form'){
+   const isPassword=form.id==='admin-security-password-form',button=form.querySelector('[type=submit]');
+   const data=new FormData(form);
+   const errorNode=$('#'+(isPassword?'admin-security-password-error':'admin-security-email-error'));
+   setLoading(button,true);
+   try{
+     if(!state.config.demo||!state.admin||!DEMO.adminLogged)throw new Error('Entre no Admin Master para alterar a segurança.');
+     if(isPassword){
+       await window.FUTEBOL_demoAuth.changePassword(
+        String(data.get('current_password')||''),String(data.get('new_password')||''),String(data.get('confirm_password')||''));
+       form.reset();
+       await api('/api/admin/logout',{method:'POST'});
+       state.admin=null;
+       nav('admin');
+       toast('Senha alterada. Entre novamente com a nova senha.');
+     }else{
+       await window.FUTEBOL_demoAuth.changeEmail(
+        String(data.get('current_password')||''),String(data.get('email')||''));
+       form.reset();drawAdmin();toast('E-mail de acesso local atualizado.');
+     }
+   }catch(err){if(errorNode)errorNode.innerHTML='<div class="error-box">'+escapeHTML(err.message)+'</div>';}
+   finally{setLoading(button,false);}
+   return;
+ }
  if(form.getAttribute('id')==='demo-admin-lock-form'){
    const button=form.querySelector('[type=submit]');
    const password=String(new FormData(form).get('password')||'');
    const confirmation=String(new FormData(form).get('confirm_password')||'');
+   const email=String(new FormData(form).get('email')||'');
    setLoading(button,true);
    try{
      if(!state.config.demo)throw new Error('Modo demonstração não está disponível.');
      if(!window.FUTEBOL_demoAuth.configured()){
-       await window.FUTEBOL_demoAuth.setup(password,confirmation);
-     }else if(!await window.FUTEBOL_demoAuth.verify(password)){
+       await window.FUTEBOL_demoAuth.setup(password,confirmation,email);
+     }else if(!await window.FUTEBOL_demoAuth.verifyCredentials(email,password)){
        throw new Error('Senha incorreta. Verifique e tente novamente.');
      }
      await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
