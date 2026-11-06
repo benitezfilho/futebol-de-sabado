@@ -8,6 +8,7 @@ on:
       - "features-ranking.js"
       - "features-manual-draw.js"
       - "features-admin-member.js"
+      - "features-demo-auth.js"
       - "tests/manual-draw-admin.test.mjs"
       - "tests/v8.test.mjs"
       - "tests/lista-0711.test.mjs"
@@ -47,6 +48,8 @@ jobs:
           node --check features-ranking.js
           node --check features-manual-draw.js
           node --check features-admin-member.js
+          node --check features-demo-auth.js
+          node --test tests/demo-auth.test.mjs
           node --test tests/manual-draw-admin.test.mjs
           node --test tests/v8.test.mjs
           node --test tests/lista-0711.test.mjs
@@ -69,9 +72,11 @@ jobs:
             const admin = document.querySelector('[data-nav="admin"]');
             if (!admin) { document.body.setAttribute('data-v8-test','nav-missing'); return; }
             admin.click();
-            const enterDemo=document.querySelector('[data-action="enter-demo-admin"]');
-            if(!enterDemo){document.body.setAttribute('data-v8-test','entry-demo-missing');return;}
-            enterDemo.click();
+            const form=document.querySelector('#demo-admin-lock-form');
+            if(!form){document.body.setAttribute('data-v8-test','demo-password-form-missing');return;}
+            form.querySelector('[name="password"]').value='TesteDeSenha2026_';
+            form.querySelector('[name="confirm_password"]').value='TesteDeSenha2026_';
+            form.requestSubmit();
             setTimeout(() => {
               const start=document.querySelector('[data-tab="visao"].active');
               const roster=document.querySelector('#admin-home-roster');
@@ -132,7 +137,7 @@ jobs:
           Path(".smoke-index.html").write_text(html.replace("</body>",addon+"</body>"))
           PY
           google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
-            --allow-file-access-from-files --virtual-time-budget=8000 \
+            --allow-file-access-from-files --virtual-time-budget=12000 \
             --dump-dom "file://$PWD/.smoke-index.html" > /tmp/futebol-smoke.html 2>/tmp/futebol-chrome.log
           grep -q 'data-v8-test="ok"' /tmp/futebol-smoke.html || {
             echo "Teste visual de navegação falhou."
@@ -164,10 +169,13 @@ jobs:
               if(document.querySelector('#demo-badge'))return failure('badge-still-fixed');
               document.querySelector('[data-nav="admin"]').click();
               await delay(150);
-              const enter=document.querySelector('[data-action="enter-demo-admin"]');
-              if(!enter)return failure('explicit-entry-missing');
-              enter.click();
-              await delay(700);
+              const form=document.querySelector('#demo-admin-lock-form');
+              if(!form)return failure('password-form-missing');
+              form.querySelector('[name="password"]').value='TesteDeSenha2026_';
+              form.querySelector('[name="confirm_password"]').value='TesteDeSenha2026_';
+              form.requestSubmit();
+              await delay(1100);
+              if(!state.admin||!DEMO.adminLogged)return failure('first-demo-password-entry-failed');
               const tab=document.querySelector('[data-tab="manual"]');
               if(!tab)return failure('manual-tab-missing');
               tab.click();await delay(200);
@@ -213,14 +221,20 @@ jobs:
               if(state.view!=='home'||DEMO.adminLogged||state.admin)return failure('logout-confirm-failed');
               document.querySelector('[data-nav="admin"]').click();
               await delay(200);
-              if(!document.querySelector('[data-action="enter-demo-admin"]')||
-                  state.admin!==null || DEMO.adminLogged ||
-                  document.querySelector('#admin-home-roster'))
-                 return failure('admin-auto-login-after-exit');
-              document.querySelector('[data-action="enter-demo-admin"]').click();
-              await delay(300);
+              const login=document.querySelector('#demo-admin-lock-form');
+              if(!login||!login.querySelector('[name="password"]')||
+                 login.querySelector('[name="confirm_password"]')||
+                 state.admin!==null||DEMO.adminLogged||document.querySelector('#admin-home-roster'))
+                return failure('password-not-required-after-logout');
+              login.querySelector('[name="password"]').value='SenhaIncorreta123';
+              login.requestSubmit();
+              await delay(900);
+              if(state.admin||DEMO.adminLogged)return failure('incorrect-password-accepted');
+              login.querySelector('[name="password"]').value='TesteDeSenha2026_';
+              login.requestSubmit();
+              await delay(1100);
               if(!state.admin||!DEMO.adminLogged||!document.querySelector('[data-tab="visao"]'))
-                return failure('manual-reentry-failed');
+                return failure('correct-password-reentry-failed');
               document.body.setAttribute('data-v9-test','ok');
             }catch(err){failure('unexpected-'+String(err.message).slice(0,80).replace(/[^a-zA-Z0-9-]/g,'-'));}
           })();
@@ -228,7 +242,7 @@ jobs:
           Path(".smoke-v9.html").write_text(html.replace("</body>",addon+"</body>"))
           PY
           google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
-            --allow-file-access-from-files --virtual-time-budget=9000 \
+            --allow-file-access-from-files --virtual-time-budget=18000 \
             --dump-dom "file://$PWD/.smoke-v9.html" > /tmp/futebol-smoke-v9.html 2>/tmp/futebol-chrome-v9.log
           grep -q 'data-v9-test="ok"' /tmp/futebol-smoke-v9.html || {
             echo "Teste de navegador V9 falhou."
