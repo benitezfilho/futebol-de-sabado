@@ -317,6 +317,8 @@ window.fetch=async function mockedFetch(input, options={}){
     let member=DEMO.members.find(x=>x.phone===phone);
     if(member&&!member.active)return fault('Membro bloqueado pelo Master.',403);
     if(!member){member={id:DEMO.members.length+1,name:'',phone,email:'',verified_at:new Date().toISOString(),active:true,whatsapp_opt_in:false};DEMO.members.push(member)}
+    // OTP local simulado registra confirmação apenas na demonstração.
+    member.verified_at ||= new Date().toISOString();
     DEMO.memberLogged=member.id;lastOTP=null;saveDemo();return json({ok:true,member,needs_profile:!member.name||!member.email});
  }
  if(path==='/api/member/me'){
@@ -499,14 +501,14 @@ window.fetch=async function mockedFetch(input, options={}){
  return fault('Recurso não disponível na demonstração local.',404);
 };
 
-</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script src="features-manual-draw.js"></script><script src="features-admin-member.js"></script><script src="features-demo-auth.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
+</script><script src="features-v8.js"></script><script src="features-ranking.js"></script><script src="features-manual-draw.js"></script><script src="features-admin-member.js"></script><script src="features-demo-auth.js"></script><script src="features-member-accounts.js"></script><script>/* Futebol de Sábado - client app. No private API keys or administrative secrets here. */
 'use strict';
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const BR_TZ = 'America/Sao_Paulo';
 const siteLink = location.origin && location.origin!=='null' ? location.origin : '[link público após publicação]';
 const state = { view: 'home', config: {}, matches: [], admin: null, adminTab: 'visao', adminFilter: 'all', homeFilter: 'all', homeRosterMatchId: null, activeMatch: null, rankPeriodId: null, adminRankPeriodId: null,
-  my: [], interests: [], member: null, pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
+  my: [], interests: [], member: null, memberTab:'inscricoes', pendingMatchID: null, selectedRole: 'indefinido', autoRefresh: null, registrationToken: null };
 const storeKey = 'racha_minhas_inscricoes_v1';
 const savedTokens = () => { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch { return []; } };
 const saveToken = token => { const all = [...new Set([token, ...savedTokens()])].slice(0, 80); localStorage.setItem(storeKey, JSON.stringify(all)); };
@@ -674,10 +676,20 @@ async function loadMy() {
 }
 async function renderMy() {
   if(!state.member){content(`${headline('ÁREA DO MEMBRO','Seu <span>futebol.</span>','Entre com seu próprio celular para acessar suas inscrições.')}
-    <section class="panel admin-login">${panelTitle('Acesso individual','Código de verificação por SMS, sem senha.')}<button class="button button-block" data-action="member-login">Entrar ou criar minha conta ↗</button></section>`);return}
+    <section class="panel admin-login">${panelTitle('Entrar como jogador','Escolha o acesso por celular ou por e-mail e senha, caso já tenha uma senha configurada.')}
+    <div class="highlight-bar"><strong>Somente demonstração</strong><p>O código de celular é exibido no próprio site e não comprova a identidade real. A autenticação definitiva depende do backend.</p></div>
+    <div class="row mt" style="gap:9px;flex-wrap:wrap"><button class="button" data-action="member-login">Entrar pelo celular</button>
+      <button class="button button-outline" data-action="member-email-login">Entrar com e-mail e senha</button></div></section>`);return}
   if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Seu celular já foi validado. Falta só nome completo e e-mail.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
   content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Suas inscrições acompanham sua conta, em qualquer celular onde você entrar.')}
-    <div class="member-account-bar"><div>${window.FUTEBOL_avatar(state.member,34)}<strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div><div id="my-container">${empty('◷','Carregando inscrições...','Buscando suas vagas.')}</div>`);
+    <div class="member-account-bar"><div>${window.FUTEBOL_avatar(state.member,34)}<strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div>
+    <div class="admin-subnav"><button class="tab ${state.memberTab==='inscricoes'?'active':''}" data-action="member-tab" data-tab="inscricoes">Minhas inscrições</button>
+     <button class="tab ${state.memberTab==='conta'?'active':''}" data-action="member-tab" data-tab="conta">Minha conta / Senha</button></div>
+    <div id="my-container">${empty('◷','Carregando...','Acessando sua conta.')}</div>`);
+  if(state.memberTab==='conta'){
+    const area=$('#my-container');if(area)area.innerHTML=renderMemberAccount();
+    return;
+  }
   await loadMy();if(state.view!=='my')return;
   $('#my-container').innerHTML=(state.my.length?state.my.map(x=>{
     const r=x.registration,m=x.match;
@@ -826,7 +838,8 @@ function drawAdmin(){
     <div class="admin-deadline">🗓 <strong>Calendário:</strong> Abre <strong>${selected?fullDate(selected.opens_at):'—'}</strong> · Pix até <strong>${selected?fullDate(selected.payment_deadline):'—'}</strong> · Fila liberada <strong>${selected?fullDate(selected.waitlist_releases_at||selected.payment_deadline):'—'}</strong> · <strong>${selected?.capacity??'—'} vagas</strong>. Convocados recebem 30 minutos para pagar. <button class="button button-sm button-outline" data-action="run-queue">Processar fila manualmente</button> ${state.config.demo?'<button class="button button-sm button-secondary" data-action="sim-deadline">Simular vencimento (demo)</button> <button class="button button-sm button-secondary" data-action="sim-full-paid">Simular vagas pagas (demo)</button>':''}</div>
     <div class="admin-subnav"><button class="tab ${state.adminTab==='visao'?'active':''}" data-action="admin-tab" data-tab="visao">Visão inicial</button><button class="tab ${state.adminTab==='jogadores'?'active':''}" data-action="admin-tab" data-tab="jogadores">Jogadores</button><button class="tab ${state.adminTab==='classificacao'?'active':''}" data-action="admin-tab" data-tab="classificacao">Top 10 + Rodízio</button><button class="tab ${state.adminTab==='rankings'?'active':''}" data-action="admin-tab" data-tab="rankings">Ranking / Períodos</button><button class="tab ${state.adminTab==='estatisticas'?'active':''}" data-action="admin-tab" data-tab="estatisticas">Gols e MVP</button><button class="tab ${state.adminTab==='whatsapp'?'active':''}" data-action="admin-tab" data-tab="whatsapp">WhatsApp</button><button class="tab ${state.adminTab==='times'?'active':''}" data-action="admin-tab" data-tab="times">Sorteio dos times</button><button class="tab ${state.adminTab==='manual'?'active':''}" data-action="admin-tab" data-tab="manual">Sorteio manual</button>
       <button class="tab ${state.adminTab==='seguranca'?'active':''}" data-action="admin-tab" data-tab="seguranca">Segurança Master</button>
-      <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button></div>
+      <button class="tab ${state.adminTab==='avisos'?'active':''}" data-action="admin-tab" data-tab="avisos">Convocações (${data.notifications.filter(x=>x.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='historico'?'active':''}" data-action="admin-tab" data-tab="historico">Histórico (${(data.events||[]).filter(e=>e.match_id===selected?.id).length})</button><button class="tab ${state.adminTab==='interesses'?'active':''}" data-action="admin-tab" data-tab="interesses">Interesses (${interestCount})</button><button class="tab ${state.adminTab==='membros'?'active':''}" data-action="admin-tab" data-tab="membros">Membros (${data.members?.length||0})</button>
+      <button class="tab ${state.adminTab==='usuarios'?'active':''}" data-action="admin-tab" data-tab="usuarios">Usuários e acessos</button></div>
     <div id="admin-tab-content">${adminTabContent(reg,selected,data)}</div>
     ${(data.archived_matches||[]).length?`<section class="panel mt">${panelTitle('Partidas arquivadas','Mantidas para segurança financeira e histórico.')}${data.archived_matches.map(a=>`<div class="upcoming-row"><span>${escapeHTML(a.title)} • ${shortDate(a.starts_at)}</span><button class="button button-sm button-outline" data-action="restore-match" data-id="${a.id}">Restaurar</button></div>`).join('')}</section>`:''}`);
 }
@@ -991,6 +1004,7 @@ function renderAdminSecurity(){
 }
 
 function adminTabContent(reg,m,data){
+ if(state.adminTab==='usuarios')return renderAdminUsers(data);
  if(state.adminTab==='seguranca')return renderAdminSecurity();
  if(state.adminTab==='rankings')return renderAdminRankingPeriods(data);
  if(!m)return `<section class="panel">${empty('⚽','Nenhuma partida ativa','Crie uma partida ou restaure uma partida arquivada.')}</section>`;
