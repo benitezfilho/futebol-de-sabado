@@ -41,7 +41,7 @@ test("ranking 2026 considera data da partida, não de pagamento",async()=>{
 test("criação retroativa e edição de datas sem bloquear passado",async()=>{
  const c=create();
  const created=await c.fetch("/api/admin/ranking-periods","POST",{title:"Outubro retroativo",start_date:"2026-10-01",end_date:"2026-10-31"});
- assert.equal(created.status,201);assert.equal(created.body.period.status,"closed");
+ assert.equal(created.status,201);assert.equal(created.body.period.status,"draft");
  const id=created.body.period.id;
  const open=await c.fetch("/api/admin/ranking-periods/"+id+"/open","POST");
  assert.equal(open.status,200);
