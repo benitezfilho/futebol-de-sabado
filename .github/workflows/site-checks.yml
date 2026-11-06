@@ -244,6 +244,19 @@ jobs:
               await delay(1100);stage('relogin-settled');
               if(!state.admin||!DEMO.adminLogged||!document.querySelector('[data-tab="visao"]'))
                 return failure('correct-password-reentry-failed');
+              const securityTab=document.querySelector('[data-tab="seguranca"]');
+              if(!securityTab)return failure('security-tab-missing');
+              securityTab.click();
+              await delay(150);
+              if(!document.querySelector('#admin-security-password-form')||
+                 !document.querySelector('#admin-security-email-form'))return failure('security-console-missing');
+              const eye=document.querySelector('[data-target="master-old-password"]');
+              const input=document.querySelector('#master-old-password');
+              if(!eye||!input)return failure('security-toggle-missing');
+              eye.click();
+              if(input.type!=='text')return failure('security-show-failed');
+              eye.click();
+              if(input.type!=='password')return failure('security-hide-failed');
               document.body.setAttribute('data-v9-test','ok');
             }catch(err){failure('unexpected-'+String(err.message).slice(0,80).replace(/[^a-zA-Z0-9-]/g,'-'));}
           })();
