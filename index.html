@@ -763,11 +763,14 @@ async function loadCommunity(matchId){
 async function renderAdmin(){
   if(!state.admin){
     if(state.config.demo){
-      try{
-        await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
-        state.admin=await api('/api/admin/overview');
-        drawAdmin();
-      }catch(e){content(empty('⚠','Painel de demonstração indisponível',escapeHTML(e.message)));}
+      // Acessar a aba Admin não reabre automaticamente uma sessão encerrada.
+      // Demonstração pública: entrada explícita, SEM credencial de produção.
+      content(`${headline('ACESSO DEMONSTRATIVO','Painel do <span>Admin Master.</span>','Acompanhe a organização e teste os recursos administrativos.')}
+        <section class="panel admin-login">
+          ${panelTitle('Entrar na demonstração','O botão Sair encerra a sessão do painel; para retornar é necessária uma nova ação explícita.')}
+          <div class="highlight-bar"><strong>Somente demonstração</strong><p>Este acesso não exige senha e não protege dados reais. A autenticação do Admin Master em produção será feita no servidor com verificação de identidade e MFA.</p></div>
+          <button class="button button-block mt" data-action="enter-demo-admin">Entrar no painel demonstrativo</button>
+        </section>`);
       return;
     }
     content(`${headline('ÁREA RESTRITA','Painel do <span>Admin Master.</span>','Controle de jogadores, vagas, pagamentos, sorteio e histórico.')}
@@ -1264,6 +1267,16 @@ document.addEventListener('click',async e=>{
     }catch(err){toast(err.message,true)}break;
   case 'copy-broadcast':
     try{await navigator.clipboard.writeText(document.querySelector('#broadcast-form [name=message]').value);toast('Mensagem copiada.')}catch{toast('Selecione o texto para copiar.',true)}break;
+  case 'enter-demo-admin':{
+    if(!state.config.demo)return toast('Acesso demonstrativo indisponível.',true);
+    try{
+      await api('/api/admin/login',{method:'POST',body:JSON.stringify({preview:true})});
+      state.admin=await api('/api/admin/overview');
+      drawAdmin();
+      toast('Modo demonstração iniciado.');
+    }catch(err){toast(err.message,true)}
+    break;
+  }
   case 'logout':showLogoutDialog('master');break;
   case 'logout-no':closeModal();break;
   case 'logout-yes':{
