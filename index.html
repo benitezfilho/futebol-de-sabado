@@ -305,7 +305,9 @@ window.fetch=async function mockedFetch(input, options={}){
   DEMO.votes=DEMO.votes.filter(v=>!(v.match_id===mid&&v.voter_member_id===member.id));
   DEMO.votes.push({match_id:mid,voter_member_id:member.id,voted_registration_id:candidate.id});saveDemo();return json({ok:true});
  }
- if(path==='/api/member/otp/start'&&method==='POST'){
+ if((path==='/api/member/otp/start'||path==='/api/member/otp/verify')&&method==='POST')
+  return fault('SMS em stand-by. Utilize e-mail e senha na demonstração.',410);
+  if(path==='/api/member/otp/start'&&method==='POST'){
     const phone=String(body.phone||'').replace(/\D/g,'').replace(/^55(?=\d{11}$)/,'');
     if(!/^\d{11}$/.test(phone))return fault('Informe celular com DDD.',422);
     const code=String(Math.floor(100000+Math.random()*900000));lastOTP={phone,code};
@@ -675,13 +677,14 @@ async function loadMy() {
   state.my=data.registrations;state.interests=data.interests||[];
 }
 async function renderMy() {
-  if(!state.member){content(`${headline('ÁREA DO MEMBRO','Seu <span>futebol.</span>','Entre com seu próprio celular para acessar suas inscrições.')}
-    <section class="panel admin-login">${panelTitle('Entrar como jogador','Escolha o acesso por celular ou por e-mail e senha, caso já tenha uma senha configurada.')}
-    <div class="highlight-bar"><strong>Somente demonstração</strong><p>O código de celular é exibido no próprio site e não comprova a identidade real. A autenticação definitiva depende do backend.</p></div>
-    <div class="row mt" style="gap:9px;flex-wrap:wrap"><button class="button" data-action="member-login">Entrar pelo celular</button>
-      <button class="button button-outline" data-action="member-email-login">Entrar com e-mail e senha</button></div></section>`);return}
-  if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Seu celular já foi validado. Falta só nome completo e e-mail.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
-  content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Suas inscrições acompanham sua conta, em qualquer celular onde você entrar.')}
+  if(!state.member){content(`${headline('ÁREA DO MEMBRO','Seu <span>futebol.</span>','Entre com e-mail e senha para acompanhar as suas inscrições.')}
+    <section class="panel admin-login">${panelTitle('Acesso do jogador','Entrar com e-mail e senha, sem integração de SMS.')}
+    <div class="highlight-bar"><strong>Demonstração local, sem custos de mensagens</strong><p>O SMS está em stand-by. Senhas e contas de teste ficam somente neste navegador; não existe autenticação compartilhada entre celulares.</p></div>
+    <div class="row mt" style="gap:9px;flex-wrap:wrap"><button class="button" data-action="member-email-login">Entrar com e-mail e senha</button>
+      <button class="button button-outline" data-action="member-create">Criar minha conta</button>
+      <button class="button button-secondary" data-action="member-reset">Redefinir com código do Master</button></div></section>`);return}
+  if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Atualize seu nome e e-mail de demonstração.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
+  content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Acompanhe seus dados de teste neste navegador.')}
     <div class="member-account-bar"><div>${window.FUTEBOL_avatar(state.member,34)}<strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div>
     <div class="admin-subnav"><button class="tab ${state.memberTab==='inscricoes'?'active':''}" data-action="member-tab" data-tab="inscricoes">Minhas inscrições</button>
      <button class="tab ${state.memberTab==='conta'?'active':''}" data-action="member-tab" data-tab="conta">Minha conta / Senha</button></div>
@@ -1137,11 +1140,7 @@ async function adminAction(action,id,extra){
   await api(endpoint,{method:'POST',body:body?JSON.stringify(body):undefined});await reloadAdmin();await reloadMatches();toast('Alteração realizada.');
  }catch(e){toast(e.message,true)}
 }
-function openMemberLogin(){
-  modal('Acesso de membro','Cada pessoa precisa confirmar o próprio número. Não é possível inscrever amigos pelo mesmo acesso.',
-    `<form id="member-phone-form"><div class="form-group"><label>Seu celular com DDD</label><input class="form-control" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(62) 99999-9999" required minlength="15" maxlength="15" aria-describedby="phone-helper" /></div>
-    <p class="notice" id="phone-helper">Formato: (DDD) 9XXXX-XXXX. Apenas 11 números. Enviaremos um código por SMS para validar sua conta.</p><div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Voltar</button><button class="button" type="submit">Receber código ↗</button></div></form>`);
-}
+function openMemberLogin(){return openMemberEmailLogin()}
 function openMemberCode(phone, demoCode){
   modal('Validar meu celular',`Código enviado para ${escapeHTML(phone)}`,
   `<form id="member-code-form"><input type="hidden" name="phone" value="${escapeHTML(phone)}"/><div class="form-group"><label>Código de 6 dígitos</label><input class="form-control otp-input" name="code" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="000000" /></div>
@@ -1150,12 +1149,12 @@ function openMemberCode(phone, demoCode){
 function openProfile(){
   if(!state.member)return openMemberLogin();
   modal('Meu cadastro','Informe seus dados uma única vez. Apenas você poderá reservar sua vaga.',
-  `<form id="member-profile-form"><div class="member-identity"><span class="member-avatar">✓</span><div><strong>Celular confirmado</strong><p>${escapeHTML(phoneMask(state.member.phone))}</p></div></div>
+  `<form id="member-profile-form"><div class="member-identity"><span class="member-avatar">✓</span><div><strong>Celular cadastrado (sem SMS)</strong><p>${escapeHTML(phoneMask(state.member.phone))}</p></div></div>
    <div class="form-group mt"><label>Nome completo</label><input class="form-control" name="name" autocomplete="name" required minlength="5" maxlength="90" value="${escapeHTML(state.member.name)}" placeholder="Nome e sobrenome" /></div>
    <div class="form-group mt"><label>E-mail</label><input class="form-control" type="email" name="email" autocomplete="email" required maxlength="160" value="${escapeHTML(state.member.email)}" placeholder="voce@email.com" /></div>
    <div class="form-group mt"><label>Foto do membro (opcional)</label><input type="file" accept="image/png,image/jpeg,image/webp" name="photo" id="member-photo-input" class="form-control"><small class="muted">Na demonstração a foto é salva apenas neste navegador (até 3 MB).</small><div id="photo-status"></div></div>
    <label class="consent-check"><input type="checkbox" name="whatsapp_opt_in" ${state.member.whatsapp_opt_in?'checked':''}/><span>Quero receber pelo WhatsApp avisos sobre minha inscrição, pagamento e convocação da fila. Posso desativar quando quiser.</span></label>
-   <p class="notice">O sistema verifica que seu celular pertence a você. O nome e o e-mail são vinculados à sua conta. Não cadastre informações de terceiros.</p>
+   <p class="notice">Nesta demonstração, o celular não é verificado. Não utilize dados reais ou de terceiros.</p>
    <div id="form-error"></div><div class="form-actions"><button type="button" class="button button-secondary" data-action="close">Voltar</button><button type="submit" class="button">Salvar cadastro ↗</button></div></form>`);
 }
 function showLogoutDialog(who){
@@ -1380,7 +1379,7 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-phone-form','member-code-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
  if(form.id==='admin-security-password-form'||form.id==='admin-security-email-form'){
    const isPassword=form.id==='admin-security-password-form',button=form.querySelector('[type=submit]');
