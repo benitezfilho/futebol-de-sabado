@@ -370,12 +370,11 @@ window.fetch=async function mockedFetch(input, options={}){
    if(!DEMO.adminLogged)return fault('Somente Master.',401);
    const m=DEMO.matches.find(x=>x.id===body.match_id);if(!m)return fault('Partida não encontrada.',404);
    m.capacity=22;
-   m.opens_at=new Date(Date.now()-3600000).toISOString();
-   m.signup_closes_at=new Date(Date.now()+86400000).toISOString();
-   m.starts_at=new Date(Date.now()+2*86400000).toISOString();
+   // A simulação preenche apenas vagas de linha. Jogadores em espera sem prioridade
+   // permanecem na espera e não são promovidos automaticamente para o pagamento.
    let list=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha');
    const now=new Date().toISOString();
-   for(const r of list){if(r.status==='waitlist'||r.status==='reserved'){r.status='paid';r.paid_at=now;r.reserved_until=null;}}
+   for(const r of list){if(r.status==='reserved' || (r.status==='waitlist'&&!r.queue_hold)){r.status='paid';r.paid_at=now;r.reserved_until=null;}}
    list=DEMO.regs.filter(r=>r.match_id===m.id&&r.role==='linha'&&r.status==='paid');
    for(let i=list.length;i<m.capacity;i++){
       const id=Math.max(0,...DEMO.regs.map(x=>x.id))+1;
