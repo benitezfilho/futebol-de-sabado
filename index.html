@@ -324,10 +324,10 @@ window.fetch=async function mockedFetch(input, options={}){
     DEMO.memberLogged=member.id;lastOTP=null;saveDemo();return json({ok:true,member,needs_profile:!member.name||!member.email});
  }
  if(path==='/api/member/me'){
-    const member=currentMember();return member?json({member,needs_profile:!member.name||!member.email}):fault('Entre com código de SMS.',401);
+    const member=currentMember();return member?json({member,needs_profile:!member.name||!member.email}):fault('Entre com seu e-mail e senha.',401);
  }
  if(path==='/api/member/profile'&&method==='PUT'){
-    const member=currentMember();if(!member)return fault('Entre com o seu código.',401);
+    const member=currentMember();if(!member)return fault('Entre com seu e-mail e senha.',401);
     const name=String(body.name||'').trim().replace(/\s+/g,' '),email=String(body.email||'').trim().toLowerCase();
     if(name.split(' ').length<2||!email.includes('@'))return fault('Informe nome completo e e-mail.',422);
     if(DEMO.members.some(x=>x.id!==member.id&&x.email===email))return fault('Este e-mail já pertence a outro membro.',409);
@@ -335,7 +335,7 @@ window.fetch=async function mockedFetch(input, options={}){
  }
  if(path==='/api/member/logout'&&method==='POST'){DEMO.memberLogged=null;saveDemo();return json({ok:true})}
  if(path==='/api/member/registrations'){
-    const member=currentMember();if(!member)return fault('Entre com código de SMS.',401);
+    const member=currentMember();if(!member)return fault('Entre com seu e-mail e senha.',401);
     const registrations=DEMO.regs.filter(r=>r.member_id===member.id).map(r=>{
       const m=DEMO.matches.find(x=>x.id===r.match_id);
       const ahead=DEMO.regs.filter(x=>x.match_id===m.id&&x.status==='waitlist');
@@ -343,7 +343,7 @@ window.fetch=async function mockedFetch(input, options={}){
     });return json({registrations,interests:DEMO.interests.filter(i=>i.member_id===member.id).map(i=>({...i,...((m)=>({title:m.title,venue:m.venue,starts_at:m.starts_at,signup_closes_at:m.signup_closes_at}))(DEMO.matches.find(m=>m.id===i.match_id))}))});
  }
  if(path==='/api/register'&&method==='POST'){
-   const member=currentMember();if(!member)return fault('Faça acesso com o código do celular.',401);
+   const member=currentMember();if(!member)return fault('Entre com seu e-mail e senha.',401);
    if(!member.name||!member.email)return fault('Complete seu cadastro.',403);
    const m=DEMO.matches.find(x=>x.id===body.match_id);if(!m)return fault('Partida não encontrada',404);
    if(m.status!=='active'||m.deleted_at||Date.now()>=new Date(m.signup_closes_at).getTime())return fault('Inscrições encerradas para esta partida.',400);
@@ -645,7 +645,7 @@ function registerModal(matchID) {
   state.selectedRole='indefinido';
   modal(m.state==='fully_paid'?'Todas as vagas de linha foram preenchidas':m.state==='waitlist'?'Entrar na lista de espera':'Garantir minha vaga',`${shortDate(m.starts_at)} • ${clock(m.starts_at)}`,
     `<form id="registration-form"><input name="match_id" type="hidden" value="${m.id}"/>
-    <div class="member-identity"><span class="member-avatar">✓</span><div><strong>${escapeHTML(state.member.name)}</strong><p>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</p><small>Inscrição individual autenticada por SMS</small></div></div>
+    <div class="member-identity"><span class="member-avatar">✓</span><div><strong>${escapeHTML(state.member.name)}</strong><p>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</p><small>Cadastro demonstrativo com e-mail e senha</small></div></div>
     ${m.state==='fully_paid'?`<div class="highlight-bar" role="alert"><strong>${m.capacity} jogadores de linha confirmaram o pagamento!</strong> Você pode registrar seu interesse até ${fullDate(m.signup_closes_at)}. Seu registro será apenas histórico, sem lista de espera, sem Pix, sem garantia de vaga e sem convocação automática. Goleiros possuem controle próprio e precisam de aprovação do Master.</div>`:''}
     <div class="form-group mt"><label for="player-position">Sua posição (opcional)</label><select class="form-control" id="player-position" name="position"><option value="indefinido">Não informar / sem preferência</option><option value="atacante">Atacante</option><option value="centroavante">Centroavante</option><option value="ponta_direita">Ponta direita</option><option value="ponta_esquerda">Ponta esquerda</option><option value="meia">Meia</option><option value="meia_atacante">Meia-atacante</option><option value="volante">Volante</option><option value="zagueiro">Zagueiro</option><option value="lateral_direito">Lateral direito</option><option value="lateral_esquerdo">Lateral esquerdo</option><option value="ala">Ala</option><option value="coringa">Coringa de linha</option><option value="goleiro">Goleiro (isento, sujeito à aprovação)</option></select></div>
     <div class="banner">Linha: <b>${money(m.price_cents)}</b>. Goleiro: <b>gratuito após aprovação do Master</b>. Prazo inicial: <b>${fullDate(m.payment_deadline)}</b>. Convocados depois têm 30 minutos.</div>
