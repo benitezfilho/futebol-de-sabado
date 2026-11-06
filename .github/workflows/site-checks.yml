@@ -261,6 +261,25 @@ jobs:
               if(input.type!=='text')return failure('security-show-failed');
               eye.click();
               if(input.type!=='password')return failure('security-hide-failed');
+              const usersTab=document.querySelector('[data-tab="usuarios"]');
+              if(!usersTab)return failure('users-tab-missing');
+              usersTab.click();
+              await delay(120);
+              if(!document.querySelector('#admin-tab-content')?.textContent.includes('Usuários e permissões'))
+                return failure('users-admin-screen-missing');
+              document.querySelector('[data-nav="my"]').click();
+              await delay(150);
+              if(!document.querySelector('[data-action="member-create"]')||
+                 !document.querySelector('[data-action="member-email-login"]')||
+                 document.querySelector('[data-action="member-login"]'))
+                 return failure('email-member-access-missing');
+              document.querySelector('[data-action="member-create"]').click();
+              await delay(80);
+              if(!document.querySelector('#member-signup-form'))return failure('signup-form-missing');
+              document.querySelector('[data-action="close"]').click();
+              document.querySelector('[data-action="member-reset"]').click();
+              await delay(80);
+              if(!document.querySelector('#member-reset-form'))return failure('reset-form-missing');
               document.body.setAttribute('data-v9-test','ok');
             }catch(err){failure('unexpected-'+String(err.message).slice(0,80).replace(/[^a-zA-Z0-9-]/g,'-'));}
           })();
