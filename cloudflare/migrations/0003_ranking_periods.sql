@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS ranking_periods (
   title TEXT NOT NULL CHECK (length(title) BETWEEN 3 AND 100),
   start_date TEXT NOT NULL,
   end_date TEXT NOT NULL,
-  status TEXT NOT NULL CHECK(status IN ('open','closed')),
+  status TEXT NOT NULL CHECK(status IN ('draft','open','closed')),
   created_by TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
   updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
