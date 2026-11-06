@@ -93,7 +93,7 @@
     return periodsSorted().find(p=>p.status==="open")||periodsSorted()[0]||null;
   }
   function getRanking(p){
-    return p.status==="closed"&&Array.isArray(p.snapshot)
+    return p.status==="draft"?[]:p.status==="closed"&&Array.isArray(p.snapshot)
       ?p.snapshot.map(row=>({...row})):calculate(p);
   }
   window.FUTEBOL_calcRankingPeriod=calculate;
@@ -121,8 +121,8 @@
       if(!DEMO.adminLogged)return error("Acesso administrativo necessário",401);
       let values;try{values=validate(body)}catch(e){return error(e.message,422)}
       const timestamp=now();
-      const period={...values,id:uuid(),status:"closed",created_at:timestamp,updated_at:timestamp,
-        opened_at:null,closed_at:timestamp,snapshot:[],closures:[]};
+      const period={...values,id:uuid(),status:"draft",created_at:timestamp,updated_at:timestamp,
+        opened_at:null,closed_at:null,snapshot:null,closures:[]};
       DEMO.rankPeriods.push(period);
       audit("RANKING_PERIODO_CRIADO",period);saveDemo();
       return response({period:safePeriod(period)},201);
@@ -133,7 +133,7 @@
       const period=DEMO.rankPeriods.find(x=>x.id===decodeURIComponent(match[1]));
       if(!period)return error("Período não encontrado",404);
       if(method==="PATCH"&&!match[2]){
-        if(period.status!=="open")return error("Reabra o ranking para alterar datas ou nome.",409);
+        if(period.status==="closed")return error("Reabra o ranking encerrado para alterar as datas ou nome.",409);
         let data;try{data=validate({...period,...body})}catch(e){return error(e.message,422)}
         Object.assign(period,data,{updated_at:now()});
         audit("RANKING_DATAS_ALTERADAS",period);saveDemo();
@@ -141,10 +141,11 @@
       }
       if(method==="POST" && match[2]==="open"){
         if(period.status==="open")return error("Ranking já está aberto",409);
+        const previouslyClosed=period.status==="closed";
         period.status="open";
         period.opened_at=now();period.updated_at=period.opened_at;
         period.snapshot=null;
-        audit("RANKING_REABERTO",period);saveDemo();
+        audit(previouslyClosed?"RANKING_REABERTO":"RANKING_ABERTO",period);saveDemo();
         return response({period:safePeriod(period)});
       }
       if(method==="POST" && match[2]==="close"){
