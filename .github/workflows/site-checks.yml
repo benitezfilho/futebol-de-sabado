@@ -74,7 +74,7 @@ jobs:
             if (!admin) { document.body.setAttribute('data-v8-test','nav-missing'); return; }
             // Smoke de interface: usa verificador de teste. O PBKDF2 real é testado no Node.
             window.FUTEBOL_demoAuth={
-              configured:()=>true,verify:async password=>password==='TesteDeSenha2026_'
+              configured:()=>true,verifyCredentials:async (email,password)=>password==='TesteDeSenha2026_'
             };
             admin.click();
             const form=document.querySelector('#demo-admin-lock-form');
@@ -175,7 +175,7 @@ jobs:
               if(document.querySelector('#demo-badge'))return failure('badge-still-fixed');
               // A UI roda com verificador simulado; teste do derivador real roda no Node.
               window.FUTEBOL_demoAuth={
-                configured:()=>true,verify:async password=>password==='TesteDeSenha2026_'
+                configured:()=>true,verifyCredentials:async (email,password)=>password==='TesteDeSenha2026_'
               };
               document.querySelector('[data-nav="admin"]').click();
               await delay(150);
