@@ -964,6 +964,81 @@ function openRankingPeriodForm(edit){
     '<button type="submit" class="button">Salvar período</button></div></form>',true);
 }
 
+function renderMemberAccount(){
+ const a=window.FUTEBOL_memberAccounts.status();
+ return '<section class="panel">'+panelTitle('Minha conta / Senha','Configuração individual do jogador, separada do Admin Master.')+
+  '<div class="highlight-bar"><strong>Sem SMS nesta versão</strong><p>Esta conta e sua senha são demonstrativas e existem somente neste navegador. Não utilize dados ou senhas reais.</p></div>'+
+  '<div class="roster-grid mt"><div class="roster-group"><h3>Dados do perfil</h3>'+
+   '<p><strong>Nome:</strong> '+escapeHTML(a.name||'Não informado')+'</p>'+
+   '<p><strong>E-mail:</strong> '+escapeHTML(a.email||'Não informado')+'</p>'+
+   '<p><strong>Celular:</strong> '+escapeHTML(phoneMask(a.phone||''))+'</p>'+
+   '<button class="button button-sm button-outline mt" data-action="member-profile">Editar meus dados</button></div>'+
+   '<div class="roster-group"><h3>Alterar minha senha</h3>'+
+    '<form id="member-account-password-form" autocomplete="off">'+
+     '<div class="form-group"><label>Senha atual</label><input class="form-control" name="current_password" id="user-old-password" type="password" autocomplete="current-password" required></div>'+
+     '<div class="form-group mt"><label>Nova senha</label><input class="form-control" id="user-new-password" name="new_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<div class="form-group mt"><label>Confirmar nova senha</label><input class="form-control" id="user-confirm-password" name="confirm_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<button type="button" class="button button-sm button-outline mt" data-action="toggle-account-password" data-target="user-new-password">Mostrar / ocultar nova senha</button>'+
+     '<div id="member-account-error"></div>'+
+     '<button class="button mt" type="submit">Salvar nova senha</button></form>'+
+   '</div></div>'+
+  '<p class="status-text mt">Se esqueceu a senha, solicite ao Admin Master um código único de redefinição. Ele não terá acesso à senha anterior.</p></section>';
+}
+function renderAdminUsers(){
+ if(!state.admin||!DEMO.adminLogged)return '<section class="panel"><p>Acesso restrito ao Admin Master.</p></section>';
+ const users=window.FUTEBOL_memberAccounts.directory();
+ const rows=users.map(u=>'<tr><td><strong>'+escapeHTML(u.name||'Cadastro incompleto')+'</strong>'+
+    '<small class="muted"> ID '+escapeHTML(u.id)+'</small></td><td>'+escapeHTML(u.email||'Sem e-mail')+'</td>'+
+    '<td>'+escapeHTML(phoneMask(u.phone||''))+'</td>'+
+    '<td>'+(u.reset_pending?'<span class="pill reserved">RESET PENDENTE</span>':
+       u.has_password?'<span class="pill paid">SENHA CRIADA</span>':'<span class="pill neutral">SEM SENHA</span>')+'</td>'+
+    '<td>'+(u.active?'Ativo':'Bloqueado')+'</td>'+
+    '<td><button class="button button-sm button-outline" data-action="admin-reset-member" data-id="'+u.id+
+    '">Gerar código de reset</button></td></tr>').join('');
+ return '<section class="panel">'+panelTitle('Usuários e permissões',
+   'Administre contas de jogadores sem acessar suas senhas. Configuração do Master fica na aba Segurança Master.')+
+   '<div class="highlight-bar"><strong>Reset seguro por código manual</strong><p>O Master gera um código único, válido por 60 minutos, e entrega diretamente ao jogador por um canal combinado. O jogador informa o código e cria sua própria senha. Nenhum SMS ou e-mail é disparado pelo site.</p></div>'+
+   '<div class="row mt"><button class="button button-sm" data-action="add-manual-member">+ Cadastrar jogador</button></div>'+
+   '<div class="table-wrap mt"><table><thead><tr><th>Membro</th><th>E-mail</th><th>Telefone</th><th>Senha</th><th>Conta</th><th>Administração</th></tr></thead>'+
+   '<tbody>'+(rows||'<tr><td colspan="6">Nenhuma conta cadastrada.</td></tr>')+'</tbody></table></div>'+
+   '<p class="notice mt">Os registros do futebol de teste podem aparecer como "Sem senha" por terem sido importados antes desta funcionalidade. Gere um código para ativar o acesso de teste. A demonstração não sincroniza entre dispositivos.</p></section>';
+}
+function openMemberEmailLogin(){
+ modal('Entrar na Área do Membro','Use e-mail e senha. SMS não está ativo.',
+  '<form id="member-email-login-form" autocomplete="on">'+
+   '<div class="form-group"><label>E-mail</label><input class="form-control" name="email" type="email" autocomplete="username" required></div>'+
+   '<div class="form-group mt"><label>Senha</label><input class="form-control" name="password" type="password" autocomplete="current-password" required></div>'+
+   '<div id="member-auth-error"></div>'+
+   '<div class="form-actions"><button class="button button-secondary" type="button" data-action="member-create">Criar conta</button>'+
+   '<button class="button" type="submit">Entrar</button></div>'+
+   '<p class="status-text mt">Esqueceu a senha? Peça um código ao Master e escolha Redefinir com código.</p>'+
+   '<button type="button" class="button button-sm button-outline mt" data-action="member-reset">Redefinir com código</button></form>');
+}
+function openMemberSignup(){
+ modal('Criar conta de jogador','Cadastro demonstrativo sem SMS, verificação de e-mail ou cobranças.',
+  '<form id="member-signup-form" autocomplete="off">'+
+   '<div class="form-group"><label>Nome completo</label><input class="form-control" name="name" minlength="5" maxlength="100" required></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>E-mail</label><input type="email" class="form-control" name="email" required></div>'+
+   '<div class="form-group"><label>Celular com DDD</label><input type="tel" class="form-control" name="phone" placeholder="(62) 99999-1234" required></div></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>Senha</label><input type="password" class="form-control" name="password" minlength="10" maxlength="128" required></div>'+
+   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="10" maxlength="128" required></div></div>'+
+   '<p class="notice mt">Use somente dados fictícios para testar. Esta demonstração não comprova a titularidade do e-mail ou telefone.</p>'+
+   '<div id="member-auth-error"></div><div class="form-actions">'+
+   '<button type="button" class="button button-secondary" data-action="member-email-login">Já tenho conta</button>'+
+   '<button class="button" type="submit">Criar conta</button></div></form>');
+}
+function openMemberReset(){
+ modal('Redefinir senha','Utilize o código entregue pelo Admin Master manualmente, sem SMS.',
+  '<form id="member-reset-form" autocomplete="off">'+
+   '<div class="form-group"><label>E-mail da conta</label><input class="form-control" name="email" type="email" required></div>'+
+   '<div class="form-group mt"><label>Código de redefinição (recebido do Master)</label><input class="form-control" name="code" maxlength="48" required></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>Nova senha</label><input type="password" class="form-control" name="password" minlength="10" maxlength="128" required></div>'+
+   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="10" maxlength="128" required></div></div>'+
+   '<div id="member-auth-error"></div><div class="form-actions">'+
+   '<button type="button" class="button button-secondary" data-action="member-email-login">Voltar</button>'+
+   '<button class="button" type="submit">Salvar senha e entrar</button></div></form>');
+}
+
 function renderAdminSecurity(){
  if(!state.config.demo){
   return '<section class="panel">'+panelTitle('Segurança Master','A autenticação real será gerenciada pelo Cloudflare Access.')+
