@@ -13,7 +13,7 @@ async function sha(data){return hex(new Uint8Array(await crypto.subtle.digest("S
 function validPassword(p){if(typeof p!=="string"||p.length<12||p.length>128||!/[A-Za-zÀ-ÿ]/.test(p)||!/\d/.test(p))throw Error("A senha deve ter 12 a 128 caracteres, incluindo letras e números.")}
 async function passwordRecord(p){validPassword(p);const salt=crypto.getRandomValues(new Uint8Array(16));const iterations=250000;const key=await crypto.subtle.importKey("raw",encoder.encode(p),"PBKDF2",false,["deriveBits"]);const hash=await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations,hash:"SHA-256"},key,256);return {salt:hex(salt),password_hash:hex(new Uint8Array(hash)),iterations}}
 async function validHash(p,c){
- if(!c||!c.salt||!c.password_hash)return false;
+ if(!c||!c.salt||!c.password_hash||!Number.isInteger(c.iterations)||c.iterations<100000)return false;
  const salt=fromHex(c.salt);if(salt.length!==16)return false;
  const key=await crypto.subtle.importKey("raw",encoder.encode(String(p||"")),"PBKDF2",false,["deriveBits"]);
  const v=hex(new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:c.iterations,hash:"SHA-256"},key,256)));
