@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V10 · Acesso seguro | Futebol de Sábado</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark;background:#0a1521;color:#e8f1f8}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px}
+main{width:min(100%,460px);background:#152839;border:1px solid #375064;border-radius:20px;padding:28px}
+h1{font-size:1.6rem;margin:0 0 10px}.muted{color:#bdcbd7;font-size:.92rem;line-height:1.55}
+label{display:block;margin:17px 0 6px;font-weight:600}input{width:100%;padding:12px 14px;border:1px solid #698095;border-radius:9px;background:#071420;color:#fff;font:inherit}
+button{font:inherit;background:#1ac58b;color:#061f16;border:0;border-radius:9px;padding:12px 16px;font-weight:700;cursor:pointer;margin-top:20px;width:100%}
+button.secondary{background:#30495c;color:#fff;margin-top:10px}button:disabled{opacity:.6;cursor:wait}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:.9rem;padding:12px;border-radius:8px;background:#071420}
+a{color:#7de5bf}.hide{display:none}small{display:block;color:#bdd2df;margin-top:6px}
+</style></head>
+<body><main>
+<h1>Futebol de Sábado · V10</h1>
+<p class="muted">Acesso real de teste usando Cloudflare D1. A versão V9 permanece separada. Não utilize credenciais reais até concluir a implantação e a homologação.</p>
+<form id="endpoint"><label for="base">Endereço da API Cloudflare</label>
+<input id="base" type="url" placeholder="https://SEU-WORKER.workers.dev" required>
+<small>Informe apenas a URL pública da API. Nunca insira chaves de administração.</small>
+<button type="submit" class="secondary">Salvar endereço</button></form>
+<form id="login" class="hide"><label for="email">E-mail</label><input id="email" type="email" autocomplete="username" required>
+<label for="pass">Senha</label><input id="pass" type="password" autocomplete="current-password" required>
+<button type="submit">Entrar</button></form>
+<section id="profile" class="hide"><p id="hello"></p>
+<form id="change"><label for="old">Senha atual</label><input id="old" type="password" autocomplete="current-password" required>
+<label for="fresh">Nova senha (12+ caracteres, letra e número)</label><input id="fresh" type="password" autocomplete="new-password" minlength="12" required>
+<button type="submit">Alterar senha</button></form>
+<button class="secondary" id="logout" type="button">Sair da conta</button></section>
+<pre id="message" role="status" aria-live="polite"></pre>
+<a href="./">Voltar à V9</a>
+</main><script>
+"use strict";
+// O token existe somente na sessão desta aba, nunca em localStorage.
+// Este protótipo não oferece inscrição ou acesso administrativo.
+const $=s=>document.querySelector(s),store=sessionStorage;
+let base=localStorage.getItem("futebol_v10_public_api_url")||"";
+let token=store.getItem("futebol_v10_token")||"";
+$("#base").value=base;
+const message=(s)=>{$("#message").textContent=s};
+const view=account=>{
+ $("#login").classList.toggle("hide",!!account);
+ $("#profile").classList.toggle("hide",!account);
+ $("#hello").textContent=account?"Conectado: "+account.email+" | Perfil: "+account.role:"";
+};
+async function api(path,opts={}){
+ if(!base)throw Error("Configure o endereço da API.");
+ const headers={"Content-Type":"application/json"};
+ if(token)headers.Authorization="Bearer "+token;
+ const r=await fetch(base+path,{...opts,headers,cache:"no-store"});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw Error(data.error||"Falha na solicitação ("+r.status+")");
+ return data;
+}
+async function refresh(){
+ if(!token){view(null);return}
+ try{const r=await api("/api/auth/me");view(r.account);message("Sessão verificada no servidor.")}
+ catch{token="";store.removeItem("futebol_v10_token");view(null);message("Sessão encerrada ou expirada.")}
+}
+$("#endpoint").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const url=new URL($("#base").value);
+ if(url.protocol!=="https:"){message("Use apenas HTTPS.");return}
+ base=url.origin;localStorage.setItem("futebol_v10_public_api_url",base);
+ $("#login").classList.remove("hide");message("API configurada. Entre com uma conta criada pelo Master.");
+ await refresh();
+});
+$("#login").addEventListener("submit",async e=>{
+ e.preventDefault();const b=e.submitter;b.disabled=true;
+ try{
+ const r=await api("/api/auth/login",{method:"POST",body:JSON.stringify({email:$("#email").value,password:$("#pass").value})});
+ token=r.token;store.setItem("futebol_v10_token",token);$("#pass").value="";
+ view(r.account);message("Login confirmado pelo D1.");
+ }catch(err){message(err.message)}finally{b.disabled=false}
+});
+$("#change").addEventListener("submit",async e=>{
+ e.preventDefault();const b=e.submitter;b.disabled=true;
+ try{await api("/api/auth/change-password",{method:"POST",body:JSON.stringify({current_password:$("#old").value,new_password:$("#fresh").value})});
+ token="";store.removeItem("futebol_v10_token");e.target.reset();view(null);message("Senha alterada. Entre novamente.");}
+ catch(err){message(err.message)}finally{b.disabled=false}
+});
+$("#logout").addEventListener("click",async()=>{
+ try{await api("/api/auth/logout",{method:"POST"})}catch{}
+ token="";store.removeItem("futebol_v10_token");view(null);message("Sessão local encerrada. Token revogado no servidor quando disponível.");
+});
+if(base){$("#login").classList.remove("hide");refresh()}else{view(null);message("Configure o Worker para começar.")}
+</script></body></html>
