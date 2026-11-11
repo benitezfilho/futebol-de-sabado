@@ -41,3 +41,44 @@ Adicionar **login de verdade com e-mail e senha**, sessões revogáveis, altera�
 - O perfil `admin` no D1 ainda não concede acesso às rotas `/api/admin/*` (somente Master via Access + segredo).
 - Não há recuperação self-service de senha nem validação de posse de e-mail; provisionamento/reset é administrativo. Não enviar senha provisória por canais inseguros.
 - Antes de lançar, revisar proteção de abuso distribuído, mecanismo de verificação de e-mail, sessão/CSRF conforme arquitetura final e vinculação das inscrições reais aos membros autenticados.
+
+## PeladaPro: identidade e três links separados (nova arquitetura)
+
+A plataforma passa a se chamar **PeladaPro** na V10. A V9 permanece com o nome e código originais, publicada em `https://benitezfilho.github.io/futebol-de-sabado/`, sem redirecionamentos ou substituições nesta etapa.
+
+### Identidade visual
+- Marca tipográfica **PeladaPro**, com tema noturno azul-marinho, verde-gramado como cor de ação e cartões de alto contraste.
+- Tom de interface curto, direto e mobile-first; informações públicas da próxima partida sem barreira de login.
+- Estilo compartilhado entre portais, com conteúdo e menus específicos de cada perfil.
+
+### Estrutura de links
+
+| Portal | Rota na V10 | Exibição e objetivo |
+| --- | --- | --- |
+| Entrada | `/peladapro/` | Seleção dos ambientes |
+| Jogador | `/peladapro/jogador/` | Agenda pública, login para minha conta, inscrições futuras |
+| Administrador | `/peladapro/admin/` | Prévia de partidas, pagamentos e times; operações ainda bloqueadas |
+| Admin Master | `/peladapro/master/` | Prévia de gestão de usuários, permissões e auditoria; operações ainda bloqueadas |
+
+**Após aprovação**, podemos usar aliases mais curtos (`/jogador`, `/admin`, `/master`) em Cloudflare Pages ou domínio próprio. Os caminhos acima existem na branch mas **não estão publicados no site oficial** enquanto a Pull Request estiver em rascunho.
+
+### Princípio técnico
+Os três links não representam três aplicações: frontend segmentado + Worker compartilhado + D1. Para acessar cada portal, o login consulta `/api/auth/login` e verifica `/api/auth/me` e papel no D1. **A verificação no navegador serve somente para navegação**: qualquer endpoint operacional também deve impor RBAC no Worker.
+
+- `member`: somente dados próprios, agenda e inscrições.
+- `admin`: gerenciamento de partidas e pagamentos, após APIs protegidas por `admin`/`master`.
+- `master`: configurações globais, papéis e contas, após autenticação forte com Cloudflare Access e autorização no Worker.
+- O Worker V10 atual ainda não provisiona contas Master via login comum e mantém `/api/admin/*` exigindo Cloudflare Access e segredo privado. As novas páginas **não pedem nem expõem o segredo Master**.
+
+### Simplificação
+Visibilidade primária por perfil: jogador (próxima partida, minhas inscrições, conta); administrador (partidas, inscrições/Pix, times); master (usuários, segurança, configurações/auditoria). Ranking, MVP e histórico avançado serão agrupados em menus secundários ou adiados, **não apagados** da V9.
+
+### Checklist para entrar em produção
+1. Testes de navegação e responsividade dos três portais, com leitores de tela e navegadores móveis.
+2. Homologar backend D1 isolado, CORS e criação/ativação verificada de contas; não reutilizar credenciais locais da V9.
+3. Desenvolver proteção RBAC em **todas** as rotas administrativas; fluxo Master com Cloudflare Access, sem API key no browser.
+4. Criar recuperação de senha verificada por e-mail ou fluxo administrativo seguro, sem SMS.
+5. Ligar agenda, inscrições e pagamentos reais ao D1, com concorrência e auditoria de ações.
+6. Confirmar testes E2E e segurança. Fazer publicação controlada e só então redirecionar links.
+
+**Nesta entrega há telas de homologação e vínculo de login, não há deploy, criação de usuários reais, alterações no D1 remoto nem ativação de inscrições.**
