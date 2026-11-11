@@ -82,3 +82,21 @@ Visibilidade primária por perfil: jogador (próxima partida, minhas inscriçõe
 6. Confirmar testes E2E e segurança. Fazer publicação controlada e só então redirecionar links.
 
 **Nesta entrega há telas de homologação e vínculo de login, não há deploy, criação de usuários reais, alterações no D1 remoto nem ativação de inscrições.**
+
+## RBAC: controle por perfil no Worker (segunda etapa)
+
+Adicionado `cloudflare/src/permissions.js`, com políticas específicas para `member`, `admin` e `master`. A API valida o token de sessão por consulta ao D1 **antes de conceder qualquer acesso aos novos painéis**.
+
+| Rota | Perfil mínimo | Observação |
+| --- | --- | --- |
+| `GET /api/portal/player` | member/admin/master | Dados mínimos do próprio login |
+| `GET /api/portal/admin` | admin/master | Visão geral de operação, somente leitura |
+| `GET /api/portal/master` | master | Exige também identidade Cloudflare Access, associada a `MASTER_EMAIL` |
+
+Os portais em `peladapro/` consultam agora a rota do respectivo perfil após login e ao restaurar a sessão. `POST/PATCH/DELETE` não foram habilitados nessas rotas. Nenhuma chave `MASTER_API_KEY` é solicitada nas páginas.
+
+**Limitação deliberada:** as rotas antigas `/api/admin/*` continuam exigindo Cloudflare Access e o segredo Master privado, como antes. Para liberar as ações de admin e master pelo navegador, será preciso projetar e implementar endpoints novos com privilégios específicos e revisar a configuração real do Access.
+
+**Atenção:** o fluxo de provisionamento inicial de `master` permanece bloqueado na API pública. Não criar Master automaticamente ao abrir a interface; configurar a identidade de forma segura na homologação.
+
+A V9 não foi alterada nem houve implantação da branch V10. Esta etapa adicionou testes de autorização em `cloudflare/tests/permissions.test.js`; a execução deve ser confirmada no CI antes de considerar o recurso validado.
