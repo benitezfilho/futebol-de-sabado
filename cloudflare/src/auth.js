@@ -134,9 +134,9 @@ export async function masterAccountRoute(request,db,path){
 export async function portalRoute(request,db,path,ctx,env){
  const respond=(data,status=200)=>reply(data,status);
  try{
-  const a=await session(db,request);
   const required=path==="/api/portal/player"?"account:self":path==="/api/portal/admin"?"operations:read":path==="/api/portal/master"?"security:read":null;
   if(!required||request.method!=="GET")return err(404,"Rota não encontrada");
+  const a=await session(db,request);
   const permitted=authorize(a,required);
   if(!permitted.ok)return err(permitted.status,permitted.error);
   if(required==="security:read"){
