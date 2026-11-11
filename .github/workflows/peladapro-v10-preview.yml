@@ -1,0 +1,62 @@
+name: PeladaPro V10 - validar e empacotar homologacao
+
+on:
+  push:
+    branches:
+      - feature/v10-d1-auth
+    paths:
+      - "peladapro/**"
+      - "cloudflare/**"
+      - ".github/workflows/peladapro-v10-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar branch V10
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validar sintaxe dos modulos
+        run: |
+          node --check cloudflare/src/index.js
+          node --check cloudflare/src/auth.js
+          node --check cloudflare/src/permissions.js
+          node --check peladapro/assets/portal.js
+
+      - name: Testes automatizados
+        run: node --test cloudflare/tests/*.test.js
+
+      - name: Testar migracoes D1 em SQLite isolado
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sqlite3
+          db = sqlite3.connect(":memory:")
+          db.execute("PRAGMA foreign_keys=ON")
+          for migration in sorted(Path("cloudflare/migrations").glob("*.sql")):
+              print("Validando:", migration)
+              db.executescript(migration.read_text(encoding="utf-8"))
+          expected = ["members","matches","registrations","user_accounts",
+                      "user_credentials","user_sessions","user_login_limits",
+                      "user_security_audit"]
+          for name in expected:
+              assert db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(name,)).fetchone(), name
+          print("Migrações verificadas em banco em memória; nenhum D1 remoto foi alterado.")
+          PY
+
+      - name: Empacotar interfaces para revisão
+        uses: actions/upload-artifact@v4
+        with:
+          name: peladapro-v10-portais
+          path: peladapro/
+          if-no-files-found: error
+          retention-days: 14
