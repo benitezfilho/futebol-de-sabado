@@ -100,3 +100,26 @@ Os portais em `peladapro/` consultam agora a rota do respectivo perfil após log
 **Atenção:** o fluxo de provisionamento inicial de `master` permanece bloqueado na API pública. Não criar Master automaticamente ao abrir a interface; configurar a identidade de forma segura na homologação.
 
 A V9 não foi alterada nem houve implantação da branch V10. Esta etapa adicionou testes de autorização em `cloudflare/tests/permissions.test.js`; a execução deve ser confirmada no CI antes de considerar o recurso validado.
+
+## Homologação automatizada sem tocar na V9
+
+Arquivo: `.github/workflows/peladapro-v10-preview.yml` (executa na branch `feature/v10-d1-auth`, ou manualmente pelo GitHub Actions).
+- Valida sintaxe dos módulos Worker e da interface.
+- Executa os testes Node.js dos três perfis e da API.
+- Aplica migrações SQL em SQLite **somente na memória do runner**, nunca no D1 remoto.
+- Se os testes passarem, disponibiliza o artifact `peladapro-v10-portais` para revisão estática dos layouts.
+- **Não publica um endereço público**, não faz deploy Worker, não cria D1 e não altera a V9.
+
+Para uma URL de homologação real, ainda é necessário provisionar **novo** projeto Cloudflare Pages, Worker separado e banco D1 de testes e configurar CORS de acordo com a origem real. As credenciais da Cloudflare devem ser configuradas diretamente no provedor ou no GitHub Actions secrets, nunca em commits ou mensagens.
+
+### Atenção sobre Cloudflare Access
+O guard atual do Master consulta `ctx.access.getIdentity()`. Essa interface **não está confirmada** como mecanismo de identidade disponível no Worker implantado; a integração com Cloudflare Access deve ser revista e testada antes da publicação. Não desabilitar a proteção para contornar erros. A autenticação Master real **não está homologada**.
+
+### Checklist antes de marcar a V10 como pronta
+- [ ] GitHub Actions da branch V10 passa nos testes automatizados.
+- [ ] Worker e D1 de **homologação** existem e foram vinculados sem reutilizar o D1 real.
+- [ ] CORS do ambiente de preview configurado com origem precisa.
+- [ ] Teste de negativa (jogador em /admin, administrador em /master) confirmado no servidor.
+- [ ] Fluxo de provisionamento seguro de Master e integração Cloudflare Access validados.
+- [ ] Telas de jogador/admin/master navegadas no desktop e no celular.
+- [ ] Operações reais continuam indisponíveis até autorização e testes de integração completos.
