@@ -24,6 +24,10 @@ async function call(path,{method="GET",data,authenticated=true}={}){
  if(!res.ok)throw Error(value.error||"Falha de comunicação com o servidor.");
  return value;
 }
+async function verifyPanel(){
+ const route={member:"player",admin:"admin",master:"master"}[role];
+ return call("/api/portal/"+route);
+}
 function show(account){
  const login=$("[data-login]",root),dashboard=$("[data-dashboard]",root);
  login.classList.toggle("hidden",!!account);dashboard.classList.toggle("hidden",!account);
@@ -52,7 +56,10 @@ function buildLogin(){
     throw Error("Esta conta não tem permissão para esta área.");
   }
   clearToken();setToken(result.token);form.elements.password.value="";
-  show(result.account);say("Acesso autenticado com sucesso no servidor.");
+  try{
+   const panel=await verifyPanel();
+   show(panel.account);say("Acesso autenticado e permissões verificadas no servidor.");
+  }catch(error){clearToken();show(null);throw error}
  }catch(error){say(error.message)}finally{btn.disabled=false}
  });
  login.append(text,form,status);
@@ -67,7 +74,8 @@ async function restoreSession(){
  try{
   const result=await call("/api/auth/me");
   if(!allowed(result.account)){show(null);say("A sessão atual não autoriza este painel.");return}
-  show(result.account);say("Sessão confirmada pelo D1.");
+  const panel=await verifyPanel();
+  show(panel.account);say("Sessão e permissões confirmadas pelo D1.");
  }catch{clearToken();show(null);say("Sessão expirada ou inválida.");}
 }
 async function loadPublicMatches(){
