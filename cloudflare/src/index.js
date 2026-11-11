@@ -1,5 +1,5 @@
 import { validateMatch, paymentDue } from "./logic.js";
-import { authRoute, masterAccountRoute } from "./auth.js";
+import { authRoute, masterAccountRoute, portalRoute } from "./auth.js";
 
 const now = () => new Date().toISOString();
 function reply(data,status=200,headers={}) {
@@ -105,6 +105,11 @@ export default {
      }
      if(path.startsWith("/api/auth/")) {
        const r=await authRoute(request,env.DB,path);
+       const h=new Headers(r.headers);for(const [k,v] of Object.entries(headers))h.set(k,v);
+       return new Response(r.body,{status:r.status,headers:h});
+     }
+     if(path.startsWith("/api/portal/")) {
+       const r=await portalRoute(request,env.DB,path,ctx,env);
        const h=new Headers(r.headers);for(const [k,v] of Object.entries(headers))h.set(k,v);
        return new Response(r.body,{status:r.status,headers:h});
      }
