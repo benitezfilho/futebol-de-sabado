@@ -1,5 +1,6 @@
 // V10: autenticação real para membros. Rotas admin devem passar pela proteção
 // Cloudflare Access + MASTER_API_KEY já existente no Worker. Sem SMS ou cadastro aberto.
+import { authorize } from "./permissions.js";
 const encoder=new TextEncoder();
 const hex=b=>Array.from(b,x=>x.toString(16).padStart(2,"0")).join("");
 const fromHex=s=>Uint8Array.from(s.match(/.{2}/g)||[],x=>parseInt(x,16));
@@ -28,7 +29,7 @@ async function session(db,request){
  const hash=await sha(authorization.slice(7));
  return await db.prepare("SELECT a.id,a.member_id,a.email,a.role,a.active,s.id AS session_id FROM user_sessions s JOIN user_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.revoked_at IS NULL AND s.expires_at>? AND a.active=1").bind(hash,iso()).first();
 }
-function safeUser(a){return {id:a.id,member_id:a.member_id,email:a.email,role:a.role}}
+function safeUser(a){return {id:a.id,member_id:a.member_id,email:a.email,role:a.role,active:!!a.active}}
 async function userRoute(request,db,path){
  const method=request.method;
  if(path==="/api/auth/login"&&method==="POST"){
@@ -124,4 +125,33 @@ export async function masterAccountRoute(request,db,path){
   if(/^(A senha|Dados|JSON)/.test(String(e.message)))return err(400,e.message);
   return err(500,"Falha interna na gestão de contas");
  }
+}
+
+/**
+ * Endpoints por perfil: sempre valida sessão no D1 e permissão no Worker.
+ * Apenas leitura durante homologação. Rotas de escrita exigem revisão separada.
+ */
+export async function portalRoute(request,db,path,ctx,env){
+ const respond=(data,status=200)=>reply(data,status);
+ try{
+  const a=await session(db,request);
+  const required=path==="/api/portal/player"?"account:self":path==="/api/portal/admin"?"operations:read":path==="/api/portal/master"?"security:read":null;
+  if(!required||request.method!=="GET")return err(404,"Rota não encontrada");
+  const permitted=authorize(a,required);
+  if(!permitted.ok)return err(permitted.status,permitted.error);
+  if(required==="security:read"){
+   // Duplo fator de proteção: conta Master e identidade da política Access.
+   const configured=String(env.MASTER_EMAIL||"").trim().toLowerCase();
+   if(!configured||configured!==String(a.email).toLowerCase()||!ctx?.access)return err(403,"Master requer Cloudflare Access");
+   let accessIdentity;
+   try{accessIdentity=await ctx.access.getIdentity()}catch{return err(403,"Cloudflare Access não validado")}
+   if(String(accessIdentity?.email||"").toLowerCase()!==configured)return err(403,"Identidade Master não autorizada");
+   return respond({role:"master",account:safeUser(a),modules:["users","permissions","settings","audit"],operations_enabled:false});
+  }
+  if(required==="operations:read"){
+   const matches=await db.prepare("SELECT COUNT(*) AS total FROM matches WHERE status='active'").first();
+   return respond({role:a.role,account:safeUser(a),matches_active:Number(matches?.total||0),modules:["matches","registrations","payments","draw"],operations_enabled:false});
+  }
+  return respond({role:a.role,account:safeUser(a),modules:["my-account","my-matches"],registrations_enabled:false});
+ }catch{return err(500,"Falha interna ao consultar painel")}
 }
