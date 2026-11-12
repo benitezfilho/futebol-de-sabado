@@ -31,6 +31,7 @@ async function verifyPanel(){
 function show(account){
  const login=$("[data-login]",root),dashboard=$("[data-dashboard]",root);
  login.classList.toggle("hidden",!!account);dashboard.classList.toggle("hidden",!account);
+ document.querySelectorAll("[data-header-logout]").forEach(button=>{button.hidden=!account;});
  if(account)$("[data-greeting]",root).textContent="Conta: "+account.email+" | Perfil: "+account.role;
 }
 function buildLogin(){
@@ -63,11 +64,14 @@ function buildLogin(){
  }catch(error){say(error.message)}finally{btn.disabled=false}
  });
  login.append(text,form,status);
- const out=$("[data-logout]",root);
- out.addEventListener("click",async()=>{
-  try{await call("/api/auth/logout",{method:"POST"})}catch{say("Não foi possível confirmar a revogação no servidor. A sessão local será encerrada.");}
-  clearToken();show(null);say("Acesso encerrado. Para entrar novamente, informe a senha.");
- });
+ async function logout(){
+  let serverRevoked=false;
+  try{await call("/api/auth/logout",{method:"POST"});serverRevoked=true}catch{}
+  clearToken();show(null);
+  say(serverRevoked?"Sessão encerrada no servidor e neste navegador.":"Sessão local encerrada. Não foi possível confirmar a revogação no servidor; encerre outras sessões se necessário.");
+ }
+ root.querySelectorAll("[data-logout]").forEach(button=>button.addEventListener("click",logout));
+ document.querySelectorAll("[data-header-logout]").forEach(button=>button.addEventListener("click",logout));
 }
 async function restoreSession(){
  if(!token||!apiOrigin){show(null);return}
