@@ -123,3 +123,13 @@ O guard atual do Master consulta `ctx.access.getIdentity()`. Essa interface **n�
 - [ ] Fluxo de provisionamento seguro de Master e integração Cloudflare Access validados.
 - [ ] Telas de jogador/admin/master navegadas no desktop e no celular.
 - [ ] Operações reais continuam indisponíveis até autorização e testes de integração completos.
+
+## Ajustes adicionais da demonstração, 12/11/2026
+- Na `index.html` da **branch V10**, removemos da tela de acesso do membro o botão **"Redefinir com código do Master"**, assim como o botão no modal de login. No painel local Master, removemos **"Gerar código de reset"** e o bloco explicativo desse processo. Não é uma remoção de mecanismos de recuperação do backend D1: estes permanecem em avaliação para uma solução segura de e-mail/identidade.
+- Ao fechar o formulário de criação de conta ou trocar entre criação de conta e login, se já houver dados digitados o sistema pergunta antes de descartar. Após autenticar com sucesso, o modal fecha sem pedir confirmação.
+- Para não perder ou sobrescrever a simulação histórica do navegador, a nova versão usa outra chave local, `peladapro_demo_14nov2026_v1`. Não executamos `localStorage.clear()`.
+- Uma única partida simulada inicia em **14/11/2026, sábado, 09h** no **Farofa Society**, ingresso **R$ 15**, limite de **20 jogadores de linha**, **2 goleiros fora da capacidade**. Abertura **12/11 às 12h**; prazo Pix **13/11 às 18h**; encerramento de inscrição **14/11 às 08h** (horário de Goiânia).
+- **Lista inicial vazia**: sem jogadores, goleiros, pagamentos, presenças, inscritos ou fila de espera pré-carregados. O botão de reinício do Master limpa somente a simulação de 14/11 guardada neste navegador.
+- Testes estáticos iniciais em `cloudflare/tests/demo-14nov.test.js`.
+
+Esses ajustes estão somente na branch `feature/v10-d1-auth`; **a V9 publicada continua exatamente como antes**. Não há propagação de dados entre dispositivos nem alteração no D1 remoto.
