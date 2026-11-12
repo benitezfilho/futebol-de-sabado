@@ -124,7 +124,10 @@ select.form-control option,select.form-control optgroup{background:#fff!importan
      <div class="topbar">
        <a class="mobile-brand" href="/" data-nav="home"><span class="mini-logo">✦</span> FUTEBOL<span>.</span></a>
        <div class="top-left"><span class="crumb">PELA RESENHA, PELO FUTEBOL</span></div>
-       <div class="top-right"><span class="live-dot"></span> FUTEBOL SOCIETY <span class="top-separator">/</span> GOIÂNIA</div>
+       <div class="top-right"><span class="live-dot"></span> FUTEBOL SOCIETY <span class="top-separator">/</span> GOIÂNIA
+         <button type="button" class="button button-sm button-secondary" id="member-global-logout" data-action="member-logout" hidden aria-label="Sair da conta do jogador">Sair da conta</button>
+         <button type="button" class="button button-sm button-secondary" id="master-global-logout" data-action="logout" hidden aria-label="Sair do Admin Master">Sair do Master</button>
+       </div>
      </div>
      <div id="screen" class="page-container"><div class="initial-loading"><div class="spinner"></div><p>Preparando o campo...</p></div></div>
      <footer class="footer">© 2026 Futebol de Sábado <span>•</span> Jogo organizado, resenha garantida.</footer>
@@ -515,7 +518,13 @@ function confirmMemberFormExit() {
 }
 function closeModal(force=false) { if(!force && !confirmMemberFormExit())return; $('#modal-root').innerHTML=''; }
 function setLoading(button, status=true) { if (button) { button.disabled=status; button.dataset.original ||= button.textContent;button.textContent = status?'Processando...':button.dataset.original; } }
-function content(html) { $('#screen').innerHTML=html; }
+function updateLogoutControls(){
+ const member=document.getElementById('member-global-logout');
+ const master=document.getElementById('master-global-logout');
+ if(member)member.hidden=!Boolean(state.member);
+ if(master)master.hidden=!Boolean(state.admin);
+}
+function content(html) { $('#screen').innerHTML=html; updateLogoutControls(); }
 async function reloadMatches() { const data=await api('/api/matches'); state.matches=data.matches; state.activeMatch=state.activeMatch && state.matches.find(x=>x.id===state.activeMatch.id) || state.matches[0] || null; }
 async function refresh() { try {await reloadMatches();if(state.view==='home')renderHome();else if(state.view==='my')await renderMy();} catch(e){console.error(e)} }
 function nav(view) {
@@ -550,7 +559,7 @@ function renderHome() {
       <div class="hero-actions"><button class="button" data-action="open-register" data-id="${main?.id||0}">Quero jogar <span>↗</span></button><button class="button button-secondary" data-nav="my">Minhas inscrições</button></div></div>
       <div class="hero-graphic" aria-hidden="true"><div class="field"><span class="field-end top"></span><span class="field-end bottom"></span></div><span class="field-ball">⚽</span></div></section>
       ${state.config.demo?'<div class="highlight-bar">MODO DEMONSTRAÇÃO: respeite o calendário de abertura configurado para cada partida. Pagamentos reais não estão ativos.</div>':''}
-      <div class="highlight-bar"><strong>SIMULAÇÃO DA ESCALAÇÃO · 07/11/2026</strong><p>Escalação importada: 20 jogadores de linha pagos, 2 vagas de linha disponíveis, Terror do Ferreira confirmado como goleiro isento, e JV Negro na lista de espera sem prioridade automática. As vagas de linha são configuráveis pelo Master (22 neste exemplo). <b>Goleiros fixos são isentos e não ocupam vagas de linha.</b> Cada time recebe cinco jogadores de linha; os demais ficam como reservas. Os primeiros dez pagantes abrem o jogo com os times A e B. O time seguinte entra no lugar do perdedor; empate tem sorteio de saída.</p><p>Inscrições canceladas podem ser restauradas pelo Master quando houver vaga. Quem foi convocado e teve o Pix confirmado sai das convocações ativas; a movimentação fica em Histórico. Após a lotação paga, novas tentativas de linha são registradas apenas como interesse, até o horário de encerramento.</p></div>
+      <div class="highlight-bar"><strong>SIMULAÇÃO PELADAPRO · 14/11/2026</strong><p>Partida de teste no Farofa Society, sábado às 09h. Lista inicial limpa: 0 inscritos, 0 goleiros, 0 pagamentos e fila vazia. Vagas: 20 jogadores de linha, goleiros isentos. Abertura das inscrições quinta-feira às 12h.</p></div>
       <div class="content-grid"><div class="content-col">${main?matchCard(main,true):empty('⚽','Sem partidas','Uma nova partida aparecerá aqui em breve.')}
        ${main?`<section class="panel" id="public-roster">${panelTitle('Escalação e lista','Pagos, pendentes e fila de espera em um só lugar.')}${state.member?'<p class="muted">Carregando os jogadores...</p>':`<p class="notice">Para proteger os dados dos jogadores, entre como membro para consultar os nomes completos e os status.</p><button class="button button-sm" data-action="member-login">Entrar e ver a lista</button>`}</section>`:''}
        <section class="panel">${panelTitle('Como funciona','Três passos para entrar em campo.')}
