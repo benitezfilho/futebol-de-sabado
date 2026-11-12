@@ -513,7 +513,7 @@ function memberFormHasDraft() {
 function confirmMemberFormExit() {
  return !memberFormHasDraft() || confirm('Você já começou a preencher este formulário. Deseja sair e perder os dados digitados?');
 }
-function closeModal() { if(!confirmMemberFormExit())return; $('#modal-root').innerHTML=''; }
+function closeModal(force=false) { if(!force && !confirmMemberFormExit())return; $('#modal-root').innerHTML=''; }
 function setLoading(button, status=true) { if (button) { button.disabled=status; button.dataset.original ||= button.textContent;button.textContent = status?'Processando...':button.dataset.original; } }
 function content(html) { $('#screen').innerHTML=html; }
 async function reloadMatches() { const data=await api('/api/matches'); state.matches=data.matches; state.activeMatch=state.activeMatch && state.matches.find(x=>x.id===state.activeMatch.id) || state.matches[0] || null; }
@@ -1392,9 +1392,9 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','member-email-login-form','member-signup-form','member-reset-form','member-account-password-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','member-email-login-form','member-signup-form','member-account-password-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
- if(['member-email-login-form','member-signup-form','member-reset-form','member-account-password-form'].includes(form.id)){
+ if(['member-email-login-form','member-signup-form','member-account-password-form'].includes(form.id)){
   const data=new FormData(form),button=form.querySelector('[type=submit]');setLoading(button,true);
   const field=name=>String(data.get(name)||'');
   const errTarget=form.id==='member-account-password-form'?'#member-account-error':'#member-auth-error';
@@ -1411,9 +1411,9 @@ document.addEventListener('submit',async e=>{
       else if(form.id==='member-signup-form')member=await window.FUTEBOL_memberAccounts.signup({
        name:field('name'),email:field('email'),phone:field('phone'),password:field('password'),confirmation:field('confirm_password')
       });
-      else member=await window.FUTEBOL_memberAccounts.redeemReset(field('email'),field('code'),field('password'),field('confirm_password'));
+      else throw Error('Fluxo de acesso desconhecido.');
       state.member=member;state.memberTab='inscricoes';
-      closeModal();
+      closeModal(true);
       if(state.pendingMatchID){const matchId=state.pendingMatchID;state.pendingMatchID=null;registerModal(matchId)}
       else nav('my');
       toast('Acesso de demonstração autorizado.');
