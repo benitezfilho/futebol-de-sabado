@@ -100,6 +100,9 @@ select.form-control option,select.form-control optgroup{background:#fff!importan
 
 /* V7: aviso explícito de lotação com pagamento confirmado. */
 .pill.fully_paid{background:#33482a;color:#d2ff9d}.pill.interest{background:#2b3842;color:#d1e0ec}
+
+/* Segurança visual: nunca mostrar Sair de sessão inexistente */
+[hidden]{display:none!important}
 </style></head>
 <body>
  <div class="app-shell">
@@ -124,7 +127,10 @@ select.form-control option,select.form-control optgroup{background:#fff!importan
      <div class="topbar">
        <a class="mobile-brand" href="/" data-nav="home"><span class="mini-logo">✦</span> FUTEBOL<span>.</span></a>
        <div class="top-left"><span class="crumb">PELA RESENHA, PELO FUTEBOL</span></div>
-       <div class="top-right"><span class="live-dot"></span> FUTEBOL SOCIETY <span class="top-separator">/</span> GOIÂNIA</div>
+       <div class="top-right"><span class="live-dot"></span> FUTEBOL SOCIETY <span class="top-separator">/</span> GOIÂNIA
+         <button type="button" class="button button-sm button-secondary" id="member-global-logout" data-action="member-logout" hidden aria-label="Sair da conta do jogador">Sair da conta</button>
+         <button type="button" class="button button-sm button-secondary" id="master-global-logout" data-action="logout" hidden aria-label="Sair do Admin Master">Sair do Master</button>
+       </div>
      </div>
      <div id="screen" class="page-container"><div class="initial-loading"><div class="spinner"></div><p>Preparando o campo...</p></div></div>
      <footer class="footer">© 2026 Futebol de Sábado <span>•</span> Jogo organizado, resenha garantida.</footer>
@@ -142,7 +148,7 @@ window.history.replaceState=()=>{};
 try { localStorage.getItem('__test__'); } catch {
  const mem = new Map();Object.defineProperty(window, 'localStorage', {configurable:true,value:{getItem:k=>mem.has(k)?mem.get(k):null,setItem:(k,v)=>mem.set(k,String(v)),removeItem:k=>mem.delete(k)}});
 }
-const DBKEY='futebol_demo_07nov2026_v1';
+const DBKEY='peladapro_demo_14nov2026_v1';
 const DEMO=(function(){
  const old=(()=>{try{return JSON.parse(localStorage.getItem(DBKEY))}catch{return null}})();
  if(old){
@@ -164,68 +170,22 @@ const DEMO=(function(){
   for(const member of (old.members||[])) member.whatsapp_opt_in ||= false;
   return old;
  }
- const now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'})), day=now.getDay(), next=(6-day+7)%7;
- const saturday=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()+next+(next===0&&now.getHours()>=9?7:0),12,0));
+ // Partida de demonstração isolada: sábado 14/11/2026 às 09h em Goiânia.
+ const saturday=new Date('2026-11-14T12:00:00.000Z');
  const matches=[];
- for(let i=0;i<7;i++){
+ for(let i=0;i<1;i++){
   const start=new Date(saturday.getTime()+i*7*86400000),th=new Date(start.getTime()-2*86400000);
-  const open=new Date(th);open.setUTCHours(15,0);const pay=new Date(th);pay.setUTCHours(23,0);
+  const open=new Date(th);open.setUTCHours(15,0);const pay=new Date(start.getTime()-86400000);pay.setUTCHours(21,0);
   const close=new Date(start);close.setUTCHours(11,0);
-  matches.push({id:i+1,title:'Futebol de Sábado',venue:'Farofa Society',starts_at:start.toISOString(),opens_at:open.toISOString(),payment_deadline:pay.toISOString(),waitlist_releases_at:pay.toISOString(),waitlist_note:'Quem não confirmar o Pix perde a reserva. Convocaremos o próximo da fila.',signup_closes_at:close.toISOString(),capacity:20,price_cents:1500,goalie_limit:2,status:'active'});
+  matches.push({id:i+1,title:'PeladaPro | Simulação 14/11',venue:'Farofa Society',starts_at:start.toISOString(),opens_at:open.toISOString(),payment_deadline:pay.toISOString(),waitlist_releases_at:pay.toISOString(),waitlist_note:'Lista de teste inicialmente vazia. Sem pagamentos confirmados.',signup_closes_at:close.toISOString(),capacity:20,price_cents:1500,goalie_limit:2,status:'active'});
  }
  return {matches,regs:[],interests:[],teams:[],notices:[],members:[],stats:[],votes:[],memberLogged:null,adminLogged:false};
 })();
 DEMO.interests ||= [];DEMO.members ||= [];DEMO.memberLogged ||= null;DEMO.stats ||= [];DEMO.votes ||= [];
 // Sempre exigir nova entrada ao recarregar: sessão demo antiga não autoriza acesso.
 DEMO.adminLogged=false;
-if(!DEMO.regs.length){
- // Escalação informada pelo organizador, exclusivamente para simulação.
- // Sem CPF, chave Pix, telefones verdadeiros ou e-mails dos jogadores no site.
- const orderedNames=[
-  'Benitez','João','Ferreira','CH','Alan','Pinguim','Gustavo',
-  'Wallyson','Eduardo','Luis Fabiano','Alexandre','Yuri','Yan',
-  'Caio Cabeça','Rodrigo','Hadrian','Heitor','Pedro Augusto',
-  'Kayo Oreia','Marcos Felipe'
- ];
- const firstTen=['Hadrian','Yuri','João','Heitor','Eduardo','Luis Fabiano','Alexandre','Benitez','Rodrigo','Marcos Felipe'];
- const otherTen=['CH','Alan','Pinguim','Ferreira','Gustavo','Wallyson','Yan','Pedro Augusto','Caio Cabeça','Kayo Oreia'];
- const payOrder=[...firstTen,...otherTen];
- const fixture=DEMO.matches[0];
- fixture.title='Futebol de Sábado | Simulação 07/11';
- fixture.venue='Farofa Society';
- fixture.capacity=22;
- fixture.goalie_limit=2;
- fixture.price_cents=1500;
- fixture.starts_at='2026-11-07T12:00:00.000Z';
- fixture.opens_at='2026-11-05T15:00:00.000Z';
- fixture.payment_deadline='2026-11-05T23:00:00.000Z';
- fixture.waitlist_releases_at='2026-11-05T23:00:00.000Z';
- fixture.signup_closes_at='2026-11-07T11:00:00.000Z';
- fixture.voting_enabled=true;
- fixture.waitlist_note='JV Negro está sem prioridade. Duas vagas de linha continuam abertas para novos pagantes.';
- function addDemoMember(name,options={}){
-   const id=DEMO.members.length+1;
-   const member={id,name,phone:'',email:'simulacao'+id+'@example.invalid',
-     verified_at:null,active:true,whatsapp_opt_in:false};
-   DEMO.members.push(member);
-   const paymentPosition=payOrder.indexOf(name);
-   const role=options.role||'linha',status=options.status||'paid';
-   const paid_at=role==='linha'&&paymentPosition>=0
-       ?new Date(Date.parse('2026-11-05T15:00:00Z')+paymentPosition*60_000).toISOString():null;
-   const created_at=new Date(Date.parse('2026-11-05T15:00:00Z')+id*1000).toISOString();
-   DEMO.regs.push({id,token:'simulacao-0711-'+id,match_id:fixture.id,member_id:id,
-     name,phone:'',email:member.email,role,position:role==='goleiro'?'goleiro':'indefinido',
-     status,paid_at,reserved_until:null,created_at,
-     queue_entered_at:status==='waitlist'?created_at:null,
-     queue_hold:options.queue_hold||0,queue_note:options.queue_note||'',
-     attended:0,pix_code:null,pix_qr_image:null,review_reason:''});
- }
- orderedNames.forEach(name=>addDemoMember(name));
- addDemoMember('Terror do Ferreira',{role:'goleiro',status:'paid'});
- addDemoMember('JV Negro',{role:'linha',status:'waitlist',queue_hold:1,
-   queue_note:'Sem prioridade. Não promover automaticamente; se dois novos jogadores pagarem primeiro, fica fora.'});
- saveDemo();
-}
+// Simulação de 14/11 começa com lista de jogadores e goleiros vazia.
+// A escalação histórica de 07/11 permanece salva na chave antiga do navegador, sem migração.
 
 function currentMember(){return DEMO.members.find(x=>x.id===DEMO.memberLogged&&x.active)!==undefined?DEMO.members.find(x=>x.id===DEMO.memberLogged):null}
 function saveDemo(){try{localStorage.setItem(DBKEY,JSON.stringify(DEMO))}catch{}}
@@ -551,9 +511,23 @@ function toast(message, isError=false) {
 function modal(title, subtitle, body, large=false) {
   $('#modal-root').innerHTML = `<div class="modal-overlay" role="presentation"><section class="modal ${large?'modal-lg':''}" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="modal-head"><div><h2>${title}</h2><p>${subtitle}</p></div><button class="close-modal" data-action="close" aria-label="Fechar janela">×</button></div>${body}</section></div>`;
 }
-function closeModal() { $('#modal-root').innerHTML=''; }
+function memberFormHasDraft() {
+ const form=document.querySelector('#member-signup-form, #member-email-login-form');
+ if(!form)return false;
+ return [...form.querySelectorAll('input')].some(input=>input.value.trim().length>0);
+}
+function confirmMemberFormExit() {
+ return !memberFormHasDraft() || confirm('Você já começou a preencher este formulário. Deseja sair e perder os dados digitados?');
+}
+function closeModal(force=false) { if(!force && !confirmMemberFormExit())return; $('#modal-root').innerHTML=''; }
 function setLoading(button, status=true) { if (button) { button.disabled=status; button.dataset.original ||= button.textContent;button.textContent = status?'Processando...':button.dataset.original; } }
-function content(html) { $('#screen').innerHTML=html; }
+function updateLogoutControls(){
+ const member=document.getElementById('member-global-logout');
+ const master=document.getElementById('master-global-logout');
+ if(member)member.hidden=!Boolean(state.member);
+ if(master)master.hidden=!Boolean(state.admin);
+}
+function content(html) { $('#screen').innerHTML=html; updateLogoutControls(); }
 async function reloadMatches() { const data=await api('/api/matches'); state.matches=data.matches; state.activeMatch=state.activeMatch && state.matches.find(x=>x.id===state.activeMatch.id) || state.matches[0] || null; }
 async function refresh() { try {await reloadMatches();if(state.view==='home')renderHome();else if(state.view==='my')await renderMy();} catch(e){console.error(e)} }
 function nav(view) {
@@ -588,7 +562,7 @@ function renderHome() {
       <div class="hero-actions"><button class="button" data-action="open-register" data-id="${main?.id||0}">Quero jogar <span>↗</span></button><button class="button button-secondary" data-nav="my">Minhas inscrições</button></div></div>
       <div class="hero-graphic" aria-hidden="true"><div class="field"><span class="field-end top"></span><span class="field-end bottom"></span></div><span class="field-ball">⚽</span></div></section>
       ${state.config.demo?'<div class="highlight-bar">MODO DEMONSTRAÇÃO: respeite o calendário de abertura configurado para cada partida. Pagamentos reais não estão ativos.</div>':''}
-      <div class="highlight-bar"><strong>SIMULAÇÃO DA ESCALAÇÃO · 07/11/2026</strong><p>Escalação importada: 20 jogadores de linha pagos, 2 vagas de linha disponíveis, Terror do Ferreira confirmado como goleiro isento, e JV Negro na lista de espera sem prioridade automática. As vagas de linha são configuráveis pelo Master (22 neste exemplo). <b>Goleiros fixos são isentos e não ocupam vagas de linha.</b> Cada time recebe cinco jogadores de linha; os demais ficam como reservas. Os primeiros dez pagantes abrem o jogo com os times A e B. O time seguinte entra no lugar do perdedor; empate tem sorteio de saída.</p><p>Inscrições canceladas podem ser restauradas pelo Master quando houver vaga. Quem foi convocado e teve o Pix confirmado sai das convocações ativas; a movimentação fica em Histórico. Após a lotação paga, novas tentativas de linha são registradas apenas como interesse, até o horário de encerramento.</p></div>
+      <div class="highlight-bar"><strong>SIMULAÇÃO PELADAPRO · 14/11/2026</strong><p>Partida de teste no Farofa Society, sábado às 09h. Lista inicial limpa: 0 inscritos, 0 goleiros, 0 pagamentos e fila vazia. Vagas: 20 jogadores de linha, goleiros isentos. Abertura das inscrições quinta-feira às 12h.</p></div>
       <div class="content-grid"><div class="content-col">${main?matchCard(main,true):empty('⚽','Sem partidas','Uma nova partida aparecerá aqui em breve.')}
        ${main?`<section class="panel" id="public-roster">${panelTitle('Escalação e lista','Pagos, pendentes e fila de espera em um só lugar.')}${state.member?'<p class="muted">Carregando os jogadores...</p>':`<p class="notice">Para proteger os dados dos jogadores, entre como membro para consultar os nomes completos e os status.</p><button class="button button-sm" data-action="member-login">Entrar e ver a lista</button>`}</section>`:''}
        <section class="panel">${panelTitle('Como funciona','Três passos para entrar em campo.')}
@@ -665,7 +639,7 @@ async function renderMy() {
     <div class="highlight-bar"><strong>Demonstração local, sem custos de mensagens</strong><p>O SMS está em stand-by. Senhas e contas de teste ficam somente neste navegador; não existe autenticação compartilhada entre celulares.</p></div>
     <div class="row mt" style="gap:9px;flex-wrap:wrap"><button class="button" data-action="member-email-login">Entrar com e-mail e senha</button>
       <button class="button button-outline" data-action="member-create">Criar minha conta</button>
-      <button class="button button-secondary" data-action="member-reset">Redefinir com código do Master</button></div></section>`);return}
+</div></section>`);return}
   if(!state.member.name || !state.member.email){content(`${headline('ÁREA DO MEMBRO','Complete seu <span>cadastro.</span>','Atualize seu nome e e-mail de demonstração.')}<section class="panel admin-login"><button class="button button-block" data-action="member-profile">Completar cadastro ↗</button></section>`);return}
   content(`${headline('MEU FUTEBOL','Minhas <span>inscrições.</span>','Acompanhe seus dados de teste neste navegador.')}
     <div class="member-account-bar"><div>${window.FUTEBOL_avatar(state.member,34)}<strong>✓ ${escapeHTML(state.member.name)}</strong><small>${escapeHTML(phoneMask(state.member.phone))} · ${escapeHTML(state.member.email)}</small></div><div class="row"><button class="button button-sm button-outline" data-action="member-profile">Editar perfil</button><button class="button button-sm button-secondary" data-action="member-logout">Sair</button></div></div>
@@ -775,13 +749,13 @@ async function renderAdmin(){
                 class="form-control" placeholder="seu@email.com" value="${configured?escapeHTML(window.FUTEBOL_demoAuth.getEmail()):''}"/>
               <small class="muted">Este e-mail ainda não recebe códigos. A validação real será feita pela Cloudflare.</small></div>`:
               '<p class="notice">Este navegador já possui senha da demonstração. Após entrar, acesse Segurança Master para vincular seu e-mail.</p>'}
-            <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 10 caracteres, letra e número)'}</label>
+            <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 3 caracteres, somente demonstração)'}</label>
               <input id="demo-admin-pass" name="password" type="password" class="form-control"
-                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'10'}" maxlength="128" required/>
+                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'3'}" maxlength="128" required/>
               <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-pass" aria-pressed="false">Mostrar senha</button></div>
             ${configured?'':`<div class="form-group mt"><label for="demo-admin-confirm">Confirmar senha</label>
               <input id="demo-admin-confirm" name="confirm_password" type="password" class="form-control"
-               autocomplete="new-password" minlength="10" maxlength="128" required/>
+               autocomplete="new-password" minlength="3" maxlength="128" required/>
               <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-confirm" aria-pressed="false">Mostrar senha</button></div>`}
             <div id="admin-error" role="alert"></div>
             <button type="submit" class="button button-block mt">${configured?'Entrar no Admin Master':'Definir senha e entrar'}</button>
@@ -816,7 +790,7 @@ function drawAdmin(){
   content(`${headline('CENTRAL DE CONTROLE','Painel <span>administrativo.</span>','Você comanda a partida. O sistema cuida da lista, da fila e das confirmações.')}
     <div class="highlight-bar"><strong>APENAS DEMONSTRAÇÃO:</strong> as informações são fictícias e alterações ficam somente neste navegador. O acesso Master de produção terá autenticação no servidor.</div>
     <div class="admin-tools"><select class="form-control" id="admin-match-select" aria-label="Selecionar partida">${matchesOptions}</select><div class="row"><button class="button button-sm button-secondary" data-action="add-match">+ Nova partida</button><button class="button button-sm" data-action="add-manual-member">+ Jogador manual</button>
-    <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-outline" data-action="reset-simulacao">Reiniciar escalação 07/11</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
+    <button class="button button-sm button-outline" data-action="edit-match" ${selected?'':'disabled'}>Editar a qualquer momento</button><button class="button button-sm button-danger" data-action="archive-match" ${selected?'':'disabled'}>Excluir partida</button><button class="button button-sm button-outline" data-action="reset-simulacao">Reiniciar simulação 14/11</button><button class="button button-sm button-secondary" data-action="logout">Sair</button></div></div>
     <div class="kpi-grid"><button type="button" class="kpi kpi-link ${state.adminFilter==='paid'?'kpi-active':''}" data-action="admin-filter" data-filter="paid" aria-label="Abrir lista de confirmados"><small>VAGAS CONFIRMADAS</small><strong>${paid.length}<span class="muted">/${selected?.capacity??'—'}</span></strong><span class="tiny">Ver confirmados →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='reserved'?'kpi-active':''}" data-action="admin-filter" data-filter="reserved" aria-label="Abrir lista de pendentes"><small>AGUARDANDO PIX</small><strong>${pending.length}</strong><span class="tiny">Ver pendentes →</span></button>
     <button type="button" class="kpi kpi-link ${state.adminFilter==='waitlist'?'kpi-active':''}" data-action="admin-filter" data-filter="waitlist" aria-label="Abrir lista de espera"><small>LISTA DE ESPERA</small><strong>${waiting.length}</strong><span class="tiny">Ver fila de espera →</span></button>
@@ -959,13 +933,13 @@ function renderMemberAccount(){
    '<div class="roster-group"><h3>Alterar minha senha</h3>'+
     '<form id="member-account-password-form" autocomplete="off">'+
      '<div class="form-group"><label>Senha atual</label><input class="form-control" name="current_password" id="user-old-password" type="password" autocomplete="current-password" required></div>'+
-     '<div class="form-group mt"><label>Nova senha</label><input class="form-control" id="user-new-password" name="new_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
-     '<div class="form-group mt"><label>Confirmar nova senha</label><input class="form-control" id="user-confirm-password" name="confirm_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<div class="form-group mt"><label>Nova senha</label><input class="form-control" id="user-new-password" name="new_password" minlength="3" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<div class="form-group mt"><label>Confirmar nova senha</label><input class="form-control" id="user-confirm-password" name="confirm_password" minlength="3" maxlength="128" type="password" autocomplete="new-password" required></div>'+
      '<button type="button" class="button button-sm button-outline mt" data-action="toggle-account-password" data-target="user-new-password">Mostrar / ocultar nova senha</button>'+
      '<div id="member-account-error"></div>'+
      '<button class="button mt" type="submit">Salvar nova senha</button></form>'+
    '</div></div>'+
-  '<p class="status-text mt">Se esqueceu a senha, solicite ao Admin Master um código único de redefinição. Ele não terá acesso à senha anterior.</p></section>';
+  '<p class="status-text mt">Recuperação de acesso pela V10 com autenticação real será disponibilizada após a homologação.</p></section>';
 }
 function renderAdminUsers(){
  if(!state.admin||!DEMO.adminLogged)return '<section class="panel"><p>Acesso restrito ao Admin Master.</p></section>';
@@ -976,15 +950,14 @@ function renderAdminUsers(){
     '<td>'+(u.reset_pending?'<span class="pill reserved">RESET PENDENTE</span>':
        u.has_password?'<span class="pill paid">SENHA CRIADA</span>':'<span class="pill neutral">SEM SENHA</span>')+'</td>'+
     '<td>'+(u.active?'Ativo':'Bloqueado')+'</td>'+
-    '<td><button class="button button-sm button-outline" data-action="admin-reset-member" data-id="'+u.id+
-    '">Gerar código de reset</button></td></tr>').join('');
+    '</tr>').join('');
  return '<section class="panel">'+panelTitle('Usuários e permissões',
    'Administre contas de jogadores sem acessar suas senhas. Configuração do Master fica na aba Segurança Master.')+
-   '<div class="highlight-bar"><strong>Reset seguro por código manual</strong><p>O Master gera um código único, válido por 60 minutos, e entrega diretamente ao jogador por um canal combinado. O jogador informa o código e cria sua própria senha. Nenhum SMS ou e-mail é disparado pelo site.</p></div>'+
+
    '<div class="row mt"><button class="button button-sm" data-action="add-manual-member">+ Cadastrar jogador</button></div>'+
-   '<div class="table-wrap mt"><table><thead><tr><th>Membro</th><th>E-mail</th><th>Telefone</th><th>Senha</th><th>Conta</th><th>Administração</th></tr></thead>'+
-   '<tbody>'+(rows||'<tr><td colspan="6">Nenhuma conta cadastrada.</td></tr>')+'</tbody></table></div>'+
-   '<p class="notice mt">Os registros do futebol de teste podem aparecer como "Sem senha" por terem sido importados antes desta funcionalidade. Gere um código para ativar o acesso de teste. A demonstração não sincroniza entre dispositivos.</p></section>';
+   '<div class="table-wrap mt"><table><thead><tr><th>Membro</th><th>E-mail</th><th>Telefone</th><th>Senha</th><th>Conta</th></tr></thead>'+
+   '<tbody>'+(rows||'<tr><td colspan="5">Nenhuma conta cadastrada.</td></tr>')+'</tbody></table></div>'+
+   '<p class="notice mt">Contas de demonstração permanecem locais neste navegador. A recuperação segura de acesso será implementada na V10 com autenticação real.</p></section>';
 }
 function openMemberEmailLogin(){
  modal('Entrar na Área do Membro','Use e-mail e senha. SMS não está ativo.',
@@ -994,8 +967,7 @@ function openMemberEmailLogin(){
    '<div id="member-auth-error"></div>'+
    '<div class="form-actions"><button class="button button-secondary" type="button" data-action="member-create">Criar conta</button>'+
    '<button class="button" type="submit">Entrar</button></div>'+
-   '<p class="status-text mt">Esqueceu a senha? Peça um código ao Master e escolha Redefinir com código.</p>'+
-   '<button type="button" class="button button-sm button-outline mt" data-action="member-reset">Redefinir com código</button></form>');
+   '</form>');
 }
 function openMemberSignup(){
  modal('Criar conta de jogador','Cadastro demonstrativo sem SMS, verificação de e-mail ou cobranças.',
@@ -1003,23 +975,12 @@ function openMemberSignup(){
    '<div class="form-group"><label>Nome completo</label><input class="form-control" name="name" minlength="5" maxlength="100" required></div>'+
    '<div class="form-grid mt"><div class="form-group"><label>E-mail</label><input type="email" class="form-control" name="email" required></div>'+
    '<div class="form-group"><label>Celular com DDD</label><input type="tel" class="form-control" name="phone" placeholder="(62) 99999-1234" required></div></div>'+
-   '<div class="form-grid mt"><div class="form-group"><label>Senha</label><input type="password" class="form-control" name="password" minlength="10" maxlength="128" required></div>'+
-   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="10" maxlength="128" required></div></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>Senha</label><input type="password" class="form-control" name="password" minlength="3" maxlength="128" required></div>'+
+   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="3" maxlength="128" required></div></div>'+
    '<p class="notice mt">Use somente dados fictícios para testar. Esta demonstração não comprova a titularidade do e-mail ou telefone.</p>'+
    '<div id="member-auth-error"></div><div class="form-actions">'+
    '<button type="button" class="button button-secondary" data-action="member-email-login">Já tenho conta</button>'+
    '<button class="button" type="submit">Criar conta</button></div></form>');
-}
-function openMemberReset(){
- modal('Redefinir senha','Utilize o código entregue pelo Admin Master manualmente, sem SMS.',
-  '<form id="member-reset-form" autocomplete="off">'+
-   '<div class="form-group"><label>E-mail da conta</label><input class="form-control" name="email" type="email" required></div>'+
-   '<div class="form-group mt"><label>Código de redefinição (recebido do Master)</label><input class="form-control" name="code" maxlength="48" required></div>'+
-   '<div class="form-grid mt"><div class="form-group"><label>Nova senha</label><input type="password" class="form-control" name="password" minlength="10" maxlength="128" required></div>'+
-   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="10" maxlength="128" required></div></div>'+
-   '<div id="member-auth-error"></div><div class="form-actions">'+
-   '<button type="button" class="button button-secondary" data-action="member-email-login">Voltar</button>'+
-   '<button class="button" type="submit">Salvar senha e entrar</button></div></form>');
 }
 
 function renderAdminSecurity(){
@@ -1038,10 +999,10 @@ function renderAdminSecurity(){
       '<input type="password" id="master-old-password" name="current_password" autocomplete="current-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-old-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div class="form-group mt"><label for="master-new-password">Nova senha</label>'+
-      '<input type="password" id="master-new-password" name="new_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<input type="password" id="master-new-password" name="new_password" minlength="3" maxlength="128" autocomplete="new-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-new-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div class="form-group mt"><label for="master-confirm-password">Confirmar nova senha</label>'+
-      '<input type="password" id="master-confirm-password" name="confirm_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<input type="password" id="master-confirm-password" name="confirm_password" minlength="3" maxlength="128" autocomplete="new-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-confirm-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div id="admin-security-password-error" role="alert"></div>'+
      '<button type="submit" class="button mt">Salvar nova senha</button>'+
@@ -1273,9 +1234,9 @@ document.addEventListener('click',async e=>{
  switch(action){
   case 'close':closeModal();break;
   case 'open-register':registerModal(id);break;
-  case 'member-login':case 'member-email-login':openMemberEmailLogin();break;
-  case 'member-create':openMemberSignup();break;
-  case 'member-reset':openMemberReset();break;
+  case 'member-login':case 'member-email-login':if(confirmMemberFormExit())openMemberEmailLogin();break;
+  case 'member-create':if(confirmMemberFormExit())openMemberSignup();break;
+
   case 'member-tab':state.memberTab=target.dataset.tab;await renderMy();break;
   case 'toggle-account-password':{
     const possible=['user-new-password','user-old-password','user-confirm-password'];
@@ -1284,22 +1245,7 @@ document.addEventListener('click',async e=>{
     el.type=el.type==='password'?'text':'password';
     target.textContent=el.type==='text'?'Ocultar senha':'Mostrar senha';break;
   }
-  case 'admin-reset-member':{
-    if(!confirm('Gerar um novo código de redefinição? A senha anterior será invalidada e o jogador precisará criar outra.'))break;
-    try{
-      const reset=await window.FUTEBOL_memberAccounts.adminReset(id);
-      await reloadAdmin();
-      modal('Código para redefinir senha','Entregue o código manualmente ao jogador, sem SMS.',
-       '<div class="highlight-bar"><strong>'+escapeHTML(reset.member.name||reset.member.email)+'</strong>'+
-       '<p>Este código aparece apenas agora, expira em 60 minutos e pode ser utilizado uma única vez.</p></div>'+
-       '<div class="form-group mt"><label>Código de recuperação</label>'+
-       '<input class="form-control" readonly value="'+escapeHTML(reset.code)+'"/></div>'+
-       '<p class="notice">Copie o código e compartilhe individualmente, por um canal de sua escolha. Não envie em grupo público.</p>'+
-       '<div class="form-actions"><button class="button button-secondary" data-action="close">Fechar</button>'+
-       '<button class="button" data-action="copy" data-text="'+escapeHTML(reset.code)+'">Copiar código</button></div>');
-    }catch(err){toast(err.message,true);}
-    break;
-  }
+
   case 'member-profile':openProfile();break;
   case 'member-logout':showLogoutDialog('member');break;
   case 'member-access':
@@ -1450,7 +1396,7 @@ document.addEventListener('click',async e=>{
     break;
   }
   case 'restore-registration':if(confirm('Restaurar a inscrição? A vaga paga só será recuperada se houver capacidade.')){try{await api(`/api/admin/registrations/${id}/restore`,{method:'POST'});await reloadAdmin();toast('Inscrição restaurada e registrada no histórico.')}catch(err){toast(err.message,true)}}break;
-  case 'reset-simulacao':if(confirm('Reiniciar a simulação de 07/11? As mudanças feitas neste navegador serão descartadas, sem afetar o banco real.')){localStorage.removeItem('futebol_demo_07nov2026_v1');location.reload()}break;
+  case 'reset-simulacao':if(confirm('Reiniciar apenas a simulação de 14/11? A lista e as alterações dessa simulação serão descartadas neste navegador, sem afetar o histórico de 07/11.')){localStorage.removeItem(DBKEY);location.reload()}break;
   case 'sim-deadline':await adminAction('sim-deadline');break;
   case 'sim-full-paid':await adminAction('sim-full-paid');break;
   case 'confirm':case 'cancel-admin':case 'attendance':case 'draw-teams':case 'dismiss-notice':
@@ -1458,9 +1404,9 @@ document.addEventListener('click',async e=>{
  }
 });
 document.addEventListener('submit',async e=>{
- if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','member-email-login-form','member-signup-form','member-reset-form','member-account-password-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
+ if(!['registration-form','admin-login-form','pix-form','match-form','member-profile-form','member-email-login-form','member-signup-form','member-account-password-form','stats-form','broadcast-form','payment-time-form','manual-promotion-form','rotation-form','ranking-period-form','admin-manual-member-form','demo-admin-lock-form','admin-security-password-form','admin-security-email-form'].includes(e.target.getAttribute('id')))return;
  e.preventDefault();const form=e.target;
- if(['member-email-login-form','member-signup-form','member-reset-form','member-account-password-form'].includes(form.id)){
+ if(['member-email-login-form','member-signup-form','member-account-password-form'].includes(form.id)){
   const data=new FormData(form),button=form.querySelector('[type=submit]');setLoading(button,true);
   const field=name=>String(data.get(name)||'');
   const errTarget=form.id==='member-account-password-form'?'#member-account-error':'#member-auth-error';
@@ -1477,9 +1423,9 @@ document.addEventListener('submit',async e=>{
       else if(form.id==='member-signup-form')member=await window.FUTEBOL_memberAccounts.signup({
        name:field('name'),email:field('email'),phone:field('phone'),password:field('password'),confirmation:field('confirm_password')
       });
-      else member=await window.FUTEBOL_memberAccounts.redeemReset(field('email'),field('code'),field('password'),field('confirm_password'));
+      else throw Error('Fluxo de acesso desconhecido.');
       state.member=member;state.memberTab='inscricoes';
-      closeModal();
+      closeModal(true);
       if(state.pendingMatchID){const matchId=state.pendingMatchID;state.pendingMatchID=null;registerModal(matchId)}
       else nav('my');
       toast('Acesso de demonstração autorizado.');

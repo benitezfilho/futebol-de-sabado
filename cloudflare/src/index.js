@@ -1,4 +1,5 @@
 import { validateMatch, paymentDue } from "./logic.js";
+import { authRoute, masterAccountRoute, portalRoute } from "./auth.js";
 
 const now = () => new Date().toISOString();
 function reply(data,status=200,headers={}) {
@@ -102,6 +103,16 @@ export default {
        const match=await env.DB.prepare(listing+" WHERE m.id=? AND m.status='active' GROUP BY m.id").bind(path.split("/")[3]).first();
        return match?reply({match},200,headers):fail("Partida não encontrada",404,headers);
      }
+     if(path.startsWith("/api/auth/")) {
+       const r=await authRoute(request,env.DB,path);
+       const h=new Headers(r.headers);for(const [k,v] of Object.entries(headers))h.set(k,v);
+       return new Response(r.body,{status:r.status,headers:h});
+     }
+     if(path.startsWith("/api/portal/")) {
+       const r=await portalRoute(request,env.DB,path,ctx,env);
+       const h=new Headers(r.headers);for(const [k,v] of Object.entries(headers))h.set(k,v);
+       return new Response(r.body,{status:r.status,headers:h});
+     }
      if(path==="/api/member/register")return fail("Inscrições reais bloqueadas até ativar verificação segura do membro",503,headers);
      if(!path.startsWith("/api/admin/"))return fail("Rota não encontrada",404,headers);
      // Fail closed: todo acesso Master exige sessão verificada pelo Cloudflare Access.
@@ -113,6 +124,11 @@ export default {
      if(String(verified?.email||"").trim().toLowerCase()!==masterEmail)return fail("Identidade Master não autorizada",403,headers);
      if(!env.MASTER_API_KEY || env.MASTER_API_KEY.length<32)return fail("Segredo MASTER_API_KEY não configurado",503,headers);
      if(!await allowMaster(request,env))return fail("Master não autorizado",401,headers);
+     if(path==="/api/admin/accounts" || /^\/api\/admin\/accounts\/[a-f0-9-]{36}\/(reset-password|disable)$/.test(path)) {
+       const r=await masterAccountRoute(request,env.DB,path);
+       const h=new Headers(r.headers);for(const [k,v] of Object.entries(headers))h.set(k,v);
+       return new Response(r.body,{status:r.status,headers:h});
+     }
      if(request.method==="POST" && path==="/api/admin/matches")return reply({id:await createMatch(env.DB,await body(request))},201,headers);
      if(request.method==="PATCH" && /^\/api\/admin\/matches\/[a-f0-9-]{36}$/.test(path)) {
        const id=path.split("/")[4],ok=await updateMatch(env.DB,id,await body(request));

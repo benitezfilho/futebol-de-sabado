@@ -4,7 +4,7 @@
 (function(){
 "use strict";
 const KEY="futebol_demo_admin_lock_v1";
-const MIN=10,ITERATIONS=250000;
+const MIN=3,ITERATIONS=250000;
 function read(){
   try{const record=JSON.parse(localStorage.getItem(KEY)||"null");
     return record && record.version===1 && typeof record.salt==="string" && typeof record.hash==="string"?record:null;
@@ -33,9 +33,7 @@ function normalizedEmail(email){
 function checkPassword(password,confirmation){
  if(password!==confirmation)throw new Error("A confirmação não corresponde à senha.");
  if(typeof password!=="string"||password.length<MIN || password.length>128)
-   throw new Error("Use uma senha de 10 a 128 caracteres.");
- if(!/[a-zA-ZÀ-ÿ]/.test(password)||!/\d/.test(password))
-   throw new Error("Inclua pelo menos uma letra e um número.");
+   throw new Error("Use uma senha de 3 a 128 caracteres na demonstração.");
  if(/^(demo123|1234567890|admin123456|password123)$/i.test(password))
    throw new Error("Essa senha de teste é conhecida. Escolha outra.");
 }
