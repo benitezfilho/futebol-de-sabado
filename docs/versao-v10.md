@@ -142,3 +142,10 @@ Esses ajustes estão somente na branch `feature/v10-d1-auth`; **a V9 publicada c
 - Testes adicionados em `cloudflare/tests/logout-ui.test.js`. A execução ainda precisa ser confirmada no GitHub Actions.
 
 A V9 publicada não recebeu alterações.
+
+## Senha simplificada somente na demonstração (12/11/2026)
+- A senha **local de demonstração** de membro e Admin Master passa a aceitar **3 a 128 caracteres**. Campos de cadastro, confirmação de senha, alteração de senha e validação local foram ajustados.
+- A verificação de confirmação permanece obrigatória. Trata-se de um modo de testes com dados fictícios; **não utilizar a senha de três caracteres em contas reais**.
+- A API de autenticação real do Cloudflare D1 **mantém o mínimo de 12 caracteres** por segurança.
+- Adicionado teste de regressão em `cloudflare/tests/demo-password-length.test.js`.
+- **V9 publicada e branch main não foram alteradas**; a V10 segue em homologação.
