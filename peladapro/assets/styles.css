@@ -11,3 +11,8 @@ label{display:block;font-weight:700;font-size:.88rem;margin:16px 0 7px}input{wid
 form .button{margin-top:18px}button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}.status{min-height:20px;color:#c7e5df;font-size:.86rem;margin-top:12px;overflow-wrap:anywhere}.stat{padding:17px;background:var(--panel2);border-radius:13px}.stat strong{font-size:1.4rem;display:block}.section{margin-top:30px}
 footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.82rem}
 @media(max-width:720px){.grid,.grid.two{grid-template-columns:1fr}.head{align-items:flex-start;flex-direction:column}.head nav{gap:10px;flex-wrap:wrap}main{padding-top:23px}.card{padding:19px}.hero{padding-top:4px}}
+
+/* Botões Sair permanecem ocultos até a sessão ser validada */
+[hidden],.hidden{display:none!important}
+.header-logout{margin:0;padding:8px 12px;font-size:.83rem}
+@media(max-width:720px){.header-logout{font-size:.8rem}}
