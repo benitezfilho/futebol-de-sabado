@@ -133,3 +133,12 @@ O guard atual do Master consulta `ctx.access.getIdentity()`. Essa interface **n�
 - Testes estáticos iniciais em `cloudflare/tests/demo-14nov.test.js`.
 
 Esses ajustes estão somente na branch `feature/v10-d1-auth`; **a V9 publicada continua exatamente como antes**. Não há propagação de dados entre dispositivos nem alteração no D1 remoto.
+
+## Logout visível em todos os perfis
+- Cada portal V10 (`jogador`, `admin`, `master`) exibe o botão **Sair** no cabeçalho **após validação da sessão**. O botão interno no painel foi mantido para facilitar o acesso pelo celular.
+- O botão chama `POST /api/auth/logout`, exclui o token de sessão da aba e retorna à tela de login. Se a API estiver indisponível, a sessão local é encerrada e aparece um aviso de que não foi possível confirmar a revogação remota.
+- Na demonstração isolada da branch V10, o cabeçalho também disponibiliza **Sair da conta** para membros e **Sair do Master** para o Admin Master. O modal de confirmação existente continua funcionando.
+- Quando não houver sessão, os botões ficam ocultos (inclusive se outros estilos CSS forem aplicados).
+- Testes adicionados em `cloudflare/tests/logout-ui.test.js`. A execução ainda precisa ser confirmada no GitHub Actions.
+
+A V9 publicada não recebeu alterações.
