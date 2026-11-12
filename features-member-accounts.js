@@ -20,7 +20,7 @@
  function validPassword(value,confirmation){
   const p=String(value||"");
   if(p!==String(confirmation||""))throw Error("A confirmação não corresponde à nova senha.");
-  if(p.length<10||p.length>128||!/[a-zA-ZÀ-ÿ]/.test(p)||!/\d/.test(p))throw Error("Use de 10 a 128 caracteres, com letra e número.");
+  if(p.length<3||p.length>128)throw Error("Use de 3 a 128 caracteres na demonstração.");
   if(/^(demo123|1234567890|admin123456|password123)$/i.test(p))throw Error("Não utilize uma senha comum de demonstração.");
  }
  function load(){
