@@ -749,13 +749,13 @@ async function renderAdmin(){
                 class="form-control" placeholder="seu@email.com" value="${configured?escapeHTML(window.FUTEBOL_demoAuth.getEmail()):''}"/>
               <small class="muted">Este e-mail ainda não recebe códigos. A validação real será feita pela Cloudflare.</small></div>`:
               '<p class="notice">Este navegador já possui senha da demonstração. Após entrar, acesse Segurança Master para vincular seu e-mail.</p>'}
-            <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 10 caracteres, letra e número)'}</label>
+            <div class="form-group mt"><label for="demo-admin-pass">${configured?'Senha':'Criar senha (mínimo 3 caracteres, somente demonstração)'}</label>
               <input id="demo-admin-pass" name="password" type="password" class="form-control"
-                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'10'}" maxlength="128" required/>
+                autocomplete="${configured?'current-password':'new-password'}" minlength="${configured?'1':'3'}" maxlength="128" required/>
               <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-pass" aria-pressed="false">Mostrar senha</button></div>
             ${configured?'':`<div class="form-group mt"><label for="demo-admin-confirm">Confirmar senha</label>
               <input id="demo-admin-confirm" name="confirm_password" type="password" class="form-control"
-               autocomplete="new-password" minlength="10" maxlength="128" required/>
+               autocomplete="new-password" minlength="3" maxlength="128" required/>
               <button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="demo-admin-confirm" aria-pressed="false">Mostrar senha</button></div>`}
             <div id="admin-error" role="alert"></div>
             <button type="submit" class="button button-block mt">${configured?'Entrar no Admin Master':'Definir senha e entrar'}</button>
@@ -933,8 +933,8 @@ function renderMemberAccount(){
    '<div class="roster-group"><h3>Alterar minha senha</h3>'+
     '<form id="member-account-password-form" autocomplete="off">'+
      '<div class="form-group"><label>Senha atual</label><input class="form-control" name="current_password" id="user-old-password" type="password" autocomplete="current-password" required></div>'+
-     '<div class="form-group mt"><label>Nova senha</label><input class="form-control" id="user-new-password" name="new_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
-     '<div class="form-group mt"><label>Confirmar nova senha</label><input class="form-control" id="user-confirm-password" name="confirm_password" minlength="10" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<div class="form-group mt"><label>Nova senha</label><input class="form-control" id="user-new-password" name="new_password" minlength="3" maxlength="128" type="password" autocomplete="new-password" required></div>'+
+     '<div class="form-group mt"><label>Confirmar nova senha</label><input class="form-control" id="user-confirm-password" name="confirm_password" minlength="3" maxlength="128" type="password" autocomplete="new-password" required></div>'+
      '<button type="button" class="button button-sm button-outline mt" data-action="toggle-account-password" data-target="user-new-password">Mostrar / ocultar nova senha</button>'+
      '<div id="member-account-error"></div>'+
      '<button class="button mt" type="submit">Salvar nova senha</button></form>'+
@@ -975,8 +975,8 @@ function openMemberSignup(){
    '<div class="form-group"><label>Nome completo</label><input class="form-control" name="name" minlength="5" maxlength="100" required></div>'+
    '<div class="form-grid mt"><div class="form-group"><label>E-mail</label><input type="email" class="form-control" name="email" required></div>'+
    '<div class="form-group"><label>Celular com DDD</label><input type="tel" class="form-control" name="phone" placeholder="(62) 99999-1234" required></div></div>'+
-   '<div class="form-grid mt"><div class="form-group"><label>Senha</label><input type="password" class="form-control" name="password" minlength="10" maxlength="128" required></div>'+
-   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="10" maxlength="128" required></div></div>'+
+   '<div class="form-grid mt"><div class="form-group"><label>Senha</label><input type="password" class="form-control" name="password" minlength="3" maxlength="128" required></div>'+
+   '<div class="form-group"><label>Confirmar senha</label><input type="password" class="form-control" name="confirm_password" minlength="3" maxlength="128" required></div></div>'+
    '<p class="notice mt">Use somente dados fictícios para testar. Esta demonstração não comprova a titularidade do e-mail ou telefone.</p>'+
    '<div id="member-auth-error"></div><div class="form-actions">'+
    '<button type="button" class="button button-secondary" data-action="member-email-login">Já tenho conta</button>'+
@@ -999,10 +999,10 @@ function renderAdminSecurity(){
       '<input type="password" id="master-old-password" name="current_password" autocomplete="current-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-old-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div class="form-group mt"><label for="master-new-password">Nova senha</label>'+
-      '<input type="password" id="master-new-password" name="new_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<input type="password" id="master-new-password" name="new_password" minlength="3" maxlength="128" autocomplete="new-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-new-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div class="form-group mt"><label for="master-confirm-password">Confirmar nova senha</label>'+
-      '<input type="password" id="master-confirm-password" name="confirm_password" minlength="10" maxlength="128" autocomplete="new-password" class="form-control" required>'+
+      '<input type="password" id="master-confirm-password" name="confirm_password" minlength="3" maxlength="128" autocomplete="new-password" class="form-control" required>'+
       '<button type="button" class="button button-sm button-outline mt" data-action="toggle-admin-password" data-target="master-confirm-password" aria-pressed="false">Mostrar senha</button></div>'+
      '<div id="admin-security-password-error" role="alert"></div>'+
      '<button type="submit" class="button mt">Salvar nova senha</button>'+
